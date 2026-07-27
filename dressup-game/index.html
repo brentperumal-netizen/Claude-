@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runway Ready — Dress-Up Fashion Show</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="app-header">
+    <h1>✨ Runway Ready</h1>
+    <p class="subtitle">Dress your model, then send her down the runway!</p>
+  </header>
+
+  <main class="layout">
+
+    <!-- STAGE -->
+    <section class="stage-panel" id="stage-panel">
+      <div class="stage" id="stage">
+        <div class="stage-lights"></div>
+        <svg id="character" viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- BODY (skin) -->
+          <g id="layer-body">
+            <line id="arm-left" x1="125" y1="168" x2="93" y2="272" stroke-linecap="round"></line>
+            <line id="arm-right" x1="175" y1="168" x2="207" y2="272" stroke-linecap="round"></line>
+            <circle id="hand-left" cx="93" cy="272" r="12"></circle>
+            <circle id="hand-right" cx="207" cy="272" r="12"></circle>
+
+            <line id="leg-left" x1="133" y1="248" x2="127" y2="445" stroke-linecap="round"></line>
+            <line id="leg-right" x1="167" y1="248" x2="173" y2="445" stroke-linecap="round"></line>
+
+            <rect id="torso" x="106" y="148" width="88" height="108" rx="38"></rect>
+            <rect id="neck" x="137" y="132" width="26" height="26" rx="8"></rect>
+            <circle id="head" cx="150" cy="93" r="48"></circle>
+          </g>
+
+          <!-- HAIR (back layer, sits behind/around head) -->
+          <g id="layer-hair"></g>
+
+          <!-- FACE -->
+          <g id="layer-face">
+            <ellipse cx="118" cy="102" rx="9" ry="5.5" class="blush"></ellipse>
+            <ellipse cx="182" cy="102" rx="9" ry="5.5" class="blush"></ellipse>
+            <ellipse cx="132" cy="90" rx="4" ry="6" class="eye"></ellipse>
+            <ellipse cx="168" cy="90" rx="4" ry="6" class="eye"></ellipse>
+            <path d="M125,108 Q150,122 175,108" class="mouth"></path>
+          </g>
+
+          <!-- SHOES (under outfit hem, above feet) -->
+          <g id="layer-shoes"></g>
+
+          <!-- OUTFIT -->
+          <g id="layer-outfit"></g>
+
+          <!-- ACCESSORIES -->
+          <g id="layer-hat"></g>
+          <g id="layer-glasses"></g>
+          <g id="layer-necklace"></g>
+          <g id="layer-bag"></g>
+
+        </svg>
+
+        <div class="confetti-layer" id="confetti-layer"></div>
+      </div>
+
+      <div class="stage-actions">
+        <button id="randomize-btn" class="btn btn-ghost">🎲 Surprise Me</button>
+        <button id="show-btn" class="btn btn-primary">🎬 Start Fashion Show</button>
+      </div>
+
+      <div class="judging" id="judging" hidden>
+        <div class="score" id="score-display"></div>
+        <p class="comment" id="comment-display"></p>
+      </div>
+    </section>
+
+    <!-- CONTROLS -->
+    <section class="control-panel">
+      <nav class="tabs" id="tabs">
+        <button class="tab active" data-tab="skin">Skin</button>
+        <button class="tab" data-tab="hair">Hair</button>
+        <button class="tab" data-tab="outfit">Outfit</button>
+        <button class="tab" data-tab="shoes">Shoes</button>
+        <button class="tab" data-tab="accessories">Accessories</button>
+        <button class="tab" data-tab="background">Runway</button>
+      </nav>
+
+      <div class="tab-panels">
+
+        <div class="tab-panel active" data-panel="skin">
+          <h2>Skin Tone</h2>
+          <div class="swatch-row" id="skin-swatches"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="hair">
+          <h2>Style</h2>
+          <div class="option-row" id="hair-styles"></div>
+          <h2>Color</h2>
+          <div class="swatch-row" id="hair-colors"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="outfit">
+          <h2>Style</h2>
+          <div class="option-row" id="outfit-styles"></div>
+          <h2>Color</h2>
+          <div class="swatch-row" id="outfit-colors"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="shoes">
+          <h2>Style</h2>
+          <div class="option-row" id="shoe-styles"></div>
+          <h2>Color</h2>
+          <div class="swatch-row" id="shoe-colors"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="accessories">
+          <h2>Add-ons</h2>
+          <div class="option-row" id="accessory-toggles"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="background">
+          <h2>Backdrop</h2>
+          <div class="option-row" id="background-styles"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">Made for the runway 💅</footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
