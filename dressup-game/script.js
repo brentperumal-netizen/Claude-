@@ -1,3 +1,47 @@
+// ---------- Color & geometry helpers ----------
+
+function hexToRgb(hex) {
+  const n = parseInt(hex.replace('#', ''), 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+function rgbToHex(r, g, b) {
+  const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
+  return '#' + [r, g, b].map((v) => clamp(v).toString(16).padStart(2, '0')).join('');
+}
+
+function lighten(hex, amt) {
+  const { r, g, b } = hexToRgb(hex);
+  return rgbToHex(r + (255 - r) * amt, g + (255 - g) * amt, b + (255 - b) * amt);
+}
+
+function darken(hex, amt) {
+  const { r, g, b } = hexToRgb(hex);
+  return rgbToHex(r * (1 - amt), g * (1 - amt), b * (1 - amt));
+}
+
+function setGradient(gradId, baseColor, lightAmt, darkAmt) {
+  const light = document.getElementById(`${gradId}-light`);
+  const base = document.getElementById(`${gradId}-base`);
+  const dark = document.getElementById(`${gradId}-dark`);
+  if (light) light.setAttribute('stop-color', lighten(baseColor, lightAmt));
+  if (base) base.setAttribute('stop-color', baseColor);
+  if (dark) dark.setAttribute('stop-color', darken(baseColor, darkAmt));
+}
+
+// Builds a tapered "capsule" outline between two circles (r1 at x1,y1 and r2 at x2,y2),
+// used to draw limbs as real tapered shapes instead of uniform-width strokes.
+function capsulePath(x1, y1, r1, x2, y2, r2) {
+  const perp = Math.atan2(y2 - y1, x2 - x1) + Math.PI / 2;
+  const cos = Math.cos(perp);
+  const sin = Math.sin(perp);
+  const p1a = [x1 + r1 * cos, y1 + r1 * sin];
+  const p1b = [x1 - r1 * cos, y1 - r1 * sin];
+  const p2a = [x2 + r2 * cos, y2 + r2 * sin];
+  const p2b = [x2 - r2 * cos, y2 - r2 * sin];
+  return `M${p1a[0]},${p1a[1]} L${p2a[0]},${p2a[1]} A${r2},${r2} 0 0 0 ${p2b[0]},${p2b[1]} L${p1b[0]},${p1b[1]} A${r1},${r1} 0 0 0 ${p1a[0]},${p1a[1]} Z`;
+}
+
 // ---------- Data ----------
 
 const BODY_TYPES = [
@@ -143,16 +187,18 @@ const OUTFIT_COLORS = ['#e0558f', '#8c5ce0', '#5cc4e0', '#43b581', '#f2c94c', '#
 
 const SHOE_STYLES = [
   { id: 'heels', label: 'Heels', emoji: '👠',
-    svg: `<path d="M108,440 Q106,432 118,430 Q140,428 149,440 Q152,446 146,449 L112,452 Q104,450 108,440 Z"/>
-          <path d="M110,449 L118,451 L114,463 L108,461 Z"/>
-          <rect x="107" y="461" width="8" height="4" rx="1.5" fill="#8a6247"/>
-          <path d="M112,431 L127,426 L140,432 L127,435 Z" fill="#8a6247"/>
-          <ellipse cx="127" cy="466" rx="16" ry="3" fill="#000000" opacity="0.2"/>
-          <path d="M154,440 Q152,432 164,430 Q186,428 195,440 Q198,446 192,449 L158,452 Q150,450 154,440 Z"/>
-          <path d="M156,449 L164,451 L160,463 L154,461 Z"/>
-          <rect x="153" y="461" width="8" height="4" rx="1.5" fill="#8a6247"/>
-          <path d="M158,431 L173,426 L186,432 L173,435 Z" fill="#8a6247"/>
-          <ellipse cx="173" cy="466" rx="16" ry="3" fill="#000000" opacity="0.2"/>` },
+    svg: `<ellipse cx="127" cy="497" rx="9" ry="3" fill="#000000" opacity="0.22"/>
+          <path d="M123,449 L131,449 L128,495 L126,495 Z"/>
+          <path d="M113,428 Q127,420 141,428 Q145,440 141,452 Q136,462 127,464 Q118,462 113,452 Q109,440 113,428 Z"/>
+          <path d="M113,431 Q127,437 141,431 L141,436 Q127,442 113,436 Z" fill="#8a6247"/>
+          <circle cx="141" cy="433" r="2.6" fill="#8a6247"/>
+          <path d="M119,435 Q127,439 135,435" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.3"/>
+          <ellipse cx="173" cy="497" rx="9" ry="3" fill="#000000" opacity="0.22"/>
+          <path d="M169,449 L177,449 L174,495 L172,495 Z"/>
+          <path d="M159,428 Q173,420 187,428 Q191,440 187,452 Q182,462 173,464 Q164,462 159,452 Q155,440 159,428 Z"/>
+          <path d="M159,431 Q173,437 187,431 L187,436 Q173,442 159,436 Z" fill="#8a6247"/>
+          <circle cx="187" cy="433" r="2.6" fill="#8a6247"/>
+          <path d="M165,435 Q173,439 181,435" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.3"/>` },
   { id: 'flats', label: 'Flats', emoji: '🥿',
     svg: `<ellipse cx="127" cy="454" rx="22" ry="6" fill="#000000" opacity="0.25"/>
           <ellipse cx="127" cy="447" rx="21" ry="10"/>
@@ -361,7 +407,7 @@ function frecklesSVG() {
 
 function buildFaceSVG(face, hairColor) {
   return `
-    ${face.blush ? `<ellipse cx="118" cy="102" rx="9" ry="5.5" fill="#ff8fa3" opacity="0.4"/><ellipse cx="182" cy="102" rx="9" ry="5.5" fill="#ff8fa3" opacity="0.4"/>` : ''}
+    ${face.blush ? `<ellipse cx="130" cy="104" rx="8" ry="5.5" fill="#ff8fa3" opacity="0.45"/><ellipse cx="170" cy="104" rx="8" ry="5.5" fill="#ff8fa3" opacity="0.45"/>` : ''}
     ${face.freckles ? frecklesSVG() : ''}
     <path d="M147,97 Q150,101 148,102.5" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="1.2" stroke-linecap="round"/>
     ${eyeShapeSVG(face.eyeShape, 132, -1, face.eyeColor)}
@@ -669,27 +715,34 @@ function applyBodyGeometry(root, bodyTypeId) {
   const armRightShine = root.querySelector('#arm-right-shine');
   const legLeftShine = root.querySelector('#leg-left-shine');
   const legRightShine = root.querySelector('#leg-right-shine');
-  const armLeftOutline = root.querySelector('#arm-left-outline');
-  const armRightOutline = root.querySelector('#arm-right-outline');
-  const legLeftOutline = root.querySelector('#leg-left-outline');
-  const legRightOutline = root.querySelector('#leg-right-outline');
+  const armLeftOutline = root.querySelector('#arm-left-outline, .p-arm-left-outline');
+  const armRightOutline = root.querySelector('#arm-right-outline, .p-arm-right-outline');
+  const legLeftOutline = root.querySelector('#leg-left-outline, .p-leg-left-outline');
+  const legRightOutline = root.querySelector('#leg-right-outline, .p-leg-right-outline');
   const handLeftDetail = root.querySelector('#hand-left-detail');
   const handRightDetail = root.querySelector('#hand-right-detail');
 
-  [armLeft, armRight, legLeft, legRight].forEach((l) => l && l.setAttribute('stroke-width', bt.limbWidth));
-  [armLeftShine, armRightShine, legLeftShine, legRightShine].forEach((l) => l && l.setAttribute('stroke-width', Math.max(2, bt.limbWidth * 0.3)));
-  [armLeftOutline, armRightOutline, legLeftOutline, legRightOutline].forEach((l) => l && l.setAttribute('stroke-width', bt.limbWidth + 3));
-
   const lx = 93 - bt.armSpread;
   const rx = 207 + bt.armSpread;
-  if (armLeft) armLeft.setAttribute('x2', lx);
+  const rUpper = bt.limbWidth / 2 * 1.15;
+  const rLower = bt.limbWidth / 2 * 0.68;
+  const outlineGrow = 2;
+
+  if (armLeft) armLeft.setAttribute('d', capsulePath(125, 168, rUpper, lx, 272, rLower));
+  if (armRight) armRight.setAttribute('d', capsulePath(175, 168, rUpper, rx, 272, rLower));
+  if (armLeftOutline) armLeftOutline.setAttribute('d', capsulePath(125, 168, rUpper + outlineGrow, lx, 272, rLower + outlineGrow));
+  if (armRightOutline) armRightOutline.setAttribute('d', capsulePath(175, 168, rUpper + outlineGrow, rx, 272, rLower + outlineGrow));
+  if (legLeft) legLeft.setAttribute('d', capsulePath(133, 248, rUpper, 127, 445, rLower));
+  if (legRight) legRight.setAttribute('d', capsulePath(167, 248, rUpper, 173, 445, rLower));
+  if (legLeftOutline) legLeftOutline.setAttribute('d', capsulePath(133, 248, rUpper + outlineGrow, 127, 445, rLower + outlineGrow));
+  if (legRightOutline) legRightOutline.setAttribute('d', capsulePath(167, 248, rUpper + outlineGrow, 173, 445, rLower + outlineGrow));
+
+  [armLeftShine, armRightShine, legLeftShine, legRightShine].forEach((l) => l && l.setAttribute('stroke-width', Math.max(2, bt.limbWidth * 0.22)));
+
   if (handLeft) handLeft.setAttribute('cx', lx);
-  if (armRight) armRight.setAttribute('x2', rx);
   if (handRight) handRight.setAttribute('cx', rx);
   if (armLeftShine) armLeftShine.setAttribute('x2', lx);
   if (armRightShine) armRightShine.setAttribute('x2', rx);
-  if (armLeftOutline) armLeftOutline.setAttribute('x2', lx);
-  if (armRightOutline) armRightOutline.setAttribute('x2', rx);
   if (handLeftDetail) handLeftDetail.setAttribute('transform', `translate(${lx},272)`);
   if (handRightDetail) handRightDetail.setAttribute('transform', `translate(${rx},272)`);
 }
@@ -700,19 +753,21 @@ function render() {
   applyBodyGeometry(document, state.bodyType);
 
   // skin
+  setGradient('skinGradient', state.skin, 0.35, 0.22);
   const skinEls = ['torso', 'neck', 'head', 'arm-left', 'arm-right', 'hand-left', 'hand-right', 'leg-left', 'leg-right', 'ear-left', 'ear-right'];
   skinEls.forEach((id) => {
     const node = document.getElementById(id);
     if (node.tagName === 'line') node.setAttribute('stroke', state.skin);
-    else node.setAttribute('fill', state.skin);
+    else node.setAttribute('fill', 'url(#skinGradient)');
   });
 
   // hair
+  setGradient('hairGradient', state.hair.color, 0.3, 0.35);
   const hairLayer = document.getElementById('layer-hair');
   const hairDef = HAIR_STYLES.find((h) => h.id === state.hair.style);
   hairLayer.innerHTML = hairDef.svg;
-  hairLayer.setAttribute('fill', state.hair.color);
-  hairLayer.setAttribute('stroke', state.hair.color);
+  hairLayer.setAttribute('fill', 'url(#hairGradient)');
+  hairLayer.setAttribute('stroke', darken(state.hair.color, 0.35));
 
   // face
   document.getElementById('layer-face').innerHTML = buildFaceSVG(state.face, state.hair.color);
@@ -724,18 +779,20 @@ function render() {
   if (outfitDef.fixedColor) {
     outfitLayer.removeAttribute('fill');
   } else {
-    outfitLayer.setAttribute('fill', state.outfit.color);
+    setGradient('outfitGradient', state.outfit.color, 0.4, 0.3);
+    outfitLayer.setAttribute('fill', 'url(#outfitGradient)');
   }
   document.getElementById('outfit-color-label').hidden = !!outfitDef.fixedColor;
   document.getElementById('outfit-colors').hidden = !!outfitDef.fixedColor;
   document.getElementById('outfit-fixed-note').hidden = !outfitDef.fixedColor;
 
   // shoes
+  setGradient('shoeGradient', state.shoes.color, 0.35, 0.3);
   const shoeLayer = document.getElementById('layer-shoes');
   const shoeDef = SHOE_STYLES.find((s) => s.id === state.shoes.style);
   shoeLayer.innerHTML = shoeDef.svg;
-  shoeLayer.setAttribute('fill', state.shoes.color);
-  shoeLayer.setAttribute('stroke', state.shoes.color);
+  shoeLayer.setAttribute('fill', 'url(#shoeGradient)');
+  shoeLayer.setAttribute('stroke', darken(state.shoes.color, 0.4));
 
   // accessories
   ACCESSORIES.forEach((acc) => {
@@ -869,34 +926,72 @@ function launchConfetti(layer) {
 
 // ---------- Wardrobe ----------
 
-function buildDollSVG(look) {
+function buildDollSVG(look, idSuffix = '') {
   const bt = BODY_TYPES.find((b) => b.id === look.bodyType);
   const hairDef = HAIR_STYLES.find((h) => h.id === look.hair.style);
   const outfitDef = OUTFIT_STYLES.find((o) => o.id === look.outfit.style);
   const shoeDef = SHOE_STYLES.find((s) => s.id === look.shoes.style);
   const lx = 93 - bt.armSpread;
   const rxHand = 207 + bt.armSpread;
-  const outfitFill = outfitDef.fixedColor ? 'none' : look.outfit.color;
 
   const accSvg = ACCESSORIES.filter((a) => look.accessories && look.accessories[a.id])
     .map((a) => `<g fill="${a.color}" stroke="${a.color}">${a.svg}</g>`)
     .join('');
 
   const face = look.face || DEFAULT_FACE;
-  const shineWidth = Math.max(2, bt.limbWidth * 0.3);
+  const rUpper = bt.limbWidth / 2 * 1.15;
+  const rLower = bt.limbWidth / 2 * 0.68;
+  const outlineGrow = 2;
+  const shineWidth = Math.max(2, bt.limbWidth * 0.22);
 
-  const outlineWidth = bt.limbWidth + 3;
+  const skinGrad = `skinGrad${idSuffix}`;
+  const hairGrad = `hairGrad${idSuffix}`;
+  const outfitGrad = `outfitGrad${idSuffix}`;
+  const shoeGrad = `shoeGrad${idSuffix}`;
+
+  const skin = lighten(look.skin, 0.35);
+  const skinBase = look.skin;
+  const skinDark = darken(look.skin, 0.22);
+  const hairLight = lighten(look.hair.color, 0.3);
+  const hairDark = darken(look.hair.color, 0.35);
+  const outfitLight = lighten(look.outfit.color, 0.4);
+  const outfitDark = darken(look.outfit.color, 0.3);
+  const shoeLight = lighten(look.shoes.color, 0.35);
+  const shoeDark = darken(look.shoes.color, 0.3);
+  const outfitFill = outfitDef.fixedColor ? 'none' : `url(#${outfitGrad})`;
 
   return `
-    <g fill="${look.skin}" stroke="${look.skin}">
-      <line x1="125" y1="168" x2="${lx}" y2="272" stroke="rgba(40,28,20,0.28)" stroke-width="${outlineWidth}" stroke-linecap="round"/>
-      <line x1="175" y1="168" x2="${rxHand}" y2="272" stroke="rgba(40,28,20,0.28)" stroke-width="${outlineWidth}" stroke-linecap="round"/>
-      <line x1="125" y1="168" x2="${lx}" y2="272" stroke-width="${bt.limbWidth}" stroke-linecap="round"/>
-      <line x1="175" y1="168" x2="${rxHand}" y2="272" stroke-width="${bt.limbWidth}" stroke-linecap="round"/>
+    <defs>
+      <linearGradient id="${skinGrad}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${skin}"/>
+        <stop offset="55%" stop-color="${skinBase}"/>
+        <stop offset="100%" stop-color="${skinDark}"/>
+      </linearGradient>
+      <linearGradient id="${hairGrad}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${hairLight}"/>
+        <stop offset="55%" stop-color="${look.hair.color}"/>
+        <stop offset="100%" stop-color="${hairDark}"/>
+      </linearGradient>
+      <linearGradient id="${outfitGrad}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${outfitLight}"/>
+        <stop offset="55%" stop-color="${look.outfit.color}"/>
+        <stop offset="100%" stop-color="${outfitDark}"/>
+      </linearGradient>
+      <linearGradient id="${shoeGrad}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${shoeLight}"/>
+        <stop offset="55%" stop-color="${look.shoes.color}"/>
+        <stop offset="100%" stop-color="${shoeDark}"/>
+      </linearGradient>
+    </defs>
+    <g fill="url(#${skinGrad})">
+      <path d="${capsulePath(125, 168, rUpper + outlineGrow, lx, 272, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${capsulePath(175, 168, rUpper + outlineGrow, rxHand, 272, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${capsulePath(125, 168, rUpper, lx, 272, rLower)}"/>
+      <path d="${capsulePath(175, 168, rUpper, rxHand, 272, rLower)}"/>
       <line x1="125" y1="168" x2="${lx}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.28"/>
       <line x1="175" y1="168" x2="${rxHand}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.28"/>
-      <circle cx="${lx}" cy="272" r="12" stroke="rgba(40,28,20,0.28)" stroke-width="1.5"/>
-      <circle cx="${rxHand}" cy="272" r="12" stroke="rgba(40,28,20,0.28)" stroke-width="1.5"/>
+      <ellipse cx="${lx}" cy="272" rx="10" ry="12" stroke="rgba(40,28,20,0.28)" stroke-width="1.5"/>
+      <ellipse cx="${rxHand}" cy="272" rx="10" ry="12" stroke="rgba(40,28,20,0.28)" stroke-width="1.5"/>
       <g transform="translate(${lx},272)" opacity="0.35">
         <line x1="-7" y1="6" x2="-9" y2="12" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"/>
         <line x1="0" y1="9" x2="0" y2="16" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"/>
@@ -907,10 +1002,10 @@ function buildDollSVG(look) {
         <line x1="0" y1="9" x2="0" y2="16" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"/>
         <line x1="7" y1="6" x2="9" y2="12" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"/>
       </g>
-      <line x1="133" y1="248" x2="127" y2="445" stroke="rgba(40,28,20,0.28)" stroke-width="${outlineWidth}" stroke-linecap="round"/>
-      <line x1="167" y1="248" x2="173" y2="445" stroke="rgba(40,28,20,0.28)" stroke-width="${outlineWidth}" stroke-linecap="round"/>
-      <line x1="133" y1="248" x2="127" y2="445" stroke-width="${bt.limbWidth}" stroke-linecap="round"/>
-      <line x1="167" y1="248" x2="173" y2="445" stroke-width="${bt.limbWidth}" stroke-linecap="round"/>
+      <path d="${capsulePath(133, 248, rUpper + outlineGrow, 127, 445, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${capsulePath(167, 248, rUpper + outlineGrow, 173, 445, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${capsulePath(133, 248, rUpper, 127, 445, rLower)}"/>
+      <path d="${capsulePath(167, 248, rUpper, 173, 445, rLower)}"/>
       <line x1="133" y1="248" x2="127" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
       <line x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
       <rect x="106" y="148" width="88" height="108" rx="${bt.torsoRx}" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
@@ -918,12 +1013,11 @@ function buildDollSVG(look) {
       <ellipse cx="104" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"/>
       <ellipse cx="196" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"/>
       <circle cx="150" cy="93" r="48" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
-      <ellipse cx="133" cy="82" rx="13" ry="9" fill="#ffffff" opacity="0.16"/>
-      <ellipse cx="150" cy="136" rx="22" ry="7" fill="#000000" opacity="0.05"/>
+      <ellipse cx="128" cy="72" rx="10" ry="7" fill="#ffffff" opacity="0.35"/>
     </g>
-    <g fill="${look.hair.color}" stroke="${look.hair.color}">${hairDef.svg}</g>
+    <g fill="url(#${hairGrad})" stroke="${hairDark}">${hairDef.svg}</g>
     <g>${buildFaceSVG(face, look.hair.color)}</g>
-    <g fill="${look.shoes.color}" stroke="${look.shoes.color}">${shoeDef.svg}</g>
+    <g fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g>
     <g fill="${outfitFill}">${outfitDef.svg}</g>
     ${accSvg}
   `;
@@ -941,7 +1035,7 @@ function renderWardrobe() {
     const bgDef = BACKGROUNDS.find((b) => b.id === preset.look.background);
     card.innerHTML = `
       <div class="thumb" style="background:${bgDef.gradient}">
-        <svg viewBox="0 0 300 520">${buildDollSVG(preset.look)}</svg>
+        <svg viewBox="0 0 300 520">${buildDollSVG(preset.look, preset.id)}</svg>
       </div>
       <span class="label">${preset.label}</span>
       <span class="theme-tag">${themeDef.emoji} ${themeDef.label}</span>
@@ -1079,7 +1173,7 @@ function resetGameState() {
   gameWorld.querySelectorAll('.game-character').forEach((c) => c.remove());
   gameCharacterEl = document.createElement('div');
   gameCharacterEl.className = 'game-character';
-  gameCharacterEl.innerHTML = `<svg viewBox="0 -10 300 480" preserveAspectRatio="xMidYMax meet">${buildDollSVG(state)}</svg>`;
+  gameCharacterEl.innerHTML = `<svg viewBox="0 -10 300 480" preserveAspectRatio="xMidYMax meet">${buildDollSVG(state, 'game')}</svg>`;
   gameWorld.appendChild(gameCharacterEl);
 
   const bgDef = BACKGROUNDS.find((b) => b.id === state.background);

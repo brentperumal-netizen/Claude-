@@ -85,42 +85,63 @@
         <div class="stage-lights"></div>
         <div class="ambient-layer" id="ambient-layer"></div>
         <svg id="character" viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="skinGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop id="skinGradient-light" offset="0%" stop-color="#ffe0bd"></stop>
+              <stop id="skinGradient-base" offset="55%" stop-color="#ffe0bd"></stop>
+              <stop id="skinGradient-dark" offset="100%" stop-color="#e0ac69"></stop>
+            </linearGradient>
+            <linearGradient id="hairGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop id="hairGradient-light" offset="0%" stop-color="#4b4b4b"></stop>
+              <stop id="hairGradient-base" offset="55%" stop-color="#2b2b2b"></stop>
+              <stop id="hairGradient-dark" offset="100%" stop-color="#000000"></stop>
+            </linearGradient>
+            <linearGradient id="outfitGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop id="outfitGradient-light" offset="0%" stop-color="#ec84ac"></stop>
+              <stop id="outfitGradient-base" offset="55%" stop-color="#e0558f"></stop>
+              <stop id="outfitGradient-dark" offset="100%" stop-color="#a83568"></stop>
+            </linearGradient>
+            <linearGradient id="shoeGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop id="shoeGradient-light" offset="0%" stop-color="#4b4b4b"></stop>
+              <stop id="shoeGradient-base" offset="55%" stop-color="#2b2b2b"></stop>
+              <stop id="shoeGradient-dark" offset="100%" stop-color="#000000"></stop>
+            </linearGradient>
+          </defs>
 
           <!-- BODY (skin) -->
           <g id="layer-body">
-            <line id="arm-left-outline" x1="125" y1="168" x2="93" y2="272" stroke="rgba(40,28,20,0.28)" stroke-linecap="round"></line>
-            <line id="arm-right-outline" x1="175" y1="168" x2="207" y2="272" stroke="rgba(40,28,20,0.28)" stroke-linecap="round"></line>
-            <line id="arm-left" x1="125" y1="168" x2="93" y2="272" stroke-linecap="round"></line>
-            <line id="arm-right" x1="175" y1="168" x2="207" y2="272" stroke-linecap="round"></line>
-            <line id="arm-left-shine" x1="125" y1="168" x2="93" y2="272" stroke="#ffffff" stroke-linecap="round" opacity="0.28"></line>
-            <line id="arm-right-shine" x1="175" y1="168" x2="207" y2="272" stroke="#ffffff" stroke-linecap="round" opacity="0.28"></line>
-            <circle id="hand-left" cx="93" cy="272" r="12" stroke="rgba(40,28,20,0.28)" stroke-width="1.5"></circle>
-            <circle id="hand-right" cx="207" cy="272" r="12" stroke="rgba(40,28,20,0.28)" stroke-width="1.5"></circle>
+            <path id="arm-left-outline" fill="rgba(40,28,20,0.28)"></path>
+            <path id="arm-right-outline" fill="rgba(40,28,20,0.28)"></path>
+            <path id="arm-left"></path>
+            <path id="arm-right"></path>
+            <line id="arm-left-shine" x1="125" y1="168" x2="93" y2="272" stroke="#ffffff" stroke-linecap="round" opacity="0.3"></line>
+            <line id="arm-right-shine" x1="175" y1="168" x2="207" y2="272" stroke="#ffffff" stroke-linecap="round" opacity="0.3"></line>
+            <ellipse id="hand-left" cx="93" cy="272" rx="10" ry="12" stroke="rgba(40,28,20,0.28)" stroke-width="1.5"></ellipse>
+            <ellipse id="hand-right" cx="207" cy="272" rx="10" ry="12" stroke="rgba(40,28,20,0.28)" stroke-width="1.5"></ellipse>
             <g id="hand-left-detail" transform="translate(93,272)" opacity="0.35">
-              <line x1="-7" y1="6" x2="-9" y2="12" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
-              <line x1="0" y1="9" x2="0" y2="16" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
-              <line x1="7" y1="6" x2="9" y2="12" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
+              <line x1="-6" y1="7" x2="-8" y2="13" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
+              <line x1="0" y1="10" x2="0" y2="17" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
+              <line x1="6" y1="7" x2="8" y2="13" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
             </g>
             <g id="hand-right-detail" transform="translate(207,272)" opacity="0.35">
-              <line x1="-7" y1="6" x2="-9" y2="12" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
-              <line x1="0" y1="9" x2="0" y2="16" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
-              <line x1="7" y1="6" x2="9" y2="12" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
+              <line x1="-6" y1="7" x2="-8" y2="13" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
+              <line x1="0" y1="10" x2="0" y2="17" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
+              <line x1="6" y1="7" x2="8" y2="13" stroke="#2b1c14" stroke-width="1.2" stroke-linecap="round"></line>
             </g>
 
-            <line id="leg-left-outline" x1="133" y1="248" x2="127" y2="445" stroke="rgba(40,28,20,0.28)" stroke-linecap="round"></line>
-            <line id="leg-right-outline" x1="167" y1="248" x2="173" y2="445" stroke="rgba(40,28,20,0.28)" stroke-linecap="round"></line>
-            <line id="leg-left" x1="133" y1="248" x2="127" y2="445" stroke-linecap="round"></line>
-            <line id="leg-right" x1="167" y1="248" x2="173" y2="445" stroke-linecap="round"></line>
-            <line id="leg-left-shine" x1="133" y1="248" x2="127" y2="445" stroke="#ffffff" stroke-linecap="round" opacity="0.22"></line>
-            <line id="leg-right-shine" x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-linecap="round" opacity="0.22"></line>
+            <path id="leg-left-outline" fill="rgba(40,28,20,0.28)"></path>
+            <path id="leg-right-outline" fill="rgba(40,28,20,0.28)"></path>
+            <path id="leg-left"></path>
+            <path id="leg-right"></path>
+            <line id="leg-left-shine" x1="133" y1="248" x2="127" y2="445" stroke="#ffffff" stroke-linecap="round" opacity="0.24"></line>
+            <line id="leg-right-shine" x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-linecap="round" opacity="0.24"></line>
 
             <rect id="torso" x="106" y="148" width="88" height="108" rx="38" stroke="rgba(40,28,20,0.22)" stroke-width="2"></rect>
             <rect id="neck" x="137" y="132" width="26" height="26" rx="8" stroke="rgba(40,28,20,0.18)" stroke-width="1.5"></rect>
             <ellipse id="ear-left" cx="104" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"></ellipse>
             <ellipse id="ear-right" cx="196" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"></ellipse>
             <circle id="head" cx="150" cy="93" r="48" stroke="rgba(40,28,20,0.22)" stroke-width="2"></circle>
-            <ellipse id="head-highlight" cx="133" cy="82" rx="13" ry="9" fill="#ffffff" opacity="0.16"></ellipse>
-            <ellipse id="head-shadow" cx="150" cy="136" rx="22" ry="7" fill="#000000" opacity="0.05"></ellipse>
+            <ellipse id="head-highlight" cx="128" cy="72" rx="10" ry="7" fill="#ffffff" opacity="0.35"></ellipse>
           </g>
 
           <!-- HAIR -->
