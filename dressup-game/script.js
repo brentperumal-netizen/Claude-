@@ -18,11 +18,14 @@ const HAIR_STYLES = [
   { id: 'bob', label: 'Bob', emoji: '💇‍♀️',
     svg: `<path d="M98,80 A58,58 0 0 1 202,80 Z"/>
           <rect x="98" y="80" width="20" height="60" rx="10"/>
-          <rect x="182" y="80" width="20" height="60" rx="10"/>` },
+          <rect x="182" y="80" width="20" height="60" rx="10"/>
+          <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
   { id: 'long', label: 'Long Wave', emoji: '🌊',
     svg: `<path d="M96,82 A60,60 0 0 1 204,82 Z"/>
           <rect x="92" y="82" width="22" height="180" rx="11"/>
-          <rect x="186" y="82" width="22" height="180" rx="11"/>` },
+          <rect x="186" y="82" width="22" height="180" rx="11"/>
+          <path d="M110,64 Q127,52 146,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
+          <path d="M100,110 Q103,160 98,200" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.18"/>` },
   { id: 'curly', label: 'Curly', emoji: '✨',
     svg: `<circle cx="108" cy="72" r="17"/>
           <circle cx="128" cy="50" r="20"/>
@@ -32,35 +35,55 @@ const HAIR_STYLES = [
           <circle cx="98" cy="98" r="15"/>
           <circle cx="202" cy="98" r="15"/>
           <circle cx="104" cy="122" r="13"/>
-          <circle cx="196" cy="122" r="13"/>` },
+          <circle cx="196" cy="122" r="13"/>
+          <path d="M138,36 Q150,29 162,36" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
+          <circle cx="118" cy="58" r="3" fill="#ffffff" opacity="0.22"/>` },
   { id: 'ponytail', label: 'Ponytail', emoji: '🎀',
     svg: `<path d="M98,80 A58,58 0 0 1 202,80 Z"/>
           <rect x="98" y="80" width="18" height="40" rx="9"/>
           <rect x="184" y="80" width="18" height="40" rx="9"/>
-          <path d="M198,70 q34,10 26,90 q-4,26 -26,30 q14,-40 4,-70 q-6,-24 -4,-50 Z"/>` },
+          <path d="M198,70 q34,10 26,90 q-4,26 -26,30 q14,-40 4,-70 q-6,-24 -4,-50 Z"/>
+          <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
+          <path d="M204,90 Q214,130 202,165" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.2"/>` },
   { id: 'none', label: 'Bald', emoji: '⚪', svg: `` },
   { id: 'crop', label: 'Short Crop', emoji: '💈',
-    svg: `<path d="M100,78 A52,52 0 0 1 200,78 L198,96 A50,42 0 0 0 102,96 Z"/>` },
+    svg: `<path d="M100,78 A52,52 0 0 1 200,78 L198,96 A50,42 0 0 0 102,96 Z"/>
+          <path d="M116,64 Q128,56 140,60" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>` },
 ];
 
 const HAIR_COLORS = ['#2b2b2b', '#4b2e1e', '#8a5a2b', '#d9b45a', '#e0558f', '#8c5ce0', '#5cc4e0', '#e0e0e0'];
 
 const OUTFIT_STYLES = [
   { id: 'aline', label: 'A-Line Dress', emoji: '👗',
-    svg: `<path d="M118,150 L182,150 L214,340 Q150,358 86,340 Z"/>` },
+    svg: `<path d="M118,150 L182,150 L214,340 Q150,358 86,340 Z"/>
+          <path d="M125,156 L120,328" fill="none" stroke="#ffffff" stroke-width="6" opacity="0.15" stroke-linecap="round"/>
+          <path d="M96,252 Q150,260 204,252" fill="none" stroke="#000000" stroke-width="2" opacity="0.12"/>
+          <path d="M118,150 L182,150 L179,164 L121,164 Z" fill="#000000" opacity="0.08"/>` },
   { id: 'mermaid', label: 'Mermaid Gown', emoji: '💃',
-    svg: `<path d="M120,150 L180,150 L184,300 Q214,330 200,400 L100,400 Q86,330 116,300 Z"/>` },
+    svg: `<path d="M120,150 L180,150 L184,300 Q214,330 200,400 L100,400 Q86,330 116,300 Z"/>
+          <path d="M128,158 L126,288" fill="none" stroke="#ffffff" stroke-width="5" opacity="0.16" stroke-linecap="round"/>
+          <path d="M104,318 Q150,330 196,318" fill="none" stroke="#000000" stroke-width="2" opacity="0.12"/>
+          <path d="M120,150 L180,150 L177,163 L123,163 Z" fill="#000000" opacity="0.08"/>` },
   { id: 'jumpsuit', label: 'Jumpsuit', emoji: '👖',
     svg: `<path d="M118,150 L182,150 L188,250 L150,262 L112,250 Z"/>
           <path d="M112,250 L150,262 L146,430 L108,430 Z"/>
-          <path d="M188,250 L150,262 L154,430 L192,430 Z"/>` },
+          <path d="M188,250 L150,262 L154,430 L192,430 Z"/>
+          <line x1="150" y1="152" x2="150" y2="248" stroke="#000000" stroke-width="1.4" opacity="0.15"/>
+          <path d="M122,262 L118,418" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.15" stroke-linecap="round"/>
+          <path d="M118,150 L182,150 L179,164 L121,164 Z" fill="#000000" opacity="0.08"/>` },
   { id: 'skirtset', label: 'Top & Skirt', emoji: '🩱',
     svg: `<rect x="114" y="150" width="72" height="66" rx="16"/>
-          <path d="M108,216 L192,216 L216,326 Q150,342 84,326 Z"/>` },
+          <path d="M108,216 L192,216 L216,326 Q150,342 84,326 Z"/>
+          <path d="M108,232 L84,320" fill="none" stroke="#ffffff" stroke-width="5" opacity="0.15" stroke-linecap="round"/>
+          <path d="M118,230 Q150,236 182,230" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.12"/>
+          <rect x="114" y="150" width="72" height="12" rx="6" fill="#000000" opacity="0.08"/>` },
   { id: 'suit', label: 'Suit', emoji: '🤵',
     svg: `<path d="M112,150 L188,150 L184,250 L150,236 L116,250 Z"/>
           <path d="M112,250 L150,236 L146,430 L108,430 Z"/>
           <path d="M188,250 L150,236 L154,430 L192,430 Z"/>
+          <path d="M112,150 L136,150 L128,176 Z" fill="#000000" opacity="0.14"/>
+          <path d="M188,150 L164,150 L172,176 Z" fill="#000000" opacity="0.14"/>
+          <path d="M120,160 L118,238" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.14" stroke-linecap="round"/>
           <path d="M136,150 L164,150 L150,208 Z" fill="#fdfdfd"/>
           <path d="M144,150 L156,150 L152,190 L148,192 Z" fill="#7a1f2b"/>` },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
@@ -136,16 +159,21 @@ const SHOE_COLORS = ['#2b2b2b', '#8a5a2b', '#e0558f', '#ffffff', '#c68642', '#5c
 
 const ACCESSORIES = [
   { id: 'hat', label: 'Hat', emoji: '🎩', color: '#b83c6f',
-    svg: `<ellipse cx="150" cy="40" rx="48" ry="16"/><circle cx="150" cy="24" r="6"/>` },
+    svg: `<ellipse cx="150" cy="40" rx="48" ry="16"/><circle cx="150" cy="24" r="6"/>
+          <path d="M112,36 Q150,25 188,36" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.25" stroke-linecap="round"/>` },
   { id: 'glasses', label: 'Glasses', emoji: '🕶️', color: '#2b2b2b',
-    svg: `<circle cx="132" cy="90" r="15" fill="none" stroke-width="4"/>
+    svg: `<circle cx="132" cy="90" r="13" fill="#8ec9e0" opacity="0.2"/>
+          <circle cx="168" cy="90" r="13" fill="#8ec9e0" opacity="0.2"/>
+          <circle cx="132" cy="90" r="15" fill="none" stroke-width="4"/>
           <circle cx="168" cy="90" r="15" fill="none" stroke-width="4"/>
           <line x1="147" y1="90" x2="153" y2="90" stroke-width="4"/>
           <line x1="117" y1="88" x2="105" y2="82" stroke-width="4"/>
-          <line x1="183" y1="88" x2="195" y2="82" stroke-width="4"/>` },
+          <line x1="183" y1="88" x2="195" y2="82" stroke-width="4"/>
+          <path d="M126,85 Q131,82 136,85" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.5" stroke-linecap="round"/>` },
   { id: 'necklace', label: 'Necklace', emoji: '📿', color: '#f2c94c',
     svg: `<path d="M133,155 Q150,175 167,155" fill="none" stroke-width="4"/>
-          <circle cx="150" cy="176" r="5"/>` },
+          <circle cx="150" cy="176" r="5"/>
+          <circle cx="148" cy="174" r="1.4" fill="#ffffff" opacity="0.7"/>` },
   { id: 'bag', label: 'Handbag', emoji: '👛', color: '#8c5ce0',
     svg: `<rect x="192" y="278" width="34" height="28" rx="6"/>
           <path d="M198,278 Q209,258 220,278" fill="none" stroke-width="4"/>` },
@@ -181,12 +209,16 @@ const ACCESSORIES = [
           <path d="M228,240 l4,-8 l4,8 l8,4 l-8,4 l-4,8 l-4,-8 l-8,-4 Z" fill="#f2c94c"/>` },
   { id: 'tiara', label: 'Tiara', emoji: '👑', unlockLevel: 2, color: '#f2c94c',
     svg: `<path d="M112,50 L130,30 L150,42 L170,30 L188,50 Z" stroke="#c98f1f" stroke-width="2"/>
-          <circle cx="150" cy="36" r="4" fill="#fff7d6"/>` },
+          <circle cx="150" cy="36" r="4" fill="#fff7d6"/>
+          <circle cx="151" cy="34" r="1.2" fill="#ffffff" opacity="0.8"/>` },
   { id: 'diamond-necklace', label: 'Diamond Necklace', emoji: '💎', unlockLevel: 3, color: '#bfe9ff',
     svg: `<path d="M128,155 Q150,180 172,155" fill="none" stroke-width="3"/>
           <circle cx="150" cy="182" r="6"/>
           <circle cx="136" cy="172" r="3.5"/>
-          <circle cx="164" cy="172" r="3.5"/>` },
+          <circle cx="164" cy="172" r="3.5"/>
+          <circle cx="151" cy="180" r="1.6" fill="#ffffff" opacity="0.8"/>
+          <circle cx="137" cy="170" r="1" fill="#ffffff" opacity="0.7"/>
+          <circle cx="165" cy="170" r="1" fill="#ffffff" opacity="0.7"/>` },
   { id: 'star-earrings', label: 'Star Earrings', emoji: '⭐', unlockLevel: 4, color: '#f2c94c',
     svg: `<path d="M100,108 l2,-5 l2,5 l5,2 l-5,2 l-2,5 l-2,-5 l-5,-2 Z"/>
           <path d="M200,108 l2,-5 l2,5 l5,2 l-5,2 l-2,5 l-2,-5 l-5,-2 Z"/>` },
@@ -195,8 +227,110 @@ const ACCESSORIES = [
           <circle cx="150" cy="18" r="5" fill="#e05c5c"/>
           <circle cx="122" cy="40" r="4" fill="#5cc4e0"/>
           <circle cx="178" cy="40" r="4" fill="#5cc4e0"/>
-          <rect x="104" y="56" width="92" height="8" rx="3"/>` },
+          <rect x="104" y="56" width="92" height="8" rx="3"/>
+          <circle cx="148" cy="16" r="1.4" fill="#ffffff" opacity="0.8"/>
+          <circle cx="121" cy="38" r="1" fill="#ffffff" opacity="0.7"/>
+          <circle cx="177" cy="38" r="1" fill="#ffffff" opacity="0.7"/>` },
 ];
+
+const EYE_SHAPES = [
+  { id: 'round', label: 'Round', emoji: '●' },
+  { id: 'almond', label: 'Almond', emoji: '◔' },
+  { id: 'sleepy', label: 'Sleepy', emoji: '⌣' },
+  { id: 'wide', label: 'Wide', emoji: '◎' },
+];
+
+const EYE_COLORS = ['#3b2417', '#5b3a29', '#4a7043', '#3a6ea5', '#6b6b6b', '#9c6b2e'];
+
+const EYEBROW_SHAPES = [
+  { id: 'soft', label: 'Soft Arch', emoji: '⌒' },
+  { id: 'straight', label: 'Straight', emoji: '—' },
+  { id: 'thick', label: 'Bold', emoji: '▬' },
+];
+
+const MOUTH_SHAPES = [
+  { id: 'smile', label: 'Smile', emoji: '🙂' },
+  { id: 'grin', label: 'Grin', emoji: '😁' },
+  { id: 'neutral', label: 'Neutral', emoji: '😐' },
+  { id: 'surprised', label: 'Surprised', emoji: '😮' },
+];
+
+const LIP_COLORS = ['#d9a98c', '#c9707d', '#c0293b', '#e0558f', '#e8836b', '#8c4a6b'];
+
+const DEFAULT_FACE = {
+  eyeShape: 'round',
+  eyeColor: '#3b2417',
+  eyebrowShape: 'soft',
+  mouth: 'smile',
+  lipColor: '#c9707d',
+  blush: true,
+  freckles: false,
+};
+
+function eyeShapeSVG(shape, cx, side, color) {
+  const outline = '#2b2b2b';
+  if (shape === 'almond') {
+    return `<ellipse cx="${cx}" cy="90" rx="8" ry="5" fill="#ffffff" stroke="${outline}" stroke-width="0.6"/>
+            <circle cx="${cx}" cy="90" r="3" fill="${color}"/>
+            <circle cx="${cx}" cy="90" r="1.2" fill="#1a1a1a"/>
+            <circle cx="${cx - 1}" cy="88" r="0.8" fill="#ffffff"/>
+            <line x1="${cx + side * 8}" y1="88" x2="${cx + side * 11}" y2="86" stroke="${outline}" stroke-width="1.2" stroke-linecap="round"/>`;
+  }
+  if (shape === 'sleepy') {
+    return `<ellipse cx="${cx}" cy="91" rx="7" ry="3.4" fill="#ffffff" stroke="${outline}" stroke-width="0.6"/>
+            <circle cx="${cx}" cy="91.5" r="2.6" fill="${color}"/>
+            <circle cx="${cx}" cy="91.5" r="1.1" fill="#1a1a1a"/>
+            <path d="M${cx - 7},88.5 Q${cx},85.3 ${cx + 7},88.5" fill="none" stroke="${outline}" stroke-width="1.3" stroke-linecap="round"/>`;
+  }
+  if (shape === 'wide') {
+    return `<ellipse cx="${cx}" cy="89" rx="8.5" ry="7.5" fill="#ffffff" stroke="${outline}" stroke-width="0.6"/>
+            <circle cx="${cx}" cy="89.5" r="3.6" fill="${color}"/>
+            <circle cx="${cx}" cy="89.5" r="1.5" fill="#1a1a1a"/>
+            <circle cx="${cx - 1.4}" cy="86.8" r="1" fill="#ffffff"/>`;
+  }
+  return `<ellipse cx="${cx}" cy="90" rx="7" ry="6.5" fill="#ffffff" stroke="${outline}" stroke-width="0.6"/>
+          <circle cx="${cx}" cy="90" r="3.2" fill="${color}"/>
+          <circle cx="${cx}" cy="90" r="1.3" fill="#1a1a1a"/>
+          <circle cx="${cx - 1.2}" cy="87.5" r="0.9" fill="#ffffff"/>`;
+}
+
+function eyebrowSVG(shape, cx, color) {
+  if (shape === 'straight') return `<line x1="${cx - 9}" y1="78" x2="${cx + 9}" y2="76" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
+  if (shape === 'thick') return `<path d="M${cx - 11},81 Q${cx},72 ${cx + 11},77" fill="none" stroke="${color}" stroke-width="4.2" stroke-linecap="round"/>`;
+  return `<path d="M${cx - 10},80 Q${cx},74 ${cx + 10},78" fill="none" stroke="${color}" stroke-width="2.6" stroke-linecap="round"/>`;
+}
+
+function mouthSVG(shape, lipColor) {
+  if (shape === 'grin') {
+    return `<path d="M122,106 Q150,126 178,106 Q150,120 122,106 Z" fill="${lipColor}"/>
+            <path d="M132,110 Q150,116 168,110 L166,113 Q150,117 134,113 Z" fill="#ffffff"/>`;
+  }
+  if (shape === 'neutral') return `<line x1="132" y1="112" x2="168" y2="112" stroke="${lipColor}" stroke-width="3" stroke-linecap="round"/>`;
+  if (shape === 'surprised') return `<ellipse cx="150" cy="114" rx="6" ry="8" fill="#7a2f36" stroke="${lipColor}" stroke-width="2.5"/>`;
+  return `<path d="M125,108 Q150,122 175,108" fill="none" stroke="${lipColor}" stroke-width="3.4" stroke-linecap="round"/>`;
+}
+
+function frecklesSVG() {
+  return `<circle cx="122" cy="98" r="1" fill="#9c6b4a" opacity="0.55"/>
+          <circle cx="127" cy="94" r="1" fill="#9c6b4a" opacity="0.55"/>
+          <circle cx="118" cy="93" r="0.8" fill="#9c6b4a" opacity="0.5"/>
+          <circle cx="178" cy="98" r="1" fill="#9c6b4a" opacity="0.55"/>
+          <circle cx="173" cy="94" r="1" fill="#9c6b4a" opacity="0.55"/>
+          <circle cx="182" cy="93" r="0.8" fill="#9c6b4a" opacity="0.5"/>`;
+}
+
+function buildFaceSVG(face, hairColor) {
+  return `
+    ${face.blush ? `<ellipse cx="118" cy="102" rx="9" ry="5.5" fill="#ff8fa3" opacity="0.4"/><ellipse cx="182" cy="102" rx="9" ry="5.5" fill="#ff8fa3" opacity="0.4"/>` : ''}
+    ${face.freckles ? frecklesSVG() : ''}
+    <path d="M147,97 Q150,101 148,102.5" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="1.2" stroke-linecap="round"/>
+    ${eyeShapeSVG(face.eyeShape, 132, -1, face.eyeColor)}
+    ${eyeShapeSVG(face.eyeShape, 168, 1, face.eyeColor)}
+    ${eyebrowSVG(face.eyebrowShape, 132, hairColor)}
+    ${eyebrowSVG(face.eyebrowShape, 168, hairColor)}
+    ${mouthSVG(face.mouth, face.lipColor)}
+  `;
+}
 
 const BACKGROUNDS = [
   { id: 'pink', label: 'Pink Runway', emoji: '🎀', gradient: 'linear-gradient(180deg, #ffd6ec 0%, #ffb6d9 55%, #ff9fce 100%)' },
@@ -232,19 +366,23 @@ const WARDROBE_PRESETS = [
   { id: 'sharp-suit', label: 'Sharp Suit', theme: 'classic',
     look: { bodyType: 'masculine', skin: SKIN_TONES[4], hair: { style: 'none', color: '#2b2b2b' },
       outfit: { style: 'suit', color: '#2b2b2b' }, shoes: { style: 'boots', color: '#2b2b2b' },
-      accessories: { glasses: true }, background: 'gold' } },
+      accessories: { glasses: true }, background: 'gold',
+      face: { eyebrowShape: 'straight', mouth: 'neutral', blush: false } } },
   { id: 'santas-helper', label: "Santa's Helper", theme: 'christmas',
     look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'ponytail', color: '#8a5a2b' },
       outfit: { style: 'elf-costume', color: '#1e7a46' }, shoes: { style: 'boots', color: '#8a5a2b' },
-      accessories: { 'santa-hat': true, 'candy-cane': true }, background: 'christmas-snow' } },
+      accessories: { 'santa-hat': true, 'candy-cane': true }, background: 'christmas-snow',
+      face: { mouth: 'grin' } } },
   { id: 'winter-belle', label: 'Winter Belle', theme: 'christmas',
     look: { bodyType: 'feminine', skin: SKIN_TONES[2], hair: { style: 'long', color: '#d9b45a' },
       outfit: { style: 'santa-dress', color: '#c1272d' }, shoes: { style: 'flats', color: '#ffffff' },
-      accessories: { snowflake: true }, background: 'christmas-snow' } },
+      accessories: { snowflake: true }, background: 'christmas-snow',
+      face: { eyeShape: 'almond', lipColor: '#c0293b' } } },
   { id: 'woodland-fairy', label: 'Woodland Fairy', theme: 'fairy',
     look: { bodyType: 'neutral', skin: SKIN_TONES[1], hair: { style: 'curly', color: '#8c5ce0' },
       outfit: { style: 'fairy-dress', color: '#c9a6ff' }, shoes: { style: 'flats', color: '#c9a6ff' },
-      accessories: { 'fairy-wings': true, 'flower-crown': true, wand: true }, background: 'fairy-glade' } },
+      accessories: { 'fairy-wings': true, 'flower-crown': true, wand: true }, background: 'fairy-glade',
+      face: { eyeShape: 'wide', eyeColor: '#4a7043', freckles: true } } },
 ];
 
 // ---------- Leveling / unlocks ----------
@@ -296,6 +434,7 @@ const state = {
   bodyType: 'feminine',
   theme: 'classic',
   skin: SKIN_TONES[0],
+  face: { ...DEFAULT_FACE },
   hair: { style: 'bob', color: HAIR_COLORS[0] },
   outfit: { style: 'aline', color: OUTFIT_COLORS[0] },
   shoes: { style: 'heels', color: SHOE_COLORS[0] },
@@ -363,6 +502,39 @@ buildOptionButtons(document.getElementById('theme-pills'), THEMES, (id) => {
 
 buildSwatches(document.getElementById('skin-swatches'), SKIN_TONES, (c) => {
   state.skin = c;
+  render();
+});
+
+buildOptionButtons(document.getElementById('eye-shapes'), EYE_SHAPES, (id) => {
+  state.face.eyeShape = id;
+  render();
+});
+
+buildSwatches(document.getElementById('eye-colors'), EYE_COLORS, (c) => {
+  state.face.eyeColor = c;
+  render();
+});
+
+buildOptionButtons(document.getElementById('eyebrow-shapes'), EYEBROW_SHAPES, (id) => {
+  state.face.eyebrowShape = id;
+  render();
+});
+
+buildOptionButtons(document.getElementById('mouth-shapes'), MOUTH_SHAPES, (id) => {
+  state.face.mouth = id;
+  render();
+});
+
+buildSwatches(document.getElementById('lip-colors'), LIP_COLORS, (c) => {
+  state.face.lipColor = c;
+  render();
+});
+
+buildOptionButtons(document.getElementById('face-extras'), [
+  { id: 'blush', label: 'Blush', emoji: '🌸' },
+  { id: 'freckles', label: 'Freckles', emoji: '⁘' },
+], (id) => {
+  state.face[id] = !state.face[id];
   render();
 });
 
@@ -453,8 +625,13 @@ function applyBodyGeometry(root, bodyTypeId) {
   const legRight = root.querySelector('#leg-right, .p-leg-right');
   const handLeft = root.querySelector('#hand-left, .p-hand-left');
   const handRight = root.querySelector('#hand-right, .p-hand-right');
+  const armLeftShine = root.querySelector('#arm-left-shine');
+  const armRightShine = root.querySelector('#arm-right-shine');
+  const legLeftShine = root.querySelector('#leg-left-shine');
+  const legRightShine = root.querySelector('#leg-right-shine');
 
   [armLeft, armRight, legLeft, legRight].forEach((l) => l && l.setAttribute('stroke-width', bt.limbWidth));
+  [armLeftShine, armRightShine, legLeftShine, legRightShine].forEach((l) => l && l.setAttribute('stroke-width', Math.max(2, bt.limbWidth * 0.3)));
 
   const lx = 93 - bt.armSpread;
   const rx = 207 + bt.armSpread;
@@ -462,6 +639,8 @@ function applyBodyGeometry(root, bodyTypeId) {
   if (handLeft) handLeft.setAttribute('cx', lx);
   if (armRight) armRight.setAttribute('x2', rx);
   if (handRight) handRight.setAttribute('cx', rx);
+  if (armLeftShine) armLeftShine.setAttribute('x2', lx);
+  if (armRightShine) armRightShine.setAttribute('x2', rx);
 }
 
 // ---------- Render (main stage) ----------
@@ -483,6 +662,9 @@ function render() {
   hairLayer.innerHTML = hairDef.svg;
   hairLayer.setAttribute('fill', state.hair.color);
   hairLayer.setAttribute('stroke', state.hair.color);
+
+  // face
+  document.getElementById('layer-face').innerHTML = buildFaceSVG(state.face, state.hair.color);
 
   // outfit
   const outfitLayer = document.getElementById('layer-outfit');
@@ -525,6 +707,11 @@ function render() {
   highlightSelection('#bodytype-pills', state.bodyType, 'id');
   highlightSelection('#theme-pills', state.theme, 'id');
   highlightSelection('#skin-swatches', state.skin, 'color');
+  highlightSelection('#eye-shapes', state.face.eyeShape, 'id');
+  highlightSelection('#eye-colors', state.face.eyeColor, 'color');
+  highlightSelection('#eyebrow-shapes', state.face.eyebrowShape, 'id');
+  highlightSelection('#mouth-shapes', state.face.mouth, 'id');
+  highlightSelection('#lip-colors', state.face.lipColor, 'color');
   highlightSelection('#hair-colors', state.hair.color, 'color');
   highlightSelection('#outfit-colors', state.outfit.color, 'color');
   highlightSelection('#shoe-colors', state.shoes.color, 'color');
@@ -535,6 +722,9 @@ function render() {
 
   document.querySelectorAll('#accessory-toggles .option-btn').forEach((btn) => {
     btn.classList.toggle('selected', !!state.accessories[btn.dataset.id]);
+  });
+  document.querySelectorAll('#face-extras .option-btn').forEach((btn) => {
+    btn.classList.toggle('selected', !!state.face[btn.dataset.id]);
   });
 }
 
@@ -594,10 +784,19 @@ function spawnSparkle() {
 document.getElementById('randomize-btn').addEventListener('click', () => {
   state.bodyType = pick(BODY_TYPES).id;
   state.skin = pick(SKIN_TONES);
-  state.hair = { style: pick(HAIR_STYLES.filter(itemVisible)).id, color: pick(HAIR_COLORS) };
-  state.outfit = { style: pick(OUTFIT_STYLES.filter(itemVisible)).id, color: pick(OUTFIT_COLORS) };
-  state.shoes = { style: pick(SHOE_STYLES.filter(itemVisible)).id, color: pick(SHOE_COLORS) };
-  ACCESSORIES.filter(itemVisible).forEach((a) => { state.accessories[a.id] = Math.random() > 0.5; });
+  state.face = {
+    eyeShape: pick(EYE_SHAPES).id,
+    eyeColor: pick(EYE_COLORS),
+    eyebrowShape: pick(EYEBROW_SHAPES).id,
+    mouth: pick(MOUTH_SHAPES).id,
+    lipColor: pick(LIP_COLORS),
+    blush: Math.random() > 0.3,
+    freckles: Math.random() > 0.6,
+  };
+  state.hair = { style: pick(HAIR_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(HAIR_COLORS) };
+  state.outfit = { style: pick(OUTFIT_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(OUTFIT_COLORS) };
+  state.shoes = { style: pick(SHOE_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(SHOE_COLORS) };
+  ACCESSORIES.filter(itemVisible).forEach((a) => { state.accessories[a.id] = isUnlocked(a) && Math.random() > 0.5; });
   state.background = pick(BACKGROUNDS.filter(itemVisible)).id;
   render();
 });
@@ -631,26 +830,29 @@ function buildDollSVG(look) {
     .map((a) => `<g fill="${a.color}" stroke="${a.color}">${a.svg}</g>`)
     .join('');
 
+  const face = look.face || DEFAULT_FACE;
+  const shineWidth = Math.max(2, bt.limbWidth * 0.3);
+
   return `
     <g fill="${look.skin}" stroke="${look.skin}">
       <line x1="125" y1="168" x2="${lx}" y2="272" stroke-width="${bt.limbWidth}" stroke-linecap="round"/>
       <line x1="175" y1="168" x2="${rxHand}" y2="272" stroke-width="${bt.limbWidth}" stroke-linecap="round"/>
+      <line x1="125" y1="168" x2="${lx}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.28"/>
+      <line x1="175" y1="168" x2="${rxHand}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.28"/>
       <circle cx="${lx}" cy="272" r="12"/>
       <circle cx="${rxHand}" cy="272" r="12"/>
       <line x1="133" y1="248" x2="127" y2="445" stroke-width="${bt.limbWidth}" stroke-linecap="round"/>
       <line x1="167" y1="248" x2="173" y2="445" stroke-width="${bt.limbWidth}" stroke-linecap="round"/>
+      <line x1="133" y1="248" x2="127" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
+      <line x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
       <rect x="106" y="148" width="88" height="108" rx="${bt.torsoRx}"/>
       <rect x="137" y="132" width="26" height="26" rx="8"/>
       <circle cx="150" cy="93" r="48"/>
+      <ellipse cx="133" cy="82" rx="13" ry="9" fill="#ffffff" opacity="0.16"/>
+      <ellipse cx="150" cy="136" rx="22" ry="7" fill="#000000" opacity="0.05"/>
     </g>
     <g fill="${look.hair.color}" stroke="${look.hair.color}">${hairDef.svg}</g>
-    <g>
-      <ellipse cx="118" cy="102" rx="9" ry="5.5" fill="#e0558f" opacity="0.35"/>
-      <ellipse cx="182" cy="102" rx="9" ry="5.5" fill="#e0558f" opacity="0.35"/>
-      <ellipse cx="132" cy="90" rx="4" ry="6" fill="#2b2b2b"/>
-      <ellipse cx="168" cy="90" rx="4" ry="6" fill="#2b2b2b"/>
-      <path d="M125,108 Q150,122 175,108" fill="none" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>
-    </g>
+    <g>${buildFaceSVG(face, look.hair.color)}</g>
     <g fill="${look.shoes.color}">${shoeDef.svg}</g>
     <g fill="${outfitFill}">${outfitDef.svg}</g>
     ${accSvg}
@@ -684,6 +886,7 @@ function applyPreset(preset) {
   state.bodyType = look.bodyType;
   state.theme = preset.theme;
   state.skin = look.skin;
+  state.face = { ...DEFAULT_FACE, ...(look.face || {}) };
   state.hair = { ...look.hair };
   state.outfit = { ...look.outfit };
   state.shoes = { ...look.shoes };

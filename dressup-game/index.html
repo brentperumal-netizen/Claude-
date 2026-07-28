@@ -37,6 +37,7 @@
     <section class="control-panel side-panel" id="left-panel">
       <nav class="tabs" id="left-tabs">
         <button class="tab active" data-tab="skin">Skin</button>
+        <button class="tab" data-tab="face">Face</button>
         <button class="tab" data-tab="hair">Hair</button>
         <button class="tab" data-tab="shoes">Shoes</button>
       </nav>
@@ -45,6 +46,21 @@
         <div class="tab-panel active" data-panel="skin">
           <h2>Skin Tone</h2>
           <div class="swatch-row" id="skin-swatches"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="face">
+          <h2>Eye Shape</h2>
+          <div class="option-row" id="eye-shapes"></div>
+          <h2>Eye Color</h2>
+          <div class="swatch-row" id="eye-colors"></div>
+          <h2>Eyebrows</h2>
+          <div class="option-row" id="eyebrow-shapes"></div>
+          <h2>Mouth</h2>
+          <div class="option-row" id="mouth-shapes"></div>
+          <h2>Lip Color</h2>
+          <div class="swatch-row" id="lip-colors"></div>
+          <h2>Extras</h2>
+          <div class="option-row" id="face-extras"></div>
         </div>
 
         <div class="tab-panel" data-panel="hair">
@@ -74,28 +90,28 @@
           <g id="layer-body">
             <line id="arm-left" x1="125" y1="168" x2="93" y2="272" stroke-linecap="round"></line>
             <line id="arm-right" x1="175" y1="168" x2="207" y2="272" stroke-linecap="round"></line>
+            <line id="arm-left-shine" x1="125" y1="168" x2="93" y2="272" stroke="#ffffff" stroke-linecap="round" opacity="0.28"></line>
+            <line id="arm-right-shine" x1="175" y1="168" x2="207" y2="272" stroke="#ffffff" stroke-linecap="round" opacity="0.28"></line>
             <circle id="hand-left" cx="93" cy="272" r="12"></circle>
             <circle id="hand-right" cx="207" cy="272" r="12"></circle>
 
             <line id="leg-left" x1="133" y1="248" x2="127" y2="445" stroke-linecap="round"></line>
             <line id="leg-right" x1="167" y1="248" x2="173" y2="445" stroke-linecap="round"></line>
+            <line id="leg-left-shine" x1="133" y1="248" x2="127" y2="445" stroke="#ffffff" stroke-linecap="round" opacity="0.22"></line>
+            <line id="leg-right-shine" x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-linecap="round" opacity="0.22"></line>
 
             <rect id="torso" x="106" y="148" width="88" height="108" rx="38"></rect>
             <rect id="neck" x="137" y="132" width="26" height="26" rx="8"></rect>
             <circle id="head" cx="150" cy="93" r="48"></circle>
+            <ellipse id="head-highlight" cx="133" cy="82" rx="13" ry="9" fill="#ffffff" opacity="0.16"></ellipse>
+            <ellipse id="head-shadow" cx="150" cy="136" rx="22" ry="7" fill="#000000" opacity="0.05"></ellipse>
           </g>
 
           <!-- HAIR -->
           <g id="layer-hair"></g>
 
           <!-- FACE -->
-          <g id="layer-face">
-            <ellipse cx="118" cy="102" rx="9" ry="5.5" class="blush"></ellipse>
-            <ellipse cx="182" cy="102" rx="9" ry="5.5" class="blush"></ellipse>
-            <ellipse cx="132" cy="90" rx="4" ry="6" class="eye"></ellipse>
-            <ellipse cx="168" cy="90" rx="4" ry="6" class="eye"></ellipse>
-            <path d="M125,108 Q150,122 175,108" class="mouth"></path>
-          </g>
+          <g id="layer-face"></g>
 
           <!-- SHOES -->
           <g id="layer-shoes"></g>
