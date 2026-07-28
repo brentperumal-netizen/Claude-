@@ -187,6 +187,7 @@
           <g id="layer-acc-wand"></g>
 
         </svg>
+        <svg id="pet-display" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" hidden></svg>
       </div>
 
       <div class="stage-actions">
@@ -201,6 +202,7 @@
       <nav class="tabs" id="right-tabs">
         <button class="tab active" data-tab="outfit">Outfit</button>
         <button class="tab" data-tab="accessories">Accessories</button>
+        <button class="tab" data-tab="pet">Pet</button>
         <button class="tab" data-tab="background">Runway</button>
       </nav>
 
@@ -216,6 +218,13 @@
         <div class="tab-panel" data-panel="accessories">
           <h2>Add-ons</h2>
           <div class="option-row" id="accessory-toggles"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="pet">
+          <h2>Companion</h2>
+          <div class="option-row" id="pet-species"></div>
+          <h2>Pet Accessory</h2>
+          <div class="option-row" id="pet-accessories"></div>
         </div>
 
         <div class="tab-panel" data-panel="background">
@@ -252,6 +261,7 @@
     <p class="modal-subtitle">Walk the runway, grab every star, and stick the landing at the finish line.</p>
 
     <div class="game-hud">
+      <span class="game-mode-badge" id="game-mode-badge"></span>
       <span class="game-star-count" id="game-star-count">⭐ 0 / 0</span>
       <div class="game-progress"><div class="game-progress-fill" id="game-progress-fill"></div></div>
     </div>
@@ -280,7 +290,7 @@
       <button class="game-btn game-btn-jump" id="btn-jump" aria-label="Jump">⤒ Jump</button>
       <button class="game-btn" id="btn-right" aria-label="Move right">▶</button>
     </div>
-    <p class="game-hint">◀ ▶ / A D to move · Space or ↑ to jump — reach the flag to finish!</p>
+    <p class="game-hint" id="game-hint">◀ ▶ / A D to move · Space or ↑ to jump — reach the flag to finish!</p>
   </div>
 </div>
 

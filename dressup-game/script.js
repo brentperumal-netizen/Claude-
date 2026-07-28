@@ -397,6 +397,121 @@ const ACCESSORIES = [
           <circle cx="177" cy="38" r="1" fill="#ffffff" opacity="0.7"/>` },
 ];
 
+// Each pet is drawn in its own 0..160 square viewBox standing on a shared ground line,
+// with a "collar" anchor (for bow/bandana/bell) and a "hat" anchor (for the party hat).
+// The horse also carries a "mount" anchor used to seat the rider in Ride mode.
+const PETS = [
+  { id: 'none', label: 'No Pet', emoji: '🚫' },
+  { id: 'dog', label: 'Dog', emoji: '🐶', color: '#c68642', collar: { x: 118, y: 90 }, hat: { x: 118, y: 48 },
+    body: `<path d="M46,100 Q20,90 28,68 Q36,84 52,94 Z"/>
+           <rect x="95" y="112" width="13" height="38" rx="6"/>
+           <rect x="55" y="115" width="13" height="35" rx="6"/>
+           <ellipse cx="80" cy="105" rx="38" ry="26"/>
+           <circle cx="118" cy="72" r="22"/>
+           <ellipse cx="104" cy="58" rx="8" ry="16" transform="rotate(-20 104 58)"/>
+           <ellipse cx="130" cy="58" rx="8" ry="16" transform="rotate(20 130 58)"/>
+           <ellipse cx="134" cy="80" rx="10" ry="8"/>`,
+    details: `<circle cx="142" cy="78" r="3" fill="#2b2b2b"/>
+           <circle cx="122" cy="66" r="2.5" fill="#2b2b2b"/>
+           <circle cx="120" cy="64" r="0.9" fill="#ffffff"/>` },
+  { id: 'cat', label: 'Cat', emoji: '🐱', color: '#8a8a8a', collar: { x: 116, y: 92 }, hat: { x: 116, y: 55 },
+    body: `<path d="M50,105 Q20,110 18,80 Q16,55 34,50 Q28,72 40,90 Q46,100 56,102 Z"/>
+           <rect x="98" y="118" width="12" height="32" rx="6"/>
+           <rect x="58" y="120" width="12" height="30" rx="6"/>
+           <ellipse cx="82" cy="108" rx="34" ry="24"/>
+           <circle cx="116" cy="76" r="19"/>
+           <path d="M100,64 L106,44 L114,66 Z"/>
+           <path d="M120,64 L128,44 L132,68 Z"/>
+           <ellipse cx="128" cy="82" rx="7" ry="5"/>`,
+    details: `<path d="M132,80 L138,78 L132,84 Z" fill="#ff9fc7"/>
+           <circle cx="120" cy="72" r="2.2" fill="#2b2b2b"/>
+           <circle cx="108" cy="70" r="2.2" fill="#2b2b2b"/>` },
+  { id: 'bunny', label: 'Bunny', emoji: '🐰', color: '#f5f0e6', collar: { x: 110, y: 96 }, hat: { x: 110, y: 50 },
+    body: `<circle cx="52" cy="118" r="10"/>
+           <ellipse cx="95" cy="132" rx="9" ry="12"/>
+           <ellipse cx="80" cy="112" rx="32" ry="26"/>
+           <circle cx="110" cy="80" r="20"/>
+           <ellipse cx="100" cy="45" rx="6" ry="28" transform="rotate(-8 100 45)"/>
+           <ellipse cx="118" cy="45" rx="6" ry="28" transform="rotate(8 118 45)"/>`,
+    details: `<ellipse cx="122" cy="86" rx="4" ry="3" fill="#ff9fc7"/>
+           <circle cx="112" cy="74" r="2.2" fill="#2b2b2b"/>
+           <circle cx="100" cy="76" r="2.2" fill="#2b2b2b"/>` },
+  { id: 'horse', label: 'Horse', emoji: '🐴', color: '#8a5a2b', collar: { x: 122, y: 65 }, mount: { x: 75, y: 74 }, rideable: true,
+    body: `<path d="M32,95 Q15,90 20,68" fill="none" stroke-width="7" stroke-linecap="round"/>
+           <rect x="40" y="105" width="11" height="42" rx="5"/>
+           <rect x="58" y="108" width="11" height="40" rx="5"/>
+           <rect x="92" y="108" width="11" height="40" rx="5"/>
+           <rect x="112" y="105" width="11" height="42" rx="5"/>
+           <ellipse cx="75" cy="98" rx="44" ry="26"/>
+           <path d="M95,82 Q108,55 130,42 Q140,48 136,60 Q120,68 108,95 Z"/>
+           <ellipse cx="145" cy="45" rx="16" ry="11"/>
+           <ellipse cx="161" cy="49" rx="8" ry="6"/>
+           <path d="M136,36 L132,24 L142,34 Z"/>
+           <path d="M148,35 L152,22 L156,35 Z"/>`,
+    details: `<path d="M112,88 L104,84 L114,80 Z" fill="mane"/>
+           <path d="M118,76 L110,72 L120,68 Z" fill="mane"/>
+           <path d="M124,64 L116,60 L126,56 Z" fill="mane"/>
+           <path d="M130,50 L124,46 L133,44 Z" fill="mane"/>
+           <circle cx="151" cy="42" r="2.2" fill="#2b2b2b"/>` },
+  { id: 'giraffe', label: 'Giraffe', emoji: '🦒', color: '#e8c468', collar: { x: 100, y: 60 }, hat: { x: 118, y: 8 },
+    body: `<rect x="42" y="98" width="9" height="50" rx="4"/>
+           <rect x="58" y="100" width="9" height="48" rx="4"/>
+           <rect x="90" y="100" width="9" height="48" rx="4"/>
+           <rect x="105" y="98" width="9" height="50" rx="4"/>
+           <ellipse cx="75" cy="92" rx="30" ry="20"/>
+           <path d="M92,80 Q100,50 108,30 Q116,20 122,22 Q114,25 110,35 Q104,55 100,84 Z"/>
+           <ellipse cx="118" cy="18" rx="13" ry="10"/>
+           <circle cx="112" cy="7" r="3"/>
+           <circle cx="123" cy="7" r="3"/>`,
+    details: `<circle cx="60" cy="88" r="5" fill="spot" opacity="0.8"/>
+           <circle cx="80" cy="82" r="4" fill="spot" opacity="0.8"/>
+           <circle cx="70" cy="100" r="4.5" fill="spot" opacity="0.8"/>
+           <circle cx="100" cy="55" r="4" fill="spot" opacity="0.8"/>
+           <circle cx="106" cy="70" r="3.5" fill="spot" opacity="0.8"/>
+           <circle cx="122" cy="22" r="2" fill="#2b2b2b"/>` },
+];
+
+const PET_ACCESSORIES = [
+  { id: 'none', label: 'No Accessory', emoji: '—' },
+  { id: 'bow', label: 'Bow', emoji: '🎀', color: '#e0558f', anchor: 'collar',
+    svg: (c) => `<path d="M-9,0 L-2,-4.5 L-2,4.5 Z" fill="${c}"/><path d="M9,0 L2,-4.5 L2,4.5 Z" fill="${c}"/><circle cx="0" cy="0" r="3" fill="${darken(c, 0.2)}"/>` },
+  { id: 'bandana', label: 'Bandana', emoji: '🧣', color: '#5cc4e0', anchor: 'collar',
+    svg: (c) => `<path d="M-12,-3 L12,-3 L12,2 L-12,2 Z" fill="${c}"/><path d="M-4,2 L4,2 L0,13 Z" fill="${c}"/>` },
+  { id: 'bell-collar', label: 'Bell Collar', emoji: '🔔', color: '#f2c94c', anchor: 'collar',
+    svg: (c) => `<rect x="-11" y="-3" width="22" height="5" rx="2.5" fill="${c}"/><circle cx="0" cy="5" r="3.2" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/><circle cx="-1" cy="4" r="0.8" fill="#fff7d6"/>` },
+  { id: 'party-hat', label: 'Party Hat', emoji: '🎉', color: '#8c5ce0', anchor: 'hat',
+    svg: (c) => `<path d="M-9,0 L0,-20 L9,0 Z" fill="${c}"/><circle cx="0" cy="-20" r="2.4" fill="#fff7d6"/><circle cx="-3" cy="-8" r="1.6" fill="#fff7d6" opacity="0.8"/><circle cx="3" cy="-14" r="1.6" fill="#fff7d6" opacity="0.8"/>` },
+];
+
+function buildPetSVG(petDef, color, idSuffix) {
+  const grad = `petGrad${idSuffix}`;
+  const light = lighten(color, 0.3);
+  const dark = darken(color, 0.28);
+  const details = (petDef.details || '')
+    .replace(/fill="mane"/g, `fill="${darken(color, 0.5)}"`)
+    .replace(/fill="spot"/g, `fill="${darken(color, 0.45)}"`);
+  return `
+    <defs>
+      <linearGradient id="${grad}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${light}"/>
+        <stop offset="55%" stop-color="${color}"/>
+        <stop offset="100%" stop-color="${dark}"/>
+      </linearGradient>
+    </defs>
+    <g fill="url(#${grad})" stroke="${dark}" stroke-width="2">${petDef.body}</g>
+    ${details}
+  `;
+}
+
+function buildPetAccessorySVG(petDef, accessoryId) {
+  if (!accessoryId || accessoryId === 'none') return '';
+  const accDef = PET_ACCESSORIES.find((a) => a.id === accessoryId);
+  if (!accDef || !accDef.svg) return '';
+  const anchor = petDef[accDef.anchor];
+  if (!anchor) return '';
+  return `<g transform="translate(${anchor.x},${anchor.y})">${accDef.svg(accDef.color)}</g>`;
+}
+
 const EYE_SHAPES = [
   { id: 'round', label: 'Round', emoji: '●' },
   { id: 'almond', label: 'Almond', emoji: '◔' },
@@ -603,6 +718,7 @@ const state = {
   outfit: { style: 'aline', color: OUTFIT_COLORS[0] },
   shoes: { style: 'heels', color: SHOE_COLORS[0] },
   accessories: Object.fromEntries(ACCESSORIES.map((a) => [a.id, false])),
+  pet: { species: 'none', color: '#c68642', accessory: 'none' },
   background: 'pink',
 };
 
@@ -714,6 +830,18 @@ buildSwatches(document.getElementById('outfit-colors'), OUTFIT_COLORS, (c) => {
 
 buildSwatches(document.getElementById('shoe-colors'), SHOE_COLORS, (c) => {
   state.shoes.color = c;
+  render();
+});
+
+buildOptionButtons(document.getElementById('pet-species'), PETS, (id) => {
+  state.pet.species = id;
+  const def = PETS.find((p) => p.id === id);
+  if (def && def.color) state.pet.color = def.color;
+  render();
+});
+
+buildOptionButtons(document.getElementById('pet-accessories'), PET_ACCESSORIES, (id) => {
+  state.pet.accessory = id;
   render();
 });
 
@@ -886,6 +1014,17 @@ function render() {
     }
   });
 
+  // pet
+  const petDisplay = document.getElementById('pet-display');
+  const petDef = PETS.find((p) => p.id === state.pet.species);
+  if (petDef && petDef.id !== 'none') {
+    petDisplay.innerHTML = buildPetSVG(petDef, state.pet.color, 'stage') + buildPetAccessorySVG(petDef, state.pet.accessory);
+    petDisplay.removeAttribute('hidden');
+  } else {
+    petDisplay.innerHTML = '';
+    petDisplay.setAttribute('hidden', '');
+  }
+
   // background
   const bgDef = BACKGROUNDS.find((b) => b.id === state.background);
   document.getElementById('stage').style.background = bgDef.gradient;
@@ -893,6 +1032,8 @@ function render() {
 
   // selection highlighting
   highlightSelection('#bodytype-pills', state.bodyType, 'id');
+  highlightSelection('#pet-species', state.pet.species, 'id');
+  highlightSelection('#pet-accessories', state.pet.accessory, 'id');
   highlightSelection('#theme-pills', state.theme, 'id');
   highlightSelection('#skin-swatches', state.skin, 'color');
   highlightSelection('#eye-shapes', state.face.eyeShape, 'id');
@@ -985,6 +1126,8 @@ document.getElementById('randomize-btn').addEventListener('click', () => {
   state.outfit = { style: pick(OUTFIT_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(OUTFIT_COLORS) };
   state.shoes = { style: pick(SHOE_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(SHOE_COLORS) };
   ACCESSORIES.filter(itemVisible).forEach((a) => { state.accessories[a.id] = isUnlocked(a) && Math.random() > 0.5; });
+  const petDef = pick(PETS);
+  state.pet = { species: petDef.id, color: petDef.color || state.pet.color, accessory: petDef.id === 'none' ? 'none' : pick(PET_ACCESSORIES).id };
   state.background = pick(BACKGROUNDS.filter(itemVisible)).id;
   render();
 });
@@ -1148,6 +1291,7 @@ function applyPreset(preset) {
   state.outfit = { ...look.outfit };
   state.shoes = { ...look.shoes };
   state.accessories = Object.fromEntries(ACCESSORIES.map((a) => [a.id, !!(look.accessories && look.accessories[a.id])]));
+  state.pet = look.pet ? { ...look.pet } : { species: 'none', color: '#c68642', accessory: 'none' };
   state.background = look.background;
   rebuildThemedLists();
   render();
@@ -1181,9 +1325,31 @@ const GROUND_Y = 250;
 const CHAR_W = 70;
 const CHAR_H = 138;
 const FINISH_X = WORLD_WIDTH - 100;
-const GRAVITY = 1500;
-const JUMP_VELOCITY = -620;
-const MOVE_SPEED = 260;
+
+const MOUNT_W = 130;
+const MOUNT_H = 108;
+const RIDE_LIFT = 56;
+const RIDE_SCALE = 0.85;
+const COMPANION_SIZE = 58;
+const COMPANION_LAG = 44;
+
+// Movement mode is derived from the player's choices: a mermaid gown means you swim,
+// riding a horse means you gallop, fairy wings mean you fly — otherwise you walk.
+// Each mode has its own gravity/thrust feel so it plays like a distinct mini game.
+const GAME_MODES = {
+  walk: { gravity: 1500, jumpVelocity: -620, moveSpeed: 260, ceiling: 0, label: '🚶 Walk', hint: '◀ ▶ / A D to move · Space or ↑ to jump — reach the flag to finish!', jumpLabel: '⤒ Jump' },
+  fly: { gravity: 420, thrust: 1500, moveSpeed: 300, ceiling: 100, label: '🦋 Fly', hint: '◀ ▶ / A D to move · Hold Space or ↑ to rise — reach the flag to finish!', jumpLabel: '⤒ Rise' },
+  swim: { gravity: 320, thrust: 900, moveSpeed: 220, ceiling: 75, label: '🧜 Swim', hint: '◀ ▶ / A D to move · Hold Space or ↑ to swim up — reach the flag to finish!', jumpLabel: '⤒ Swim Up' },
+  ride: { gravity: 1500, jumpVelocity: -680, moveSpeed: 380, ceiling: 0, label: '🐎 Ride', hint: '◀ ▶ / A D to move · Space or ↑ to jump — reach the flag to finish!', jumpLabel: '⤒ Jump' },
+};
+
+function computeGameMode() {
+  const outfitDef = OUTFIT_STYLES.find((o) => o.id === state.outfit.style);
+  if (outfitDef && outfitDef.id === 'mermaid') return 'swim';
+  if (state.pet.species === 'horse') return 'ride';
+  if (state.accessories['fairy-wings']) return 'fly';
+  return 'walk';
+}
 
 const STAR_LAYOUT = [
   { x: 220, elevation: 14 },
@@ -1209,14 +1375,19 @@ const gameScoreDisplay = document.getElementById('game-score-display');
 const gameCommentDisplay = document.getElementById('game-comment-display');
 const gameStarsSummary = document.getElementById('game-stars-summary');
 const gameStarCount = document.getElementById('game-star-count');
+const gameModeBadge = document.getElementById('game-mode-badge');
+const gameHint = document.getElementById('game-hint');
 const gameProgressFill = document.getElementById('game-progress-fill');
 const gameConfettiLayer = document.getElementById('game-confetti-layer');
 const btnLeft = document.getElementById('btn-left');
 const btnRight = document.getElementById('btn-right');
 const btnJump = document.getElementById('btn-jump');
 
-const keys = { left: false, right: false };
+const keys = { left: false, right: false, up: false };
 let gameCharacterEl = null;
+let mountEl = null;
+let companionEl = null;
+let gameMode = 'walk';
 let starEls = [];
 let starCollected = [];
 let charX = 30;
@@ -1246,12 +1417,21 @@ function collectStar(i) {
   gameStarCount.textContent = `⭐ ${starsCollected} / ${STAR_LAYOUT.length}`;
 }
 
+function updateModeChrome() {
+  const modeDef = GAME_MODES[gameMode];
+  gameModeBadge.textContent = modeDef.label;
+  gameHint.textContent = modeDef.hint;
+  btnJump.textContent = modeDef.jumpLabel;
+}
+
 function resetGameState() {
+  gameMode = computeGameMode();
   charX = 30;
   elevation = 0;
   jumpV = 0;
   keys.left = false;
   keys.right = false;
+  keys.up = false;
   starsCollected = 0;
   starCollected = STAR_LAYOUT.map(() => false);
   lastTs = 0;
@@ -1263,14 +1443,38 @@ function resetGameState() {
 
   buildStars();
 
-  gameWorld.querySelectorAll('.game-character').forEach((c) => c.remove());
+  gameWorld.querySelectorAll('.game-character, .game-mount, .game-companion').forEach((c) => c.remove());
   gameCharacterEl = document.createElement('div');
-  gameCharacterEl.className = 'game-character';
+  gameCharacterEl.className = 'game-character' + (gameMode === 'ride' ? ' riding' : '') + (gameMode === 'fly' ? ' flying' : '') + (gameMode === 'swim' ? ' swimming' : '');
   gameCharacterEl.innerHTML = `<svg viewBox="0 -10 300 480" preserveAspectRatio="xMidYMax meet">${buildDollSVG(state, 'game')}</svg>`;
   gameWorld.appendChild(gameCharacterEl);
 
+  mountEl = null;
+  companionEl = null;
+  const petDef = PETS.find((p) => p.id === state.pet.species);
+  if (petDef && petDef.id !== 'none') {
+    if (gameMode === 'ride') {
+      mountEl = document.createElement('div');
+      mountEl.className = 'game-mount';
+      mountEl.innerHTML = `<svg viewBox="0 0 160 160" preserveAspectRatio="xMidYMax meet">${buildPetSVG(petDef, state.pet.color, 'mount')}</svg>`;
+      gameWorld.appendChild(mountEl);
+    } else {
+      companionEl = document.createElement('div');
+      companionEl.className = 'game-companion';
+      companionEl.innerHTML = `<svg viewBox="0 0 160 160" preserveAspectRatio="xMidYMax meet">${buildPetSVG(petDef, state.pet.color, 'companion')}${buildPetAccessorySVG(petDef, state.pet.accessory)}</svg>`;
+      gameWorld.appendChild(companionEl);
+    }
+  }
+
+  gameViewport.classList.remove('mode-walk', 'mode-fly', 'mode-swim', 'mode-ride');
+  gameViewport.classList.add(`mode-${gameMode}`);
+
   const bgDef = BACKGROUNDS.find((b) => b.id === state.background);
-  gameViewport.style.background = bgDef.gradient;
+  gameViewport.style.background = gameMode === 'swim'
+    ? 'linear-gradient(180deg, #bfeaff 0%, #6ec6e8 55%, #256d92 100%)'
+    : bgDef.gradient;
+
+  updateModeChrome();
 }
 
 function gameLoop(ts) {
@@ -1278,16 +1482,31 @@ function gameLoop(ts) {
   const dt = Math.min((ts - lastTs) / 1000, 0.05);
   lastTs = ts;
 
+  const modeDef = GAME_MODES[gameMode];
   let vx = 0;
-  if (keys.left) vx -= MOVE_SPEED;
-  if (keys.right) vx += MOVE_SPEED;
+  if (keys.left) vx -= modeDef.moveSpeed;
+  if (keys.right) vx += modeDef.moveSpeed;
   charX = Math.min(Math.max(charX + vx * dt, 0), WORLD_WIDTH - CHAR_W);
 
-  jumpV += GRAVITY * dt;
-  elevation -= jumpV * dt;
-  if (elevation <= 0) {
-    elevation = 0;
-    jumpV = 0;
+  if (gameMode === 'fly' || gameMode === 'swim') {
+    const thrust = keys.up ? modeDef.thrust : 0;
+    jumpV += (modeDef.gravity - thrust) * dt;
+    elevation -= jumpV * dt;
+    if (elevation <= 0) {
+      elevation = 0;
+      jumpV = Math.min(jumpV, 0);
+    }
+    if (elevation >= modeDef.ceiling) {
+      elevation = modeDef.ceiling;
+      jumpV = Math.max(jumpV, 0);
+    }
+  } else {
+    jumpV += modeDef.gravity * dt;
+    elevation -= jumpV * dt;
+    if (elevation <= 0) {
+      elevation = 0;
+      jumpV = 0;
+    }
   }
 
   const charCenterX = charX + CHAR_W / 2;
@@ -1301,9 +1520,26 @@ function gameLoop(ts) {
   const scale = gameViewport.clientWidth / BASE_W;
   const cameraX = Math.min(Math.max(charCenterX - BASE_W / 2, 0), Math.max(WORLD_WIDTH - BASE_W, 0));
   gameWorld.style.transform = `scale(${scale}) translateX(${-cameraX}px)`;
-  gameCharacterEl.style.left = `${charX}px`;
-  gameCharacterEl.style.top = `${GROUND_Y - CHAR_H - elevation}px`;
+
+  if (gameMode === 'ride' && mountEl) {
+    const mountLeft = charX + CHAR_W / 2 - MOUNT_W / 2 - 8;
+    mountEl.style.left = `${mountLeft}px`;
+    mountEl.style.top = `${GROUND_Y - MOUNT_H - elevation}px`;
+    mountEl.classList.toggle('moving', vx !== 0);
+    gameCharacterEl.style.left = `${charX}px`;
+    gameCharacterEl.style.top = `${GROUND_Y - CHAR_H - elevation - RIDE_LIFT}px`;
+  } else {
+    gameCharacterEl.style.left = `${charX}px`;
+    gameCharacterEl.style.top = `${GROUND_Y - CHAR_H - elevation}px`;
+  }
   gameCharacterEl.classList.toggle('moving', vx !== 0);
+
+  if (companionEl) {
+    const compLeft = Math.max(0, charX - COMPANION_LAG);
+    companionEl.style.left = `${compLeft}px`;
+    companionEl.style.top = `${GROUND_Y - COMPANION_SIZE}px`;
+    companionEl.classList.toggle('moving', vx !== 0);
+  }
 
   const progress = Math.min(1, charX / (FINISH_X - CHAR_W));
   gameProgressFill.style.width = `${progress * 100}%`;
@@ -1358,7 +1594,8 @@ function endGame() {
 
 function tryJump() {
   if (gameOverlay.hidden) return;
-  if (elevation === 0) jumpV = JUMP_VELOCITY;
+  if (gameMode === 'fly' || gameMode === 'swim') return;
+  if (elevation === 0) jumpV = GAME_MODES[gameMode].jumpVelocity;
 }
 
 function onGameKeyDown(e) {
@@ -1374,6 +1611,7 @@ function onGameKeyDown(e) {
     keys.right = true;
     e.preventDefault();
   } else if (k === 'ArrowUp' || k === 'w' || k === 'W' || k === ' ') {
+    keys.up = true;
     tryJump();
     e.preventDefault();
   }
@@ -1383,6 +1621,7 @@ function onGameKeyUp(e) {
   const k = e.key;
   if (k === 'ArrowLeft' || k === 'a' || k === 'A') keys.left = false;
   else if (k === 'ArrowRight' || k === 'd' || k === 'D') keys.right = false;
+  else if (k === 'ArrowUp' || k === 'w' || k === 'W' || k === ' ') keys.up = false;
 }
 
 function openGame() {
@@ -1418,7 +1657,10 @@ btnRight.addEventListener('pointerdown', () => { keys.right = true; });
   btnLeft.addEventListener(ev, () => { keys.left = false; });
   btnRight.addEventListener(ev, () => { keys.right = false; });
 });
-btnJump.addEventListener('pointerdown', tryJump);
+btnJump.addEventListener('pointerdown', () => { keys.up = true; tryJump(); });
+['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => {
+  btnJump.addEventListener(ev, () => { keys.up = false; });
+});
 
 // ---------- Init ----------
 
