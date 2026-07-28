@@ -15,12 +15,54 @@
     <p class="subtitle">Dress your model, then send her down the runway!</p>
   </header>
 
+  <div class="global-controls">
+    <div class="global-group">
+      <span class="global-label">Character</span>
+      <div class="option-row" id="bodytype-pills"></div>
+    </div>
+    <div class="global-group">
+      <span class="global-label">Theme</span>
+      <div class="option-row" id="theme-pills"></div>
+    </div>
+  </div>
+
   <main class="layout">
+
+    <!-- LEFT CONTROLS -->
+    <section class="control-panel side-panel" id="left-panel">
+      <nav class="tabs" id="left-tabs">
+        <button class="tab active" data-tab="skin">Skin</button>
+        <button class="tab" data-tab="hair">Hair</button>
+        <button class="tab" data-tab="shoes">Shoes</button>
+      </nav>
+
+      <div class="tab-panels" id="left-panels">
+        <div class="tab-panel active" data-panel="skin">
+          <h2>Skin Tone</h2>
+          <div class="swatch-row" id="skin-swatches"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="hair">
+          <h2>Style</h2>
+          <div class="option-row" id="hair-styles"></div>
+          <h2>Color</h2>
+          <div class="swatch-row" id="hair-colors"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="shoes">
+          <h2>Style</h2>
+          <div class="option-row" id="shoe-styles"></div>
+          <h2>Color</h2>
+          <div class="swatch-row" id="shoe-colors"></div>
+        </div>
+      </div>
+    </section>
 
     <!-- STAGE -->
     <section class="stage-panel" id="stage-panel">
       <div class="stage" id="stage">
         <div class="stage-lights"></div>
+        <div class="ambient-layer" id="ambient-layer"></div>
         <svg id="character" viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg">
 
           <!-- BODY (skin) -->
@@ -38,7 +80,7 @@
             <circle id="head" cx="150" cy="93" r="48"></circle>
           </g>
 
-          <!-- HAIR (back layer, sits behind/around head) -->
+          <!-- HAIR -->
           <g id="layer-hair"></g>
 
           <!-- FACE -->
@@ -50,17 +92,23 @@
             <path d="M125,108 Q150,122 175,108" class="mouth"></path>
           </g>
 
-          <!-- SHOES (under outfit hem, above feet) -->
+          <!-- SHOES -->
           <g id="layer-shoes"></g>
 
           <!-- OUTFIT -->
           <g id="layer-outfit"></g>
 
           <!-- ACCESSORIES -->
-          <g id="layer-hat"></g>
-          <g id="layer-glasses"></g>
-          <g id="layer-necklace"></g>
-          <g id="layer-bag"></g>
+          <g id="layer-acc-fairy-wings"></g>
+          <g id="layer-acc-hat"></g>
+          <g id="layer-acc-santa-hat"></g>
+          <g id="layer-acc-flower-crown"></g>
+          <g id="layer-acc-glasses"></g>
+          <g id="layer-acc-necklace"></g>
+          <g id="layer-acc-snowflake"></g>
+          <g id="layer-acc-bag"></g>
+          <g id="layer-acc-candy-cane"></g>
+          <g id="layer-acc-wand"></g>
 
         </svg>
 
@@ -69,6 +117,7 @@
 
       <div class="stage-actions">
         <button id="randomize-btn" class="btn btn-ghost">🎲 Surprise Me</button>
+        <button id="wardrobe-btn" class="btn btn-ghost">👗 Wardrobe</button>
         <button id="show-btn" class="btn btn-primary">🎬 Start Fashion Show</button>
       </div>
 
@@ -78,43 +127,21 @@
       </div>
     </section>
 
-    <!-- CONTROLS -->
-    <section class="control-panel">
-      <nav class="tabs" id="tabs">
-        <button class="tab active" data-tab="skin">Skin</button>
-        <button class="tab" data-tab="hair">Hair</button>
-        <button class="tab" data-tab="outfit">Outfit</button>
-        <button class="tab" data-tab="shoes">Shoes</button>
+    <!-- RIGHT CONTROLS -->
+    <section class="control-panel side-panel" id="right-panel">
+      <nav class="tabs" id="right-tabs">
+        <button class="tab active" data-tab="outfit">Outfit</button>
         <button class="tab" data-tab="accessories">Accessories</button>
         <button class="tab" data-tab="background">Runway</button>
       </nav>
 
-      <div class="tab-panels">
-
-        <div class="tab-panel active" data-panel="skin">
-          <h2>Skin Tone</h2>
-          <div class="swatch-row" id="skin-swatches"></div>
-        </div>
-
-        <div class="tab-panel" data-panel="hair">
-          <h2>Style</h2>
-          <div class="option-row" id="hair-styles"></div>
-          <h2>Color</h2>
-          <div class="swatch-row" id="hair-colors"></div>
-        </div>
-
-        <div class="tab-panel" data-panel="outfit">
+      <div class="tab-panels" id="right-panels">
+        <div class="tab-panel active" data-panel="outfit">
           <h2>Style</h2>
           <div class="option-row" id="outfit-styles"></div>
-          <h2>Color</h2>
+          <h2 id="outfit-color-label">Color</h2>
           <div class="swatch-row" id="outfit-colors"></div>
-        </div>
-
-        <div class="tab-panel" data-panel="shoes">
-          <h2>Style</h2>
-          <div class="option-row" id="shoe-styles"></div>
-          <h2>Color</h2>
-          <div class="swatch-row" id="shoe-colors"></div>
+          <p class="fixed-color-note" id="outfit-fixed-note" hidden>This costume has its own signature colors.</p>
         </div>
 
         <div class="tab-panel" data-panel="accessories">
@@ -126,13 +153,24 @@
           <h2>Backdrop</h2>
           <div class="option-row" id="background-styles"></div>
         </div>
-
       </div>
     </section>
 
   </main>
 
   <footer class="app-footer">Made for the runway 💅</footer>
+</div>
+
+<!-- WARDROBE MODAL -->
+<div class="modal-overlay" id="wardrobe-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="wardrobe-title">
+    <div class="modal-header">
+      <h2 id="wardrobe-title">👗 Wardrobe — Whole Looks</h2>
+      <button class="modal-close" id="wardrobe-close" aria-label="Close wardrobe">✕</button>
+    </div>
+    <p class="modal-subtitle">Pick a complete look and try it on all at once.</p>
+    <div class="wardrobe-grid" id="wardrobe-grid"></div>
+  </div>
 </div>
 
 <script src="script.js"></script>
