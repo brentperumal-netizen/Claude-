@@ -492,29 +492,7 @@ function spawnSparkle() {
   setTimeout(() => sparkle.remove(), 1900);
 }
 
-// ---------- Fashion Show ----------
-
-const stage = document.getElementById('stage');
-const judging = document.getElementById('judging');
-const scoreDisplay = document.getElementById('score-display');
-const commentDisplay = document.getElementById('comment-display');
-const confettiLayer = document.getElementById('confetti-layer');
-
-document.getElementById('show-btn').addEventListener('click', () => {
-  judging.hidden = true;
-  stage.classList.remove('walking');
-  void stage.offsetWidth;
-  stage.classList.add('walking');
-
-  setTimeout(() => {
-    const score = (Math.random() * 2.5 + 7.5).toFixed(1);
-    const comment = JUDGE_COMMENTS[Math.floor(Math.random() * JUDGE_COMMENTS.length)];
-    scoreDisplay.textContent = `${score} / 10`;
-    commentDisplay.textContent = comment;
-    judging.hidden = false;
-    if (score >= 9) launchConfetti();
-  }, 1800);
-});
+// ---------- Randomize ----------
 
 document.getElementById('randomize-btn').addEventListener('click', () => {
   state.bodyType = pick(BODY_TYPES).id;
@@ -527,7 +505,7 @@ document.getElementById('randomize-btn').addEventListener('click', () => {
   render();
 });
 
-function launchConfetti() {
+function launchConfetti(layer) {
   const colors = ['#e0558f', '#8c5ce0', '#5cc4e0', '#f2c94c', '#43b581'];
   for (let i = 0; i < 40; i++) {
     const piece = document.createElement('div');
@@ -536,7 +514,7 @@ function launchConfetti() {
     piece.style.background = colors[Math.floor(Math.random() * colors.length)];
     piece.style.animationDuration = `${1.5 + Math.random() * 1.5}s`;
     piece.style.animationDelay = `${Math.random() * 0.4}s`;
-    confettiLayer.appendChild(piece);
+    layer.appendChild(piece);
     setTimeout(() => piece.remove(), 3500);
   }
 }
@@ -636,6 +614,232 @@ wardrobeOverlay.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !wardrobeOverlay.hidden) closeWardrobe();
 });
+
+// ---------- Runway Run (mini side-scroller) ----------
+
+const BASE_W = 720;
+const BASE_H = 320;
+const WORLD_WIDTH = 2300;
+const GROUND_Y = 250;
+const CHAR_W = 70;
+const CHAR_H = 138;
+const FINISH_X = WORLD_WIDTH - 100;
+const GRAVITY = 1500;
+const JUMP_VELOCITY = -620;
+const MOVE_SPEED = 260;
+
+const STAR_LAYOUT = [
+  { x: 220, elevation: 14 },
+  { x: 420, elevation: 100 },
+  { x: 640, elevation: 14 },
+  { x: 860, elevation: 100 },
+  { x: 1080, elevation: 14 },
+  { x: 1300, elevation: 100 },
+  { x: 1540, elevation: 14 },
+  { x: 1780, elevation: 100 },
+];
+
+const STAR_ICON = `<svg viewBox="0 0 24 24" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12,2 L14.7,8.6 L22,9.3 L16.6,14.1 L18.2,21 L12,17.3 L5.8,21 L7.4,14.1 L2,9.3 L9.3,8.6 Z" fill="#f7d154" stroke="#c98f1f" stroke-width="1"/>
+</svg>`;
+
+const gameOverlay = document.getElementById('game-overlay');
+const gameViewport = document.getElementById('game-viewport');
+const gameWorld = document.getElementById('game-world');
+const gameFinish = document.getElementById('game-finish');
+const gameResult = document.getElementById('game-result');
+const gameScoreDisplay = document.getElementById('game-score-display');
+const gameCommentDisplay = document.getElementById('game-comment-display');
+const gameStarsSummary = document.getElementById('game-stars-summary');
+const gameStarCount = document.getElementById('game-star-count');
+const gameProgressFill = document.getElementById('game-progress-fill');
+const gameConfettiLayer = document.getElementById('game-confetti-layer');
+const btnLeft = document.getElementById('btn-left');
+const btnRight = document.getElementById('btn-right');
+const btnJump = document.getElementById('btn-jump');
+
+const keys = { left: false, right: false };
+let gameCharacterEl = null;
+let starEls = [];
+let starCollected = [];
+let charX = 30;
+let elevation = 0;
+let jumpV = 0;
+let starsCollected = 0;
+let rafId = null;
+let lastTs = 0;
+
+function buildStars() {
+  gameWorld.querySelectorAll('.game-star').forEach((s) => s.remove());
+  starEls = STAR_LAYOUT.map((star) => {
+    const el = document.createElement('div');
+    el.className = 'game-star';
+    el.style.left = `${star.x}px`;
+    el.style.top = `${GROUND_Y - star.elevation}px`;
+    el.innerHTML = STAR_ICON;
+    gameWorld.appendChild(el);
+    return el;
+  });
+}
+
+function collectStar(i) {
+  starCollected[i] = true;
+  starsCollected += 1;
+  starEls[i].classList.add('collected');
+  gameStarCount.textContent = `⭐ ${starsCollected} / ${STAR_LAYOUT.length}`;
+}
+
+function resetGameState() {
+  charX = 30;
+  elevation = 0;
+  jumpV = 0;
+  keys.left = false;
+  keys.right = false;
+  starsCollected = 0;
+  starCollected = STAR_LAYOUT.map(() => false);
+  lastTs = 0;
+
+  gameResult.hidden = true;
+  gameProgressFill.style.width = '0%';
+  gameStarCount.textContent = `⭐ 0 / ${STAR_LAYOUT.length}`;
+  gameFinish.style.left = `${FINISH_X}px`;
+
+  buildStars();
+
+  gameWorld.querySelectorAll('.game-character').forEach((c) => c.remove());
+  gameCharacterEl = document.createElement('div');
+  gameCharacterEl.className = 'game-character';
+  gameCharacterEl.innerHTML = `<svg viewBox="0 0 300 520">${buildDollSVG(state)}</svg>`;
+  gameWorld.appendChild(gameCharacterEl);
+
+  const bgDef = BACKGROUNDS.find((b) => b.id === state.background);
+  gameViewport.style.background = bgDef.gradient;
+}
+
+function gameLoop(ts) {
+  if (!lastTs) lastTs = ts;
+  const dt = Math.min((ts - lastTs) / 1000, 0.05);
+  lastTs = ts;
+
+  let vx = 0;
+  if (keys.left) vx -= MOVE_SPEED;
+  if (keys.right) vx += MOVE_SPEED;
+  charX = Math.min(Math.max(charX + vx * dt, 0), WORLD_WIDTH - CHAR_W);
+
+  jumpV += GRAVITY * dt;
+  elevation -= jumpV * dt;
+  if (elevation <= 0) {
+    elevation = 0;
+    jumpV = 0;
+  }
+
+  const charCenterX = charX + CHAR_W / 2;
+  const charCenterY = GROUND_Y - CHAR_H / 2 - elevation;
+  STAR_LAYOUT.forEach((star, i) => {
+    if (starCollected[i]) return;
+    const dx = Math.abs(charCenterX - star.x);
+    const dy = Math.abs(charCenterY - (GROUND_Y - star.elevation));
+    if (dx < 45 && dy < 55) collectStar(i);
+  });
+
+  const scale = gameViewport.clientWidth / BASE_W;
+  const cameraX = Math.min(Math.max(charCenterX - BASE_W / 2, 0), Math.max(WORLD_WIDTH - BASE_W, 0));
+  gameWorld.style.transform = `scale(${scale}) translateX(${-cameraX}px)`;
+  gameCharacterEl.style.left = `${charX}px`;
+  gameCharacterEl.style.top = `${GROUND_Y - CHAR_H - elevation}px`;
+  gameCharacterEl.classList.toggle('moving', vx !== 0);
+
+  const progress = Math.min(1, charX / (FINISH_X - CHAR_W));
+  gameProgressFill.style.width = `${progress * 100}%`;
+
+  if (charX >= FINISH_X - CHAR_W) {
+    endGame();
+    return;
+  }
+
+  rafId = requestAnimationFrame(gameLoop);
+}
+
+function endGame() {
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+
+  const total = STAR_LAYOUT.length;
+  const allCollected = starsCollected === total;
+  const score = Math.min(10, 6.5 + Math.random() * 0.5 + starsCollected * 0.35 + (allCollected ? 0.5 : 0));
+  const comment = JUDGE_COMMENTS[Math.floor(Math.random() * JUDGE_COMMENTS.length)];
+
+  gameScoreDisplay.textContent = `${score.toFixed(1)} / 10`;
+  gameCommentDisplay.textContent = comment;
+  gameStarsSummary.textContent = `⭐ ${starsCollected} / ${total} stars collected`;
+  gameConfettiLayer.innerHTML = '';
+  if (score >= 9) launchConfetti(gameConfettiLayer);
+  gameResult.hidden = false;
+}
+
+function tryJump() {
+  if (gameOverlay.hidden) return;
+  if (elevation === 0) jumpV = JUMP_VELOCITY;
+}
+
+function onGameKeyDown(e) {
+  const k = e.key;
+  if (k === 'Escape') {
+    closeGame();
+    return;
+  }
+  if (k === 'ArrowLeft' || k === 'a' || k === 'A') {
+    keys.left = true;
+    e.preventDefault();
+  } else if (k === 'ArrowRight' || k === 'd' || k === 'D') {
+    keys.right = true;
+    e.preventDefault();
+  } else if (k === 'ArrowUp' || k === 'w' || k === 'W' || k === ' ') {
+    tryJump();
+    e.preventDefault();
+  }
+}
+
+function onGameKeyUp(e) {
+  const k = e.key;
+  if (k === 'ArrowLeft' || k === 'a' || k === 'A') keys.left = false;
+  else if (k === 'ArrowRight' || k === 'd' || k === 'D') keys.right = false;
+}
+
+function openGame() {
+  resetGameState();
+  gameOverlay.hidden = false;
+  document.addEventListener('keydown', onGameKeyDown);
+  document.addEventListener('keyup', onGameKeyUp);
+  rafId = requestAnimationFrame(gameLoop);
+}
+
+function closeGame() {
+  gameOverlay.hidden = true;
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+  document.removeEventListener('keydown', onGameKeyDown);
+  document.removeEventListener('keyup', onGameKeyUp);
+}
+
+document.getElementById('show-btn').addEventListener('click', openGame);
+document.getElementById('game-close').addEventListener('click', closeGame);
+document.getElementById('game-done-btn').addEventListener('click', closeGame);
+document.getElementById('game-again-btn').addEventListener('click', () => {
+  resetGameState();
+  if (!rafId) rafId = requestAnimationFrame(gameLoop);
+});
+gameOverlay.addEventListener('click', (e) => {
+  if (e.target === gameOverlay) closeGame();
+});
+
+btnLeft.addEventListener('pointerdown', () => { keys.left = true; });
+btnRight.addEventListener('pointerdown', () => { keys.right = true; });
+['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => {
+  btnLeft.addEventListener(ev, () => { keys.left = false; });
+  btnRight.addEventListener(ev, () => { keys.right = false; });
+});
+btnJump.addEventListener('pointerdown', tryJump);
 
 // ---------- Init ----------
 

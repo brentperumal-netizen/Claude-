@@ -111,19 +111,12 @@
           <g id="layer-acc-wand"></g>
 
         </svg>
-
-        <div class="confetti-layer" id="confetti-layer"></div>
       </div>
 
       <div class="stage-actions">
         <button id="randomize-btn" class="btn btn-ghost">🎲 Surprise Me</button>
         <button id="wardrobe-btn" class="btn btn-ghost">👗 Wardrobe</button>
         <button id="show-btn" class="btn btn-primary">🎬 Start Fashion Show</button>
-      </div>
-
-      <div class="judging" id="judging" hidden>
-        <div class="score" id="score-display"></div>
-        <p class="comment" id="comment-display"></p>
       </div>
     </section>
 
@@ -170,6 +163,47 @@
     </div>
     <p class="modal-subtitle">Pick a complete look and try it on all at once.</p>
     <div class="wardrobe-grid" id="wardrobe-grid"></div>
+  </div>
+</div>
+
+<!-- RUNWAY RUN GAME MODAL -->
+<div class="modal-overlay" id="game-overlay" hidden>
+  <div class="modal game-modal" role="dialog" aria-modal="true" aria-labelledby="game-title">
+    <div class="modal-header">
+      <h2 id="game-title">🎬 Runway Run</h2>
+      <button class="modal-close" id="game-close" aria-label="Close runway run">✕</button>
+    </div>
+    <p class="modal-subtitle">Walk the runway, grab every star, and stick the landing at the finish line.</p>
+
+    <div class="game-hud">
+      <span class="game-star-count" id="game-star-count">⭐ 0 / 0</span>
+      <div class="game-progress"><div class="game-progress-fill" id="game-progress-fill"></div></div>
+    </div>
+
+    <div class="game-viewport" id="game-viewport">
+      <div class="game-world" id="game-world">
+        <div class="game-ground"></div>
+        <div class="game-finish" id="game-finish">🏁</div>
+      </div>
+
+      <div class="game-result" id="game-result" hidden>
+        <div class="score" id="game-score-display"></div>
+        <p class="comment" id="game-comment-display"></p>
+        <p class="stars-summary" id="game-stars-summary"></p>
+        <div class="game-result-actions">
+          <button class="btn btn-ghost" id="game-again-btn">🔁 Walk Again</button>
+          <button class="btn btn-primary" id="game-done-btn">✅ Done</button>
+        </div>
+        <div class="confetti-layer" id="game-confetti-layer"></div>
+      </div>
+    </div>
+
+    <div class="game-controls-mobile">
+      <button class="game-btn" id="btn-left" aria-label="Move left">◀</button>
+      <button class="game-btn game-btn-jump" id="btn-jump" aria-label="Jump">⤒ Jump</button>
+      <button class="game-btn" id="btn-right" aria-label="Move right">▶</button>
+    </div>
+    <p class="game-hint">◀ ▶ / A D to move · Space or ↑ to jump — reach the flag to finish!</p>
   </div>
 </div>
 
