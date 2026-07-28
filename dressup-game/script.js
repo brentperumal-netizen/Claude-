@@ -85,6 +85,35 @@ const OUTFIT_STYLES = [
           <circle cx="110" cy="260" r="3" fill="#ffe9a8"/>
           <circle cx="190" cy="300" r="3" fill="#ffe9a8"/>
           <circle cx="150" cy="360" r="3" fill="#ffe9a8"/>` },
+  { id: 'sequin-gown', label: 'Sequin Gown', emoji: '💫', unlockLevel: 2, fixedColor: true,
+    svg: `<path d="M120,150 L180,150 L196,400 Q150,414 104,400 Z" fill="#d94f8c"/>
+          <circle cx="130" cy="200" r="3" fill="#fff7d6"/>
+          <circle cx="150" cy="180" r="3" fill="#fff7d6"/>
+          <circle cx="170" cy="210" r="3" fill="#fff7d6"/>
+          <circle cx="140" cy="260" r="3" fill="#fff7d6"/>
+          <circle cx="160" cy="290" r="3" fill="#fff7d6"/>
+          <circle cx="125" cy="330" r="3" fill="#fff7d6"/>
+          <circle cx="175" cy="350" r="3" fill="#fff7d6"/>` },
+  { id: 'royal-cape', label: 'Royal Cape Gown', emoji: '👑', unlockLevel: 3, fixedColor: true,
+    svg: `<path d="M100,150 Q60,220 78,360 L104,350 Q92,240 122,158 Z" fill="#5a3aa8"/>
+          <path d="M200,150 Q240,220 222,360 L196,350 Q208,240 178,158 Z" fill="#5a3aa8"/>
+          <path d="M118,150 L182,150 L206,350 Q150,368 94,350 Z" fill="#7c53d1"/>
+          <rect x="118" y="150" width="64" height="12" fill="#f2c94c"/>` },
+  { id: 'starlight-suit', label: 'Starlight Suit', emoji: '🌠', unlockLevel: 4, fixedColor: true,
+    svg: `<path d="M112,150 L188,150 L184,250 L150,236 L116,250 Z" fill="#1b1b2e"/>
+          <path d="M112,250 L150,236 L146,430 L108,430 Z" fill="#1b1b2e"/>
+          <path d="M188,250 L150,236 L154,430 L192,430 Z" fill="#1b1b2e"/>
+          <path d="M136,150 L164,150 L150,208 Z" fill="#fdfdfd"/>
+          <path d="M144,150 L156,150 L152,190 L148,192 Z" fill="#2b6cb0"/>
+          <circle cx="126" cy="180" r="2.5" fill="#ffe9a8"/>
+          <circle cx="174" cy="200" r="2.5" fill="#ffe9a8"/>
+          <circle cx="130" cy="260" r="2.5" fill="#ffe9a8"/>
+          <circle cx="170" cy="300" r="2.5" fill="#ffe9a8"/>` },
+  { id: 'legend-gown', label: "Legend's Gown", emoji: '✨', unlockLevel: 5, fixedColor: true,
+    svg: `<path d="M116,150 L184,150 L226,410 Q150,432 74,410 Z" fill="#a83568"/>
+          <path d="M116,150 L184,150 L200,300 Q150,312 100,300 Z" fill="#ffd77a"/>
+          <rect x="118" y="150" width="64" height="10" fill="#ffd77a"/>
+          <path d="M74,410 Q150,432 226,410 L226,424 Q150,448 74,424 Z" fill="#ffd77a"/>` },
 ];
 
 const OUTFIT_COLORS = ['#e0558f', '#8c5ce0', '#5cc4e0', '#43b581', '#f2c94c', '#e05c5c', '#2b2b2b', '#ffffff'];
@@ -150,6 +179,23 @@ const ACCESSORIES = [
   { id: 'wand', label: 'Magic Wand', emoji: '✨', theme: 'fairy', color: '#f2c94c',
     svg: `<line x1="207" y1="272" x2="228" y2="240" stroke="#f2c94c" stroke-width="4" stroke-linecap="round"/>
           <path d="M228,240 l4,-8 l4,8 l8,4 l-8,4 l-4,8 l-4,-8 l-8,-4 Z" fill="#f2c94c"/>` },
+  { id: 'tiara', label: 'Tiara', emoji: '👑', unlockLevel: 2, color: '#f2c94c',
+    svg: `<path d="M112,50 L130,30 L150,42 L170,30 L188,50 Z" stroke="#c98f1f" stroke-width="2"/>
+          <circle cx="150" cy="36" r="4" fill="#fff7d6"/>` },
+  { id: 'diamond-necklace', label: 'Diamond Necklace', emoji: '💎', unlockLevel: 3, color: '#bfe9ff',
+    svg: `<path d="M128,155 Q150,180 172,155" fill="none" stroke-width="3"/>
+          <circle cx="150" cy="182" r="6"/>
+          <circle cx="136" cy="172" r="3.5"/>
+          <circle cx="164" cy="172" r="3.5"/>` },
+  { id: 'star-earrings', label: 'Star Earrings', emoji: '⭐', unlockLevel: 4, color: '#f2c94c',
+    svg: `<path d="M100,108 l2,-5 l2,5 l5,2 l-5,2 l-2,5 l-2,-5 l-5,-2 Z"/>
+          <path d="M200,108 l2,-5 l2,5 l5,2 l-5,2 l-2,5 l-2,-5 l-5,-2 Z"/>` },
+  { id: 'crown', label: 'Royal Crown', emoji: '👑', unlockLevel: 5, color: '#f2c94c',
+    svg: `<path d="M104,58 L118,20 L134,44 L150,14 L166,44 L182,20 L196,58 Z" stroke="#c98f1f" stroke-width="2"/>
+          <circle cx="150" cy="18" r="5" fill="#e05c5c"/>
+          <circle cx="122" cy="40" r="4" fill="#5cc4e0"/>
+          <circle cx="178" cy="40" r="4" fill="#5cc4e0"/>
+          <rect x="104" y="56" width="92" height="8" rx="3"/>` },
 ];
 
 const BACKGROUNDS = [
@@ -201,6 +247,49 @@ const WARDROBE_PRESETS = [
       accessories: { 'fairy-wings': true, 'flower-crown': true, wand: true }, background: 'fairy-glade' } },
 ];
 
+// ---------- Leveling / unlocks ----------
+
+const LEVELS = [
+  { level: 1, name: 'Newcomer', threshold: 0 },
+  { level: 2, name: 'Rising Star', threshold: 8 },
+  { level: 3, name: 'Runway Regular', threshold: 24 },
+  { level: 4, name: 'Style Icon', threshold: 48 },
+  { level: 5, name: 'Legend', threshold: 80 },
+];
+
+const STARS_STORAGE_KEY = 'runwayReady.totalStars';
+let totalStars = Number(localStorage.getItem(STARS_STORAGE_KEY)) || 0;
+
+function saveTotalStars() {
+  localStorage.setItem(STARS_STORAGE_KEY, String(totalStars));
+}
+
+function getLevelInfo(total) {
+  let current = LEVELS[0];
+  for (const l of LEVELS) if (total >= l.threshold) current = l;
+  const next = LEVELS.find((l) => l.threshold > total);
+  return {
+    level: current.level,
+    name: current.name,
+    total,
+    next,
+    progress: next ? (total - current.threshold) / (next.threshold - current.threshold) : 1,
+  };
+}
+
+function isUnlocked(item) {
+  return !item.unlockLevel || getLevelInfo(totalStars).level >= item.unlockLevel;
+}
+
+function renderLevelBanner() {
+  const info = getLevelInfo(totalStars);
+  document.getElementById('level-badge').textContent = `🌟 Level ${info.level} — ${info.name}`;
+  document.getElementById('level-progress-fill').style.width = `${info.progress * 100}%`;
+  document.getElementById('level-next').textContent = info.next
+    ? `${info.next.threshold - info.total} ⭐ to ${info.next.name}`
+    : 'Max level reached!';
+}
+
 // ---------- State ----------
 
 const state = {
@@ -243,11 +332,19 @@ function buildSwatches(container, colors, onPick, isSelected) {
 function buildOptionButtons(container, items, onPick) {
   container.innerHTML = '';
   items.forEach((item) => {
+    const unlocked = isUnlocked(item);
     const btn = document.createElement('button');
-    btn.className = 'option-btn';
+    btn.className = 'option-btn' + (unlocked ? '' : ' locked');
     btn.dataset.id = item.id;
-    btn.innerHTML = `<span class="emoji">${item.emoji}</span>${item.label}`;
-    btn.addEventListener('click', () => onPick(item.id));
+    btn.innerHTML = `<span class="emoji">${item.emoji}</span>${item.label}`
+      + (unlocked ? '' : `<span class="lock-badge">🔒 Lvl ${item.unlockLevel}</span>`);
+    if (unlocked) {
+      btn.addEventListener('click', () => onPick(item.id));
+    } else {
+      btn.disabled = true;
+      const levelDef = LEVELS.find((l) => l.level === item.unlockLevel);
+      btn.title = `Unlocks at Level ${item.unlockLevel} — ${levelDef.name}`;
+    }
     container.appendChild(btn);
   });
 }
@@ -709,7 +806,7 @@ function resetGameState() {
   gameWorld.querySelectorAll('.game-character').forEach((c) => c.remove());
   gameCharacterEl = document.createElement('div');
   gameCharacterEl.className = 'game-character';
-  gameCharacterEl.innerHTML = `<svg viewBox="0 0 300 520">${buildDollSVG(state)}</svg>`;
+  gameCharacterEl.innerHTML = `<svg viewBox="0 -10 300 480" preserveAspectRatio="xMidYMax meet">${buildDollSVG(state)}</svg>`;
   gameWorld.appendChild(gameCharacterEl);
 
   const bgDef = BACKGROUNDS.find((b) => b.id === state.background);
@@ -734,12 +831,11 @@ function gameLoop(ts) {
   }
 
   const charCenterX = charX + CHAR_W / 2;
-  const charCenterY = GROUND_Y - CHAR_H / 2 - elevation;
   STAR_LAYOUT.forEach((star, i) => {
     if (starCollected[i]) return;
     const dx = Math.abs(charCenterX - star.x);
-    const dy = Math.abs(charCenterY - (GROUND_Y - star.elevation));
-    if (dx < 45 && dy < 55) collectStar(i);
+    const dElevation = Math.abs(elevation - star.elevation);
+    if (dx < 45 && dElevation < 60) collectStar(i);
   });
 
   const scale = gameViewport.clientWidth / BASE_W;
@@ -769,12 +865,35 @@ function endGame() {
   const score = Math.min(10, 6.5 + Math.random() * 0.5 + starsCollected * 0.35 + (allCollected ? 0.5 : 0));
   const comment = JUDGE_COMMENTS[Math.floor(Math.random() * JUDGE_COMMENTS.length)];
 
+  const prevLevel = getLevelInfo(totalStars).level;
+  totalStars += starsCollected;
+  saveTotalStars();
+  const newLevelInfo = getLevelInfo(totalStars);
+  const leveledUp = newLevelInfo.level > prevLevel;
+  const newlyUnlocked = leveledUp
+    ? [...OUTFIT_STYLES, ...ACCESSORIES].filter((i) => i.unlockLevel === newLevelInfo.level)
+    : [];
+
   gameScoreDisplay.textContent = `${score.toFixed(1)} / 10`;
   gameCommentDisplay.textContent = comment;
-  gameStarsSummary.textContent = `⭐ ${starsCollected} / ${total} stars collected`;
+  gameStarsSummary.textContent = `⭐ ${starsCollected} earned this run · ${totalStars} total`;
+
+  const levelupEl = document.getElementById('game-levelup');
+  if (leveledUp) {
+    const names = newlyUnlocked.map((i) => i.label).join(' & ');
+    levelupEl.textContent = `🎉 Level up! You're now ${newLevelInfo.name}${names ? ` — unlocked ${names}!` : ''}`;
+    levelupEl.hidden = false;
+  } else {
+    levelupEl.hidden = true;
+  }
+
   gameConfettiLayer.innerHTML = '';
-  if (score >= 9) launchConfetti(gameConfettiLayer);
+  if (score >= 9 || leveledUp) launchConfetti(gameConfettiLayer);
   gameResult.hidden = false;
+
+  renderLevelBanner();
+  rebuildThemedLists();
+  render();
 }
 
 function tryJump() {
@@ -843,5 +962,6 @@ btnJump.addEventListener('pointerdown', tryJump);
 
 // ---------- Init ----------
 
+renderLevelBanner();
 rebuildThemedLists();
 render();

@@ -16,6 +16,11 @@
   </header>
 
   <div class="global-controls">
+    <div class="level-banner">
+      <span class="level-badge" id="level-badge">🌟 Level 1 — Newcomer</span>
+      <div class="level-progress"><div class="level-progress-fill" id="level-progress-fill"></div></div>
+      <span class="level-next" id="level-next"></span>
+    </div>
     <div class="global-group">
       <span class="global-label">Character</span>
       <div class="option-row" id="bodytype-pills"></div>
@@ -103,9 +108,13 @@
           <g id="layer-acc-hat"></g>
           <g id="layer-acc-santa-hat"></g>
           <g id="layer-acc-flower-crown"></g>
+          <g id="layer-acc-tiara"></g>
+          <g id="layer-acc-crown"></g>
           <g id="layer-acc-glasses"></g>
+          <g id="layer-acc-star-earrings"></g>
           <g id="layer-acc-necklace"></g>
           <g id="layer-acc-snowflake"></g>
+          <g id="layer-acc-diamond-necklace"></g>
           <g id="layer-acc-bag"></g>
           <g id="layer-acc-candy-cane"></g>
           <g id="layer-acc-wand"></g>
@@ -190,6 +199,7 @@
         <div class="score" id="game-score-display"></div>
         <p class="comment" id="game-comment-display"></p>
         <p class="stars-summary" id="game-stars-summary"></p>
+        <p class="level-up-msg" id="game-levelup" hidden></p>
         <div class="game-result-actions">
           <button class="btn btn-ghost" id="game-again-btn">🔁 Walk Again</button>
           <button class="btn btn-primary" id="game-done-btn">✅ Done</button>
