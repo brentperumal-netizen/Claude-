@@ -1,6 +1,7 @@
 import React, { Suspense, useEffect, useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { ContentPreviewScreen } from './src/screens/ContentPreviewScreen';
 
 // react-native-skia's web binding (`Skia.web.ts`) does `JsiSkApi(global.CanvasKit)`
 // at module-evaluation time. If anything that transitively imports `Skia` gets
@@ -15,6 +16,7 @@ const DressUpScreen = React.lazy(() =>
 
 export default function App() {
   const [skiaReady, setSkiaReady] = useState(Platform.OS !== 'web');
+  const [mode, setMode] = useState<'dressup' | 'content'>('dressup');
 
   useEffect(() => {
     if (Platform.OS !== 'web') return;
@@ -25,7 +27,17 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Suspense fallback={<Loading />}>{skiaReady ? <DressUpScreen /> : <Loading />}</Suspense>
+      <TouchableOpacity
+        style={styles.modeToggle}
+        onPress={() => setMode((m) => (m === 'dressup' ? 'content' : 'dressup'))}
+      >
+        <Text style={styles.modeToggleText}>{mode === 'dressup' ? 'Preview New Content Pack' : 'Back to Dress Up'}</Text>
+      </TouchableOpacity>
+      {mode === 'content' ? (
+        <ContentPreviewScreen />
+      ) : (
+        <Suspense fallback={<Loading />}>{skiaReady ? <DressUpScreen /> : <Loading />}</Suspense>
+      )}
       <StatusBar style="auto" />
     </View>
   );
@@ -53,5 +65,20 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#b83c6f',
     fontWeight: '600',
+  },
+  modeToggle: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 10,
+    backgroundColor: '#b83c6f',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+  },
+  modeToggleText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '700',
   },
 });
