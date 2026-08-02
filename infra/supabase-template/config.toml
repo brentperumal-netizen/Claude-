@@ -1,0 +1,10 @@
+# Copy this whole infra/supabase-template/ directory into a new app's
+# supabase/ folder (`supabase init` first, then overwrite migrations/functions),
+# then update project_id below to that app's Supabase project ref.
+project_id = "REPLACE_WITH_YOUR_PROJECT_REF"
+
+[functions.send-email]
+verify_jwt = true
+
+[functions.inbound-email]
+verify_jwt = false

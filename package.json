@@ -1,0 +1,8 @@
+{
+  "name": "claude-apps",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

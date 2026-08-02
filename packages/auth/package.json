@@ -1,0 +1,15 @@
+{
+  "name": "@claude-apps/auth",
+  "private": true,
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "peerDependencies": {
+    "@clerk/clerk-expo": "^2.0.0",
+    "@clerk/clerk-react": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@clerk/clerk-expo": { "optional": true },
+    "@clerk/clerk-react": { "optional": true }
+  }
+}
