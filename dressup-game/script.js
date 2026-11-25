@@ -4384,7 +4384,8 @@ function showLandPanel(land) {
     <div class="map-panel-head"><span class="map-panel-emoji">${land.emoji}</span>
       <div><strong>${land.name}</strong><span>🤖 Guide-Bot: "${land.says}"</span></div></div>
     <div class="map-panel-actions">
-      ${done ? '' : `<button class="btn btn-primary" id="map-treasure">🎁 Open Treasure</button>`}
+      <button class="btn btn-primary" id="map-enter">🚪 Go Inside</button>
+      ${done ? '' : `<button class="btn btn-ghost" id="map-treasure">🎁 Open Treasure</button>`}
       <button class="btn btn-ghost" id="map-visit">${theme ? `${theme.emoji} Wear ${theme.label} Style` : '✨ Visit'}</button>
     </div>
     <p class="map-panel-note" id="map-note"></p>`;
@@ -4392,6 +4393,7 @@ function showLandPanel(land) {
   const tBtn = document.getElementById('map-treasure');
   if (tBtn) tBtn.addEventListener('click', () => openTreasure(land));
   document.getElementById('map-visit').addEventListener('click', () => visitLand(land));
+  document.getElementById('map-enter').addEventListener('click', () => enterLand(land));
 }
 
 function openTreasure(land) {
@@ -4475,6 +4477,8 @@ function mapPointer(e) {
   pt.x = e.clientX;
   pt.y = e.clientY;
   const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  const tapped = LANDS.find((l) => Math.hypot(l.x - p.x, l.y - p.y) < 40);
+  if (tapped && mapLand === tapped) { enterLand(tapped); return; }
   mapTarget = { x: p.x, y: p.y };
 }
 
@@ -4508,6 +4512,11 @@ function openExplore() {
 }
 
 function closeExplore() {
+  stopLand();
+  landStage.hidden = true;
+  landStage.innerHTML = '';
+  mapStage.hidden = false;
+  document.getElementById('map-progress').hidden = false;
   exploreOverlay.hidden = true;
   if (mapRaf) cancelAnimationFrame(mapRaf);
   mapRaf = null;
@@ -4521,6 +4530,257 @@ document.getElementById('ex-close').addEventListener('click', closeExplore);
 exploreOverlay.addEventListener('click', (e) => {
   if (e.target === exploreOverlay) closeExplore();
 });
+
+// ---------- Inside a land ----------
+// Each land is a side-scrolling world: walk with your chosen walk, find the land's
+// hidden items, chat with robot locals, then open the treasure chest at the end.
+
+const landStage = document.getElementById('land-stage');
+const mapStage = document.getElementById('map-stage');
+const LAND_W = 2600, VIEW_W = 800, VIEW_H = 450, LAND_GROUND_Y = 372, LAND_ITEMS = 6;
+const LAND_FIRST_CASH = 20, LAND_FIRST_POINTS = 3, LAND_REPEAT_CASH = 5;
+
+const LAND_SCENES = {
+  classic: { ground: '#d9c7e8', back: ['🏬', '🏙️', '🏢', '🏬', '🏛️'], front: ['🌳', '🚕', '☕', '🛍️', '🌷', '🛴'], collect: { emoji: '👜', name: 'designer bag', plural: 'designer bags' }, particle: null, lines: ['Welcome to Fashion City!', 'The boutiques here are super fancy.', 'I lost my designer bags. Can you find them?'] },
+  halloween: { ground: '#3a2a4a', back: ['🌲', '🏚️', '🌲', '🌕', '🌲'], front: ['🪦', '🕸️', '🦉', '🍂', '🪦', '🕯️'], collect: { emoji: '🎃', name: 'pumpkin', plural: 'pumpkins' }, particle: { emoji: '🦇', dir: 'across' }, lines: ['Boo! Did I scare you?', 'Spooky pumpkins are hiding everywhere!', 'Watch out for the friendly ghosts 👻'] },
+  christmas: { ground: '#ffffff', back: ['🏔️', '🌲', '🏠', '🌲', '🏔️'], front: ['⛄', '🎄', '🛷', '🌲', '🦌', '🧦'], collect: { emoji: '🎁', name: 'present', plural: 'presents' }, particle: { emoji: '❄️', dir: 'down' }, lines: ['Brrr, it\'s chilly!', 'Santa dropped his presents!', 'Want to build a snowman?'] },
+  fairy: { ground: '#8fd8a0', back: ['🌳', '🌈', '🌳', '🏰', '🌳'], front: ['🍄', '🌸', '🦋', '🌼', '🍄', '🐞'], collect: { emoji: '🌟', name: 'fairy star', plural: 'fairy stars' }, particle: { emoji: '✨', dir: 'float' }, lines: ['The fairies left their stars around!', 'Make a wish! ✨', 'Mushrooms make great umbrellas.'] },
+  birds: { ground: '#9fd88a', back: ['🌳', '🌳', '🌲', '🌳', '🌴'], front: ['🌻', '🪺', '🦚', '🦜', '🌻', '🐦'], collect: { emoji: '🪶', name: 'feather', plural: 'feathers' }, particle: { emoji: '🍃', dir: 'across' }, lines: ['Tweet tweet!', 'The birds dropped their pretty feathers.', 'Have you seen the peacock?'] },
+  metgala: { ground: '#b0123f', back: ['🏛️', '🏛️', '🏰', '🏛️', '🏛️'], front: ['🌹', '📸', '💐', '🎻', '🌹', '🕯️'], collect: { emoji: '💎', name: 'diamond', plural: 'diamonds' }, particle: { emoji: '✨', dir: 'float' }, lines: ['Welcome to the Gala Palace, darling!', 'Someone lost their diamonds on the red carpet!', 'Strike a pose for the cameras 📸'] },
+  superhero: { ground: '#4a4f7a', back: ['🏙️', '🏢', '🏬', '🏢', '🏙️'], front: ['🚀', '🛸', '🚓', '⚡', '🏗️', '🚁'], collect: { emoji: '⚡', name: 'power bolt', plural: 'power bolts' }, particle: { emoji: '⭐', dir: 'float' }, lines: ['Hero training is about to begin!', 'Collect the power bolts to charge up!', 'Up, up and away!'] },
+  ballet: { ground: '#c9935a', back: ['🎭', '🪞', '🏛️', '🪞', '🎭'], front: ['🌹', '🎻', '🩰', '💐', '🎹', '🌹'], collect: { emoji: '🎀', name: 'ribbon', plural: 'ribbons' }, particle: { emoji: '🌸', dir: 'down' }, lines: ['Point your toes! 🩰', 'The dancers lost their ribbons.', 'Bravo! Bravo!'] },
+  school: { ground: '#c98f5a', back: ['🏫', '🏫', '🏟️', '🏫', '🏫'], front: ['📚', '🍎', '🎨', '✏️', '🧮', '🔬'], collect: { emoji: '⭐', name: 'gold star', plural: 'gold stars' }, particle: null, lines: ['Class is in session!', 'Find all the gold stars for an A+!', 'Art class is my favourite 🎨'] },
+  party: { ground: '#e6c2ff', back: ['🎪', '🎡', '🎪', '🎠', '🎪'], front: ['🎈', '🎂', '🎁', '🪩', '🎈', '🍿'], collect: { emoji: '🧁', name: 'cupcake', plural: 'cupcakes' }, particle: { emoji: '🎊', dir: 'down' }, lines: ['Let\'s party! 🎉', 'Someone hid all the cupcakes!', 'Dance with me! 💃'] },
+  sleepy: { ground: '#b9a6e8', back: ['🏡', '🌙', '🏡', '⭐', '🏡'], front: ['🧸', '🛏️', '🕯️', '📚', '🧸', '🌙'], collect: { emoji: '💫', name: 'dream star', plural: 'dream stars' }, particle: { emoji: '💤', dir: 'float' }, lines: ['*yawn* Is it bedtime yet?', 'Dream stars are floating around!', 'Pillow fight! 🛏️'] },
+  summer: { ground: '#f2dfb0', back: ['🌴', '⛱️', '🌴', '🏖️', '🌴'], front: ['🐚', '🦀', '🏄', '⛱️', '🏐', '🦀'], collect: { emoji: '🐚', name: 'seashell', plural: 'seashells' }, particle: null, lines: ['Surf\'s up! 🏄', 'Pretty seashells washed up on the sand!', 'Don\'t forget your sunscreen ☀️'] },
+  mermaid: { ground: '#e8d6a8', back: ['🪸', '🐋', '🪸', '🏝️', '🪸'], front: ['🐠', '🐙', '🐢', '🪸', '🐡', '🦑'], collect: { emoji: '🦪', name: 'pearl', plural: 'pearls' }, particle: { emoji: '🫧', dir: 'up' }, lines: ['Splash! Welcome to the lagoon!', 'The pearls rolled out of their shells!', 'Swim with the turtles! 🐢'] },
+};
+
+const LAND_QUEST_KEY = 'runwayReady.landQuests';
+let landQuests = new Set();
+try {
+  const saved = JSON.parse(localStorage.getItem(LAND_QUEST_KEY) || '[]');
+  if (Array.isArray(saved)) landQuests = new Set(saved);
+} catch (e) {}
+
+let landState = null;
+
+function enterLand(land) {
+  if (mapRaf) cancelAnimationFrame(mapRaf);
+  mapRaf = null;
+  const sc = LAND_SCENES[land.id];
+  const bg = BACKGROUNDS.find((b) => b.id === land.bg);
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const items = Array.from({ length: LAND_ITEMS }, (_, i) => ({
+    x: Math.round(300 + i * ((LAND_W - 650) / LAND_ITEMS) + rand(0, 220)),
+    y: Math.random() < 0.35 ? LAND_GROUND_Y - rand(70, 120) : LAND_GROUND_Y - 6,
+    got: false,
+  }));
+  const npcs = [Math.round(rand(520, 800)), Math.round(rand(1400, 1700))].map((x, i) => ({ x, ...robotLook(null), name: pick(ROBOT_NAMES), id: `ln${i}`, said: false }));
+  landState = { land, sc, items, npcs, x: 110, target: null, facing: 1, t: 0, last: 0, keys: { left: false, right: false }, chestOpen: false, raf: null, timers: [] };
+
+  const backProps = Array.from({ length: 12 }, (_, i) => `<span class="land-prop back" style="left:${80 + i * 210 + rand(-40, 40)}px; font-size:${Math.round(rand(80, 130))}px">${sc.back[i % sc.back.length]}</span>`).join('');
+  const frontProps = Array.from({ length: 16 }, (_, i) => `<span class="land-prop front" style="left:${150 + i * 155 + rand(-30, 30)}px; font-size:${Math.round(rand(38, 60))}px">${sc.front[i % sc.front.length]}</span>`).join('');
+  const particles = sc.particle ? Array.from({ length: 10 }, (_, i) => `<span class="land-particle ${sc.particle.dir}" style="left:${rand(0, 96)}%; top:${rand(0, 70)}%; animation-duration:${rand(5, 9)}s; animation-delay:${-rand(0, 8)}s">${sc.particle.emoji}</span>`).join('') : '';
+
+  landStage.innerHTML = `
+    <div class="land-hud">
+      <button class="btn btn-ghost mg-back" id="land-exit">← Map</button>
+      <span class="land-title">${land.emoji} ${land.name}</span>
+      <span class="land-count" id="land-count"></span>
+    </div>
+    <div class="land-scene" id="land-scene" style="background:${bg ? bg.gradient : '#bfe9ff'}">
+      ${particles}
+      <div class="land-world" id="land-world" style="width:${LAND_W}px; height:${VIEW_H}px">
+        ${backProps}
+        <div class="land-ground" style="top:${LAND_GROUND_Y}px; background:${sc.ground}"></div>
+        ${npcs.map((n, i) => `<div class="land-npc" id="lnpc-${i}" style="left:${n.x}px"><div class="land-bubble" id="lnb-${i}" hidden></div>${dollThumb(n.look, n.id)}<span class="fp-name">🤖 ${n.name}</span></div>`).join('')}
+        ${items.map((it, i) => `<span class="land-item" id="litem-${i}" style="left:${it.x}px; top:${it.y}px">${sc.collect.emoji}</span>`).join('')}
+        <div class="land-chest" id="land-chest" style="left:${LAND_W - 170}px"><div class="land-bubble" id="land-chest-bubble" hidden></div><span id="land-chest-icon">🧰</span></div>
+        <div class="land-player" id="land-player"><svg viewBox="0 -10 300 520" preserveAspectRatio="xMidYMax meet">${buildDollSVG(currentLookCopy(), 'land', { posed: true })}</svg></div>
+        ${frontProps}
+      </div>
+      <div class="land-toast" id="land-toast" hidden></div>
+    </div>
+    <div class="game-controls-mobile land-controls">
+      <button class="game-btn" id="land-left" aria-label="Walk left">◀</button>
+      <button class="game-btn" id="land-right" aria-label="Walk right">▶</button>
+    </div>
+    <p class="game-hint">Tap where to walk, hold ◀ ▶, or use the arrow keys. Find every ${sc.collect.emoji} ${sc.collect.name}, then open the treasure chest at the end!</p>`;
+  mapStage.hidden = true;
+  landStage.hidden = false;
+  document.getElementById('map-progress').hidden = true;
+
+  const scene = document.getElementById('land-scene');
+  scene.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return;
+    e.preventDefault();
+    const r = scene.getBoundingClientRect();
+    const scale = r.width / VIEW_W;
+    landState.target = landState.camX + (e.clientX - r.left) / scale;
+  });
+  scene.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+  const hold = (id, key) => {
+    const btn = document.getElementById(id);
+    btn.addEventListener('pointerdown', (e) => { e.preventDefault(); landState.keys[key] = true; landState.target = null; });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => btn.addEventListener(ev, () => { landState.keys[key] = false; }));
+    btn.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+  };
+  hold('land-left', 'left');
+  hold('land-right', 'right');
+  document.getElementById('land-exit').addEventListener('click', exitLand);
+  document.addEventListener('keydown', landKeyDown);
+  document.addEventListener('keyup', landKeyUp);
+  updateLandCount();
+  poseLimbs(document.getElementById('land-player'), currentWalk(), 0, 0, false);
+  landState.raf = requestAnimationFrame(landTick);
+}
+
+function landKey(down) {
+  return (e) => {
+    if (!landState) return;
+    const k = { ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right' }[e.key];
+    if (!k) return;
+    landState.keys[k] = down;
+    if (down) landState.target = null;
+    e.preventDefault();
+  };
+}
+const landKeyDown = landKey(true), landKeyUp = landKey(false);
+
+function updateLandCount() {
+  const { items, sc } = landState;
+  const got = items.filter((i) => i.got).length;
+  document.getElementById('land-count').textContent = `${sc.collect.emoji} ${got} / ${items.length} ${sc.collect.plural}`;
+}
+
+function landToast(text) {
+  const t = document.getElementById('land-toast');
+  if (!t) return;
+  t.textContent = text;
+  t.hidden = false;
+  t.classList.remove('pop');
+  void t.offsetWidth;
+  t.classList.add('pop');
+  clearTimeout(landState.toastTimer);
+  landState.toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
+}
+
+function landBubble(id, text) {
+  const b = document.getElementById(id);
+  if (!b) return;
+  b.textContent = text;
+  b.hidden = false;
+  landState.timers.push(setTimeout(() => { b.hidden = true; }, 2800));
+}
+
+function landTick(ts) {
+  const L = landState;
+  if (!L) return;
+  if (!L.last) L.last = ts;
+  const dt = Math.min(0.05, (ts - L.last) / 1000);
+  L.last = ts;
+  const speed = 240;
+  let vx = (L.keys.right ? 1 : 0) - (L.keys.left ? 1 : 0);
+  if (!vx && L.target != null) {
+    const d = L.target - L.x;
+    if (Math.abs(d) < 6) L.target = null;
+    else vx = Math.sign(d);
+  }
+  L.x = Math.min(LAND_W - 60, Math.max(40, L.x + vx * speed * dt));
+  if (vx) { L.facing = vx; L.t += dt; }
+
+  const scene = document.getElementById('land-scene');
+  const scale = scene.clientWidth / VIEW_W;
+  L.camX = Math.min(Math.max(L.x - VIEW_W / 2, 0), LAND_W - VIEW_W);
+  document.getElementById('land-world').style.transform = `scale(${scale}) translateX(${-L.camX}px)`;
+  const player = document.getElementById('land-player');
+  player.style.left = `${L.x}px`;
+  player.style.transform = `translateX(-50%) scaleX(${L.facing})`;
+  poseLimbs(player, currentWalk(), L.t, 0, vx !== 0);
+
+  L.items.forEach((it, i) => {
+    if (it.got || Math.abs(it.x - L.x) > 42) return;
+    it.got = true;
+    const el = document.getElementById(`litem-${i}`);
+    if (el) el.classList.add('got');
+    updateLandCount();
+    const left = L.items.filter((x) => !x.got).length;
+    landToast(left ? `${L.sc.collect.emoji} Found a ${L.sc.collect.name}! ${left} to go.` : `🎉 You found every ${L.sc.collect.name}! Go open the chest! ➡️`);
+  });
+
+  L.npcs.forEach((n, i) => {
+    const near = Math.abs(n.x - L.x) < 110;
+    if (near && !n.said) { n.said = true; landBubble(`lnb-${i}`, pick(L.sc.lines)); }
+    if (!near && Math.abs(n.x - L.x) > 220) n.said = false;
+  });
+
+  const chestX = LAND_W - 170;
+  if (Math.abs(chestX - L.x) < 90 && !L.chestNear) {
+    L.chestNear = true;
+    if (L.items.every((x) => x.got)) openLandChest();
+    else landBubble('land-chest-bubble', `🔒 Find all ${L.items.length} ${L.sc.collect.plural} first!`);
+  }
+  if (Math.abs(chestX - L.x) > 160) L.chestNear = false;
+
+  L.raf = requestAnimationFrame(landTick);
+}
+
+function openLandChest() {
+  const L = landState;
+  if (L.chestOpen) return;
+  L.chestOpen = true;
+  document.getElementById('land-chest-icon').textContent = '💰';
+  document.getElementById('land-chest').classList.add('open');
+  const first = !landQuests.has(L.land.id);
+  let msg;
+  if (first) {
+    landQuests.add(L.land.id);
+    try { localStorage.setItem(LAND_QUEST_KEY, JSON.stringify([...landQuests])); } catch (e) {}
+    cash += LAND_FIRST_CASH;
+    msg = `🎉 Treasure! 💵 +$${LAND_FIRST_CASH}`;
+    if (PASSES.some((x) => passOwned(x.id))) {
+      const unlocked = addPassPoints(LAND_FIRST_POINTS);
+      msg += ` · 🎟️ +${LAND_FIRST_POINTS} pass points${unlocked.length ? ` · Unlocked ${unlocked.join(' & ')}!` : ''}`;
+    }
+  } else {
+    cash += LAND_REPEAT_CASH;
+    msg = `💰 Bonus treasure! 💵 +$${LAND_REPEAT_CASH}`;
+  }
+  saveShop();
+  renderCash();
+  rebuildThemedLists();
+  render();
+  landBubble('land-chest-bubble', msg);
+  landToast(msg);
+  const layer = document.createElement('div');
+  layer.className = 'confetti-layer';
+  document.getElementById('land-scene').appendChild(layer);
+  launchConfetti(layer);
+}
+
+function stopLand() {
+  if (!landState) return;
+  if (landState.raf) cancelAnimationFrame(landState.raf);
+  landState.timers.forEach(clearTimeout);
+  clearTimeout(landState.toastTimer);
+  landState = null;
+  document.removeEventListener('keydown', landKeyDown);
+  document.removeEventListener('keyup', landKeyUp);
+}
+
+function exitLand() {
+  const land = landState && landState.land;
+  stopLand();
+  landStage.hidden = true;
+  landStage.innerHTML = '';
+  mapStage.hidden = false;
+  document.getElementById('map-progress').hidden = false;
+  drawMap();
+  if (land) { mapPos = { x: land.x, y: land.y + 10 }; placeMe(); mapLand = land; showLandPanel(land); }
+  mapLast = 0;
+  mapRaf = requestAnimationFrame(mapTick);
+}
 
 // ---------- Nail Salon ----------
 // A big hand you paint yourself: pick a polish, then rub your finger over a nail.
