@@ -227,10 +227,85 @@ const HAIR_STYLES = [
           <path d="M98,82 A58,58 0 0 1 202,82 Z"/>
           <rect x="98" y="80" width="12" height="20" rx="6"/><rect x="190" y="80" width="12" height="20" rx="6"/>
           <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
+  { id: 'braids', label: 'Long Braids', emoji: '🪢',
+    svg: `${['left', 'right'].map((side) => {
+            const mx = (x) => (side === 'left' ? x : 300 - x);
+            const links = Array.from({ length: 9 }, (_, i) => {
+              const y = 108 + i * 17, x = mx(100 + (i % 2 ? 4 : -4));
+              return `<ellipse cx="${x}" cy="${y}" rx="11" ry="10" transform="rotate(${(i % 2 ? 1 : -1) * (side === 'left' ? 20 : -20)} ${x} ${y})"/>`;
+            }).join('');
+            return `<g class="hair-sway hair-sway-${side}">${links}
+              <rect x="${mx(100) - 6}" y="254" width="12" height="7" rx="3" fill="#ff8fc7" stroke="none"/>
+              <path d="M${mx(100) - 6},261 L${mx(100)},276 L${mx(100) + 6},261 Z"/></g>`;
+          }).join('')}
+          <path d="M98,82 A58,58 0 0 1 202,82 Z"/>
+          <rect x="98" y="80" width="14" height="30" rx="7"/><rect x="188" y="80" width="14" height="30" rx="7"/>
+          <path d="M150,38 L150,56" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.25"/>
+          <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
+  { id: 'space-buns', label: 'Space Buns', emoji: '🪐',
+    svg: `<circle cx="114" cy="40" r="18"/><circle cx="186" cy="40" r="18"/>
+          <path d="M114,40 m0,-8 a8,8 0 1 1 -8,8 a5,5 0 1 1 5,5" fill="none" stroke="#000000" stroke-width="1.4" opacity="0.2"/>
+          <path d="M186,40 m0,-8 a8,8 0 1 1 -8,8 a5,5 0 1 1 5,5" fill="none" stroke="#000000" stroke-width="1.4" opacity="0.2"/>
+          <path d="M98,82 A58,58 0 0 1 202,82 Z"/>
+          <rect x="98" y="80" width="12" height="22" rx="6"/><rect x="190" y="80" width="12" height="22" rx="6"/>
+          <path d="M150,38 L150,56" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.25"/>
+          <circle cx="108" cy="32" r="3" fill="#ffffff" opacity="0.3"/><circle cx="180" cy="32" r="3" fill="#ffffff" opacity="0.3"/>` },
+  { id: 'side-pony', label: 'Side Ponytail', emoji: '💁',
+    svg: `<g class="hair-sway hair-sway-left">
+            <path d="M108,66 C82,66 70,92 72,126 C74,160 66,196 78,220 C90,206 94,176 92,148 C90,118 98,92 114,80 Z"/>
+            <path d="M84,104 C80,130 82,160 80,190" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.22"/>
+          </g>
+          <path d="M98,82 A58,58 0 0 1 202,82 Z"/>
+          <rect x="188" y="80" width="14" height="26" rx="7"/>
+          <circle cx="106" cy="72" r="6" fill="#8c5ce0" stroke="#5a3aa8" stroke-width="1"/>
+          <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
   { id: 'crop', label: 'Short Crop', emoji: '💈',
     svg: `<path d="M100,78 A52,52 0 0 1 200,78 L198,96 A50,42 0 0 0 102,96 Z"/>
           <path d="M116,64 Q128,56 140,60" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>` },
 ];
+
+const BANG_STYLES = [
+  { id: 'none', label: 'No Bangs', emoji: '○' },
+  { id: 'straight', label: 'Straight', emoji: '➖' },
+  { id: 'side', label: 'Side Swept', emoji: '↗️' },
+  { id: 'curtain', label: 'Curtain', emoji: '🪟' },
+  { id: 'wispy', label: 'Wispy', emoji: '🌬️' },
+  { id: 'micro', label: 'Short', emoji: '✂️' },
+];
+
+// Bangs sit over the forehead, drawn in the hair's own colour.
+function bangsSVG(style) {
+  if (!style || style === 'none') return '';
+  if (style === 'straight') {
+    // a blunt fringe with a softly jagged edge, from the right temple back to the left
+    let edge = '';
+    for (let i = 0; i <= 18; i++) {
+      const x = 196 - i * (92 / 18);
+      edge += ` L${x.toFixed(1)},${i % 2 ? 78 : 74}`;
+    }
+    return `<path d="M104,76 C102,50 124,42 150,42 C176,42 198,50 196,76${edge} Z" stroke-width="1"/>
+            <path d="M118,52 Q134,46 150,47" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>`;
+  }
+  if (style === 'side') {
+    return `<path d="M102,84 C100,54 124,40 154,42 C182,44 198,58 197,76 Q176,60 148,64 Q120,68 102,84 Z" stroke-width="1"/>
+            <path d="M120,58 Q144,50 172,52" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>`;
+  }
+  if (style === 'curtain') {
+    return `<path d="M103,88 C100,56 122,42 150,42 C178,42 200,56 197,88 Q188,72 174,63 Q160,55 152,49 L148,49 Q140,55 126,63 Q112,72 103,88 Z" stroke-width="1"/>
+            <path d="M118,60 Q132,50 146,48 M182,60 Q168,50 154,48" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.25"/>`;
+  }
+  if (style === 'wispy') {
+    const strands = [118, 130, 142, 154, 166, 178].map((x, i) =>
+      `<path d="M${x - 6},58 Q${x - 3},68 ${x + (i % 2 ? 2 : -2)},${76 + (i % 3)} Q${x + 3},66 ${x + 6},58 Z" stroke-width="0.8"/>`).join('');
+    return `${strands}<path d="M104,66 C104,50 126,42 150,42 C174,42 196,50 196,66 Q150,56 104,66 Z" stroke-width="1"/>`;
+  }
+  if (style === 'micro') {
+    return `<path d="M106,66 C104,48 124,42 150,42 C176,42 196,48 194,66 Q150,60 106,66 Z" stroke-width="1"/>`;
+  }
+  return '';
+}
+
+const SALON_HAIR_COLORS = ['#2b2b2b', '#4b2e1e', '#8a5a2b', '#d9b45a', '#f2994a', '#e05c5c', '#ff6fb0', '#e0558f', '#8c5ce0', '#5cc4e0', '#43b581', '#e0e0e0'];
 
 const HAIR_COLORS = ['#2b2b2b', '#4b2e1e', '#8a5a2b', '#d9b45a', '#e0558f', '#8c5ce0', '#5cc4e0', '#e0e0e0'];
 
@@ -2741,6 +2816,11 @@ buildOptionButtons(document.getElementById('face-extras'), [
   render();
 });
 
+buildOptionButtons(document.getElementById('bang-styles'), BANG_STYLES, (id) => {
+  state.hair.bangs = id;
+  render();
+});
+
 buildSwatches(document.getElementById('hair-colors'), HAIR_COLORS, (c) => {
   state.hair.color = c;
   render();
@@ -2894,7 +2974,7 @@ function render() {
   setGradient('hairGradient', state.hair.color, 0.3, 0.35);
   const hairLayer = document.getElementById('layer-hair');
   const hairDef = HAIR_STYLES.find((h) => h.id === state.hair.style);
-  hairLayer.innerHTML = hairDef.svg;
+  hairLayer.innerHTML = hairDef.svg + (hairDef.id === 'none' ? '' : bangsSVG(state.hair.bangs));
   hairLayer.setAttribute('fill', 'url(#hairGradient)');
   hairLayer.setAttribute('stroke', darken(state.hair.color, 0.35));
 
@@ -2979,6 +3059,7 @@ function render() {
   highlightSelection('#outfit-colors', state.outfit.color, 'color');
   highlightSelection('#shoe-colors', state.shoes.color, 'color');
   highlightSelection('#hair-styles', state.hair.style, 'id');
+  highlightSelection('#bang-styles', state.hair.bangs || 'none', 'id');
   highlightSelection('#outfit-styles', state.outfit.style, 'id');
   highlightSelection('#shoe-styles', state.shoes.style, 'id');
   highlightSelection('#background-styles', state.background, 'id');
@@ -3383,7 +3464,7 @@ document.getElementById('randomize-btn').addEventListener('click', () => {
     blush: Math.random() > 0.3,
     freckles: Math.random() > 0.6,
   };
-  state.hair = { style: pick(HAIR_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(HAIR_COLORS) };
+  state.hair = { style: pick(HAIR_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(HAIR_COLORS), bangs: Math.random() < 0.35 ? pick(BANG_STYLES).id : 'none' };
   state.outfit = { style: pick(OUTFIT_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(OUTFIT_COLORS) };
   state.shoes = { style: pick(SHOE_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(SHOE_COLORS) };
   ACCESSORIES.filter(itemVisible).forEach((a) => { state.accessories[a.id] = isUnlocked(a) && Math.random() > 0.5; });
@@ -3529,7 +3610,7 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
       <circle cx="150" cy="93" r="48" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
       <ellipse cx="128" cy="72" rx="10" ry="7" fill="#ffffff" opacity="0.35"/>
     </g>
-    <g fill="url(#${hairGrad})" stroke="${hairDark}">${hairDef.svg}</g>
+    <g fill="url(#${hairGrad})" stroke="${hairDark}">${hairDef.svg}${hairDef.id === 'none' ? '' : bangsSVG(look.hair.bangs)}</g>
     <g>${buildFaceSVG(face, look.hair.color)}</g>
     ${outfitDef.hidesLegs ? '' : posed ? `
       <clipPath id="shoeClipL${idSuffix}"><rect x="0" y="0" width="150" height="520"/></clipPath>
@@ -3602,6 +3683,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !passesOverlay.hidden) closePasses();
   if (e.key === 'Escape' && !mgOverlay.hidden) closeMiniGames();
   if (e.key === 'Escape' && !salonOverlay.hidden) closeSalon();
+  if (e.key === 'Escape' && !hairSalonOverlay.hidden) closeHairSalon();
   if (e.key === 'Escape' && !catwalkOverlay.hidden) closeCatwalk();
 });
 
@@ -3841,6 +3923,63 @@ document.getElementById('passes-btn').addEventListener('click', openPasses);
 document.getElementById('passes-close').addEventListener('click', closePasses);
 passesOverlay.addEventListener('click', (e) => {
   if (e.target === passesOverlay) closePasses();
+});
+
+// ---------- Hair Salon ----------
+// A mirror close-up for trying hairstyles, bangs and colours.
+
+const hairSalonOverlay = document.getElementById('hair-salon-overlay');
+const hairMirror = document.getElementById('hair-mirror');
+
+function renderHairMirror() {
+  hairMirror.innerHTML = `<svg viewBox="40 0 220 200" xmlns="http://www.w3.org/2000/svg">${buildDollSVG(state, 'hairsalon')}</svg>`;
+}
+
+function hairSet(fn) {
+  fn();
+  render();
+  renderHairMirror();
+  highlightHairSalon();
+}
+
+function highlightHairSalon() {
+  highlightSelection('#hs-styles', state.hair.style, 'id');
+  highlightSelection('#hs-bangs', state.hair.bangs || 'none', 'id');
+  highlightSelection('#hs-colors', state.hair.color, 'color');
+}
+
+function buildHairSalon() {
+  buildOptionButtons(document.getElementById('hs-styles'), HAIR_STYLES.filter(itemVisible), (id) => hairSet(() => { state.hair.style = id; }));
+  buildOptionButtons(document.getElementById('hs-bangs'), BANG_STYLES, (id) => hairSet(() => { state.hair.bangs = id; }));
+  buildSwatches(document.getElementById('hs-colors'), SALON_HAIR_COLORS, (c) => hairSet(() => { state.hair.color = c; }));
+}
+
+function surpriseHair() {
+  hairSet(() => {
+    state.hair.style = pick(HAIR_STYLES.filter(itemVisible).filter(isUnlocked).filter((h) => h.id !== 'none')).id;
+    state.hair.bangs = pick(BANG_STYLES).id;
+    state.hair.color = pick(SALON_HAIR_COLORS);
+  });
+}
+
+function openHairSalon() {
+  buildHairSalon();
+  renderHairMirror();
+  highlightHairSalon();
+  hairSalonOverlay.hidden = false;
+}
+
+function closeHairSalon() {
+  hairSalonOverlay.hidden = true;
+  render();
+}
+
+document.getElementById('hair-salon-btn').addEventListener('click', openHairSalon);
+document.getElementById('hs-close').addEventListener('click', closeHairSalon);
+document.getElementById('hs-done').addEventListener('click', closeHairSalon);
+document.getElementById('hs-surprise').addEventListener('click', surpriseHair);
+hairSalonOverlay.addEventListener('click', (e) => {
+  if (e.target === hairSalonOverlay) closeHairSalon();
 });
 
 // ---------- Mini Salon ----------

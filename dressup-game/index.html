@@ -69,6 +69,8 @@
         <div class="tab-panel" data-panel="hair">
           <h2>Style</h2>
           <div class="option-row" id="hair-styles"></div>
+          <h2>Bangs</h2>
+          <div class="option-row" id="bang-styles"></div>
           <h2>Color</h2>
           <div class="swatch-row" id="hair-colors"></div>
         </div>
@@ -257,7 +259,8 @@
         <button id="shop-btn" class="btn btn-ghost">🛍️ Shop</button>
         <button id="passes-btn" class="btn btn-ghost">🎟️ Passes</button>
         <button id="minigames-btn" class="btn btn-ghost">🎮 Mini Games</button>
-        <button id="salon-btn" class="btn btn-ghost">💄 Salon</button>
+        <button id="hair-salon-btn" class="btn btn-ghost">💇 Hair Salon</button>
+        <button id="salon-btn" class="btn btn-ghost">💄 Makeup Salon</button>
         <button id="show-btn" class="btn btn-primary">🎬 Runway Run</button>
         <button id="catwalk-btn" class="btn btn-primary">💃 Catwalk Show</button>
       </div>
@@ -317,11 +320,36 @@
   </div>
 </div>
 
+<!-- HAIR SALON MODAL -->
+<div class="modal-overlay" id="hair-salon-overlay" hidden>
+  <div class="modal salon-modal" role="dialog" aria-modal="true" aria-labelledby="hs-title">
+    <div class="modal-header">
+      <h2 id="hs-title">💇 Hair Salon</h2>
+      <button class="modal-close" id="hs-close" aria-label="Close hair salon">✕</button>
+    </div>
+    <p class="modal-subtitle">Pick a style, add bangs and choose a colour. Your new hair goes everywhere with you.</p>
+    <div class="salon-layout">
+      <div class="salon-mirror-wrap">
+        <div class="salon-mirror hair-mirror" id="hair-mirror"></div>
+        <div class="salon-mirror-actions">
+          <button class="btn btn-ghost" id="hs-surprise">🎲 Surprise Style</button>
+          <button class="btn btn-primary" id="hs-done">✅ Done</button>
+        </div>
+      </div>
+      <div class="salon-tools">
+        <h3>Hairstyle</h3><div class="option-row walk-picker" id="hs-styles"></div>
+        <h3>Bangs</h3><div class="option-row walk-picker" id="hs-bangs"></div>
+        <h3>Colour</h3><div class="swatch-row" id="hs-colors"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MINI SALON MODAL -->
 <div class="modal-overlay" id="salon-overlay" hidden>
   <div class="modal salon-modal" role="dialog" aria-modal="true" aria-labelledby="salon-title">
     <div class="modal-header">
-      <h2 id="salon-title">💄 Mini Salon</h2>
+      <h2 id="salon-title">💄 Makeup Salon</h2>
       <button class="modal-close" id="salon-close" aria-label="Close salon">✕</button>
     </div>
     <p class="modal-subtitle">Tap a colour or style to try it on. Your look updates everywhere.</p>
