@@ -1662,3 +1662,42 @@ body {
   75% { transform: translateX(6px); }
 }
 @media (prefers-reduced-motion: reduce) { .spot-card.wrong { animation: none; } }
+
+/* ---------- Explore map ---------- */
+.explore-modal { max-width: 980px; }
+.map-progress { margin: -8px 0 10px; font-weight: 700; color: #5a3aa8; }
+.map-stage { position: relative; }
+.map-wrap {
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 1000 / 700;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 4px rgba(255,255,255,0.6);
+}
+.map-wrap svg { width: 100%; height: 100%; display: block; }
+.map-treasure, .map-gem { animation: map-bob 1.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes map-bob { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+@media (prefers-reduced-motion: reduce) { .map-treasure, .map-gem { animation: none; } }
+.map-panel {
+  position: absolute;
+  left: 12px; right: 12px; bottom: 12px;
+  background: rgba(255,255,255,0.96);
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  display: grid;
+  gap: 8px;
+}
+.map-panel[hidden] { display: none; }
+.map-panel-head { display: flex; align-items: center; gap: 10px; }
+.map-panel-emoji { font-size: 2rem; }
+.map-panel-head strong { display: block; color: var(--accent-dark); font-size: 1.05rem; }
+.map-panel-head span { font-size: 0.85rem; color: var(--muted); }
+.map-panel-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.map-panel-actions .btn { padding: 8px 14px; font-size: 0.85rem; }
+.map-panel-note { margin: 0; font-size: 0.82rem; font-weight: 700; color: #1e7a46; }
+.map-panel-note:empty { display: none; }

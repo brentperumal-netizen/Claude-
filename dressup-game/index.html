@@ -265,6 +265,7 @@
         <button id="salon-btn" class="btn btn-ghost">💄 Makeup Salon</button>
         <button id="nail-salon-btn" class="btn btn-ghost">💅 Nail Salon</button>
         <button id="online-btn" class="btn btn-primary">🌐 Play Online</button>
+        <button id="explore-btn" class="btn btn-primary">🗺️ Explore</button>
         <button id="show-btn" class="btn btn-primary">🎬 Runway Run</button>
         <button id="catwalk-btn" class="btn btn-primary">💃 Catwalk Show</button>
       </div>
@@ -321,6 +322,23 @@
     </div>
     <p class="modal-subtitle">Pick a complete look and try it on all at once.</p>
     <div class="wardrobe-grid" id="wardrobe-grid"></div>
+  </div>
+</div>
+
+<!-- EXPLORE MAP MODAL -->
+<div class="modal-overlay" id="explore-overlay" hidden>
+  <div class="modal explore-modal" role="dialog" aria-modal="true" aria-labelledby="ex-title">
+    <div class="modal-header">
+      <h2 id="ex-title">🗺️ Style Island</h2>
+      <span class="cash-badge shop-cash" id="ex-cash">💵 $100</span>
+      <button class="modal-close" id="ex-close" aria-label="Close the map">✕</button>
+    </div>
+    <p class="modal-subtitle">Tap anywhere to walk there (or use the arrow keys). Visit every land, open its 🎁 treasure and pick up 💎 gems on the way!</p>
+    <p class="map-progress" id="map-progress"></p>
+    <div class="map-stage">
+      <div class="map-wrap" id="map-wrap"></div>
+      <div class="map-panel" id="map-panel" hidden></div>
+    </div>
   </div>
 </div>
 

@@ -2709,6 +2709,8 @@ function renderCash() {
   document.getElementById('cash-badge').textContent = `💵 $${cash}`;
   const shopCash = document.getElementById('shop-cash');
   if (shopCash) shopCash.textContent = `💵 $${cash}`;
+  const exCash = document.getElementById('ex-cash');
+  if (exCash) exCash.textContent = `💵 $${cash}`;
   const olCash = document.getElementById('ol-cash');
   if (olCash) olCash.textContent = `💵 $${cash}`;
   const mgCash = document.getElementById('mg-cash');
@@ -3734,6 +3736,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !hairSalonOverlay.hidden) closeHairSalon();
   if (e.key === 'Escape' && !nailSalonOverlay.hidden) closeNailSalon();
   if (e.key === 'Escape' && !onlineOverlay.hidden) closeOnline();
+  if (e.key === 'Escape' && !exploreOverlay.hidden) closeExplore();
   if (e.key === 'Escape' && !catwalkOverlay.hidden) closeCatwalk();
 });
 
@@ -4265,6 +4268,258 @@ document.getElementById('ol-close').addEventListener('click', closeOnline);
 document.getElementById('cb-ready').addEventListener('click', () => { if (compState) finishDressing(); });
 onlineOverlay.addEventListener('click', (e) => {
   if (e.target === onlineOverlay) closeOnline();
+});
+
+// ---------- Explore the Map ----------
+// An island with a land for every theme. Walk (tap a spot or use the arrow keys),
+// visit lands to switch theme and backdrop, find each land's treasure and pick up gems.
+
+const exploreOverlay = document.getElementById('explore-overlay');
+const mapWrap = document.getElementById('map-wrap');
+const mapPanel = document.getElementById('map-panel');
+
+const MAP_W = 1000, MAP_H = 700;
+const LANDS = [
+  { id: 'classic', name: 'Fashion City', emoji: '🏙️', x: 500, y: 350, tint: '#ffd6ec', bg: 'pink', says: 'Welcome to Fashion City, the heart of the runway!' },
+  { id: 'halloween', name: 'Spooky Woods', emoji: '🎃', x: 165, y: 175, tint: '#5a3a7a', bg: 'pumpkin-patch', says: 'Boo! The pumpkins here glow all night long.' },
+  { id: 'christmas', name: 'Snowy Peak', emoji: '❄️', x: 420, y: 115, tint: '#ffffff', bg: 'winter-wonderland', says: 'Brrr! Grab some hot cocoa and build a snowman.' },
+  { id: 'fairy', name: 'Fairy Forest', emoji: '🧚', x: 290, y: 305, tint: '#b9f2d0', bg: 'fairy-glade', says: 'Shh... the fairies are sprinkling sparkles.' },
+  { id: 'birds', name: 'Bird Sanctuary', emoji: '🐦', x: 700, y: 120, tint: '#c8f2c0', bg: 'treetop-sky', says: 'Tweet tweet! The peacocks are showing off today.' },
+  { id: 'metgala', name: 'Gala Palace', emoji: '🌹', x: 640, y: 265, tint: '#ffe08a', bg: 'met-steps', says: 'Only the most glamorous looks walk these steps.' },
+  { id: 'superhero', name: 'Hero Tower', emoji: '🦸', x: 860, y: 230, tint: '#9fb2ff', bg: 'hero-city', says: 'Up, up and away! Heroes train at the top of the tower.' },
+  { id: 'ballet', name: 'Ballet Theater', emoji: '🩰', x: 790, y: 405, tint: '#ffc6dc', bg: 'ballet-stage', says: 'The curtain is rising. Time to twirl!' },
+  { id: 'school', name: 'Style Academy', emoji: '🎒', x: 335, y: 470, tint: '#ffe6b0', bg: 'classroom', says: 'Today\'s lesson: how to slay a runway walk.' },
+  { id: 'party', name: 'Party Plaza', emoji: '🎉', x: 565, y: 505, tint: '#f4c6ff', bg: 'party-room', says: 'There\'s always a party here. Cake, anyone?' },
+  { id: 'sleepy', name: 'Dreamy Cottage', emoji: '😴', x: 185, y: 520, tint: '#d6ccff', bg: 'cozy-bedroom', says: 'Pajamas on! It\'s sleepover time.' },
+  { id: 'summer', name: 'Sunny Beach', emoji: '☀️', x: 755, y: 590, tint: '#ffe9a8', bg: 'pool-party', says: 'Surf\'s up! Don\'t forget your sun hat.' },
+  { id: 'mermaid', name: 'Mermaid Lagoon', emoji: '🧜‍♀️', x: 925, y: 515, tint: '#7fd6f0', bg: 'under-the-sea', says: 'Splash! The mermaids are singing by the coral.' },
+];
+const TREASURE_CASH = 15;
+const TREASURE_POINTS = 2;
+const ALL_LANDS_BONUS = 100;
+const GEM_CASH = 2;
+const EXPLORE_KEY = 'runwayReady.explored';
+
+let explored = new Set();
+try {
+  const saved = JSON.parse(localStorage.getItem(EXPLORE_KEY) || '[]');
+  if (Array.isArray(saved)) explored = new Set(saved);
+} catch (e) {}
+function saveExplored() {
+  try { localStorage.setItem(EXPLORE_KEY, JSON.stringify([...explored])); } catch (e) {}
+}
+
+let mapPos = { x: 500, y: 395 };
+let mapTarget = null;
+let mapRaf = null;
+let mapLast = 0;
+let mapLand = null;
+let mapGems = [];
+const mapKeys = { up: false, down: false, left: false, right: false };
+
+function islandPath() {
+  return 'M120,90 C220,30 380,40 520,55 C680,40 860,60 930,150 C985,240 960,330 975,430 C990,560 900,650 760,660 C600,675 460,640 330,660 C190,680 70,620 55,500 C40,390 80,330 60,240 C45,160 70,120 120,90 Z';
+}
+
+function drawMap() {
+  const roads = LANDS.filter((l) => l.id !== 'classic').map((l) => {
+    const mx = (500 + l.x) / 2 + (l.y - 350) * 0.15, my = (350 + l.y) / 2 - (l.x - 500) * 0.15;
+    return `<path d="M500,350 Q${mx},${my} ${l.x},${l.y}" fill="none" stroke="#f4e3c0" stroke-width="16" stroke-linecap="round"/>
+            <path d="M500,350 Q${mx},${my} ${l.x},${l.y}" fill="none" stroke="#e2c991" stroke-width="2" stroke-dasharray="8 10"/>`;
+  }).join('');
+  const regions = LANDS.map((l) => `<ellipse cx="${l.x}" cy="${l.y}" rx="${l.id === 'classic' ? 95 : 85}" ry="${l.id === 'classic' ? 75 : 62}" fill="${l.tint}" opacity="0.75"/>`).join('');
+  const deco = [
+    ...[[110, 230], [210, 120], [130, 140], [230, 210]].map(([x, y]) => `<text x="${x}" y="${y}" font-size="26" text-anchor="middle">🌲</text>`),
+    ...[[380, 90], [455, 80], [470, 150]].map(([x, y]) => `<text x="${x}" y="${y}" font-size="26" text-anchor="middle">🏔️</text>`),
+    ...[[250, 345], [330, 270]].map(([x, y]) => `<text x="${x}" y="${y}" font-size="22" text-anchor="middle">🍄</text>`),
+    ...[[660, 80], [745, 160]].map(([x, y]) => `<text x="${x}" y="${y}" font-size="24" text-anchor="middle">🌳</text>`),
+    ...[[700, 625], [820, 630]].map(([x, y]) => `<text x="${x}" y="${y}" font-size="24" text-anchor="middle">🌴</text>`),
+    `<text x="960" y="600" font-size="24" text-anchor="middle">🐚</text>`,
+    `<text x="80" y="420" font-size="24" text-anchor="middle">🌙</text>`,
+  ].join('');
+  const waves = Array.from({ length: 14 }, (_, i) => `<path d="M${(i * 73) % 1000},${(i * 137) % 700} q10,-6 20,0 t20,0" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5"/>`).join('');
+  const lands = LANDS.map((l) => {
+    const done = explored.has(l.id);
+    return `<g class="map-land" data-land="${l.id}">
+        <circle cx="${l.x}" cy="${l.y}" r="34" fill="#ffffff" opacity="0.9" stroke="${done ? '#43b581' : '#e0558f'}" stroke-width="4"/>
+        <text x="${l.x}" y="${l.y + 12}" font-size="34" text-anchor="middle">${l.emoji}</text>
+        <rect x="${l.x - 62}" y="${l.y + 38}" width="124" height="24" rx="12" fill="#ffffff" opacity="0.92"/>
+        <text x="${l.x}" y="${l.y + 55}" font-size="15" font-weight="700" text-anchor="middle" fill="#3a2e3a" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">${l.name}${done ? ' ✅' : ''}</text>
+        ${done ? '' : `<text class="map-treasure" x="${l.x + 30}" y="${l.y - 22}" font-size="20" text-anchor="middle">🎁</text>`}
+      </g>`;
+  }).join('');
+  const gems = mapGems.map((g, i) => (g.taken ? '' : `<text class="map-gem" id="gem-${i}" x="${g.x}" y="${g.y}" font-size="20" text-anchor="middle">💎</text>`)).join('');
+  mapWrap.innerHTML = `<svg id="map-svg" viewBox="0 0 ${MAP_W} ${MAP_H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <rect width="${MAP_W}" height="${MAP_H}" fill="#6ec6e8"/>${waves}
+      <path d="${islandPath()}" fill="#f2e3b0" stroke="#e6cf8a" stroke-width="6"/>
+      <path d="${islandPath()}" fill="#bfe7a8" transform="translate(500 350) scale(0.93) translate(-500 -350)"/>
+      ${regions}${roads}${deco}${lands}${gems}
+      <g id="map-me" transform="translate(${mapPos.x},${mapPos.y})">
+        <ellipse cx="0" cy="30" rx="22" ry="6" fill="#000000" opacity="0.18"/>
+        <circle cx="0" cy="0" r="30" fill="#ffffff" stroke="#8c5ce0" stroke-width="4"/>
+        <svg x="-28" y="-30" width="56" height="58" viewBox="88 26 124 124">${buildDollSVG(currentLookCopy(), 'map')}</svg>
+        <text x="0" y="-36" font-size="14" font-weight="800" text-anchor="middle" fill="#8c5ce0" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">You</text>
+      </g>
+    </svg>`;
+  document.getElementById('map-progress').textContent = `🗺️ ${explored.size} / ${LANDS.length} lands discovered · 💎 ${mapGems.filter((g) => g.taken).length} / ${mapGems.length} gems`;
+}
+
+function placeMe() {
+  const me = document.getElementById('map-me');
+  if (me) me.setAttribute('transform', `translate(${mapPos.x.toFixed(1)},${mapPos.y.toFixed(1)})`);
+}
+
+function scatterGems() {
+  mapGems = Array.from({ length: 12 }, () => {
+    const l = pick(LANDS);
+    const a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 60;
+    return { x: Math.round(Math.min(940, Math.max(70, l.x + Math.cos(a) * d))), y: Math.round(Math.min(640, Math.max(70, l.y + Math.sin(a) * d * 0.7))), taken: false };
+  });
+}
+
+function showLandPanel(land) {
+  const done = explored.has(land.id);
+  const theme = THEMES.find((t) => t.id === land.id);
+  mapPanel.innerHTML = `
+    <div class="map-panel-head"><span class="map-panel-emoji">${land.emoji}</span>
+      <div><strong>${land.name}</strong><span>🤖 Guide-Bot: "${land.says}"</span></div></div>
+    <div class="map-panel-actions">
+      ${done ? '' : `<button class="btn btn-primary" id="map-treasure">🎁 Open Treasure</button>`}
+      <button class="btn btn-ghost" id="map-visit">${theme ? `${theme.emoji} Wear ${theme.label} Style` : '✨ Visit'}</button>
+    </div>
+    <p class="map-panel-note" id="map-note"></p>`;
+  mapPanel.hidden = false;
+  const tBtn = document.getElementById('map-treasure');
+  if (tBtn) tBtn.addEventListener('click', () => openTreasure(land));
+  document.getElementById('map-visit').addEventListener('click', () => visitLand(land));
+}
+
+function openTreasure(land) {
+  if (explored.has(land.id)) return;
+  explored.add(land.id);
+  saveExplored();
+  cash += TREASURE_CASH;
+  let note = `🎉 Treasure found! 💵 +$${TREASURE_CASH}`;
+  if (PASSES.some((x) => passOwned(x.id))) {
+    const unlocked = addPassPoints(TREASURE_POINTS);
+    note += ` · 🎟️ +${TREASURE_POINTS} pass points${unlocked.length ? ` · Unlocked ${unlocked.join(' & ')}!` : ''}`;
+  }
+  if (explored.size === LANDS.length) {
+    cash += ALL_LANDS_BONUS;
+    note += ` · 🏆 You discovered every land! Bonus 💵 +$${ALL_LANDS_BONUS}!`;
+  }
+  saveShop();
+  renderCash();
+  rebuildThemedLists();
+  render();
+  drawMap();
+  showLandPanel(land);
+  document.getElementById('map-note').textContent = note;
+}
+
+function visitLand(land) {
+  if (THEMES.some((t) => t.id === land.id) && state.theme !== land.id) {
+    state.theme = land.id;
+    sanitizeStateForTheme();
+  }
+  const bg = BACKGROUNDS.find((b) => b.id === land.bg);
+  if (bg && isUnlocked(bg)) state.background = bg.id;
+  rebuildThemedLists();
+  render();
+  document.getElementById('map-note').textContent = `✨ You're now in ${land.name} style! Close the map to dress up for it.`;
+}
+
+function mapTick(ts) {
+  if (!mapLast) mapLast = ts;
+  const dt = Math.min(0.05, (ts - mapLast) / 1000);
+  mapLast = ts;
+  const speed = 280;
+  let vx = (mapKeys.right ? 1 : 0) - (mapKeys.left ? 1 : 0);
+  let vy = (mapKeys.down ? 1 : 0) - (mapKeys.up ? 1 : 0);
+  if (vx || vy) {
+    mapTarget = null;
+    const n = Math.hypot(vx, vy);
+    mapPos.x += (vx / n) * speed * dt;
+    mapPos.y += (vy / n) * speed * dt;
+  } else if (mapTarget) {
+    const dx = mapTarget.x - mapPos.x, dy = mapTarget.y - mapPos.y, d = Math.hypot(dx, dy);
+    if (d < 4) mapTarget = null;
+    else { const step = Math.min(d, speed * dt); mapPos.x += (dx / d) * step; mapPos.y += (dy / d) * step; }
+  }
+  mapPos.x = Math.min(MAP_W - 40, Math.max(40, mapPos.x));
+  mapPos.y = Math.min(MAP_H - 40, Math.max(40, mapPos.y));
+  placeMe();
+
+  mapGems.forEach((g, i) => {
+    if (g.taken || Math.hypot(g.x - mapPos.x, g.y - 8 - mapPos.y) > 32) return;
+    g.taken = true;
+    cash += GEM_CASH;
+    saveShop();
+    renderCash();
+    const el = document.getElementById(`gem-${i}`);
+    if (el) el.remove();
+    document.getElementById('map-progress').textContent = `🗺️ ${explored.size} / ${LANDS.length} lands discovered · 💎 ${mapGems.filter((x) => x.taken).length} / ${mapGems.length} gems (+$${GEM_CASH}!)`;
+  });
+
+  const near = LANDS.find((l) => Math.hypot(l.x - mapPos.x, l.y - mapPos.y) < 48);
+  if (near && near !== mapLand) { mapLand = near; showLandPanel(near); }
+  if (!near && mapLand && Math.hypot(mapLand.x - mapPos.x, mapLand.y - mapPos.y) > 80) { mapLand = null; mapPanel.hidden = true; }
+  mapRaf = requestAnimationFrame(mapTick);
+}
+
+function mapPointer(e) {
+  const svg = document.getElementById('map-svg');
+  if (!svg) return;
+  e.preventDefault();
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX;
+  pt.y = e.clientY;
+  const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  mapTarget = { x: p.x, y: p.y };
+}
+
+function mapKey(down) {
+  return (e) => {
+    const k = { ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down', ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right' }[e.key];
+    if (!k) return;
+    mapKeys[k] = down;
+    e.preventDefault();
+  };
+}
+const mapKeyDown = mapKey(true), mapKeyUp = mapKey(false);
+
+mapWrap.addEventListener('pointerdown', mapPointer);
+mapWrap.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+mapWrap.addEventListener('contextmenu', (e) => e.preventDefault());
+
+function openExplore() {
+  scatterGems();
+  mapPos = { x: 500, y: 395 };
+  mapTarget = null;
+  mapLand = null;
+  mapPanel.hidden = true;
+  renderCash();
+  drawMap();
+  exploreOverlay.hidden = false;
+  document.addEventListener('keydown', mapKeyDown);
+  document.addEventListener('keyup', mapKeyUp);
+  mapLast = 0;
+  mapRaf = requestAnimationFrame(mapTick);
+}
+
+function closeExplore() {
+  exploreOverlay.hidden = true;
+  if (mapRaf) cancelAnimationFrame(mapRaf);
+  mapRaf = null;
+  Object.keys(mapKeys).forEach((k) => { mapKeys[k] = false; });
+  document.removeEventListener('keydown', mapKeyDown);
+  document.removeEventListener('keyup', mapKeyUp);
+}
+
+document.getElementById('explore-btn').addEventListener('click', openExplore);
+document.getElementById('ex-close').addEventListener('click', closeExplore);
+exploreOverlay.addEventListener('click', (e) => {
+  if (e.target === exploreOverlay) closeExplore();
 });
 
 // ---------- Nail Salon ----------
