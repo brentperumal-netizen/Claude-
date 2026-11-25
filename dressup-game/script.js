@@ -767,6 +767,44 @@ const OUTFIT_STYLES = [
               <path d="M${cx - torsoHalfAt(bt, 196) - 4},196 L${cx + torsoHalfAt(bt, 196) + 4},196 M${cx - torsoHalfAt(bt, 206) - 4},206 L${cx + torsoHalfAt(bt, 206) + 4},206" stroke="#5cc4e0" stroke-width="5"/>
               <path d="M${cx - 12},${TORSO_Y.shoulder} Q${cx},${TORSO_Y.shoulder + 12} ${cx + 12},${TORSO_Y.shoulder}" fill="none" stroke="#5cc4e0" stroke-width="3"/>`;
     } },
+  { id: 'ruffle-dress', label: 'Ruffle Dress', emoji: '💗', price: 100,
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY, chest: bY, waist: wY } = TORSO_Y;
+      const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3, w = bt.waistHalf + 4;
+      const tier = (i) => {
+        const top = wY + i * 38, bot = top + 48;
+        const th = w + i * 16, bh = w + (i + 1) * 16 + 14;
+        const n = 6 + i * 2, step = (bh * 2) / n;
+        let hem = '';
+        for (let k = 0; k < n; k++) {
+          const x0 = cx + bh - step * k;
+          hem += ` Q${(x0 - step / 2).toFixed(1)},${bot + 10} ${(x0 - step).toFixed(1)},${bot}`;
+        }
+        const folds = Array.from({ length: n - 1 }, (_, k) => {
+          const f = -1 + (2 * (k + 1)) / n;
+          return `<line x1="${(cx + f * th).toFixed(1)}" y1="${top + 4}" x2="${(cx + f * bh).toFixed(1)}" y2="${bot}" stroke="#000000" stroke-width="1" opacity="0.12"/>`;
+        }).join('');
+        return `<path d="M${cx - th},${top} L${cx + th},${top} L${cx + bh},${bot}${hem} Z" stroke="#000000" stroke-opacity="0.15" stroke-width="1"/>
+                ${folds}
+                <path d="M${cx - th},${top + 2} Q${cx},${top + 6} ${cx + th},${top + 2}" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.15"/>`;
+      };
+      const neck = Array.from({ length: 7 }, (_, i) => `<circle cx="${(cx - s + 4 + i * ((2 * s - 8) / 6)).toFixed(1)}" cy="${sY + 1}" r="5" stroke="#000000" stroke-opacity="0.15" stroke-width="1"/>`).join('');
+      return `${tier(2)}${tier(1)}${tier(0)}
+              <path d="M${cx - s},${sY} L${cx + s},${sY}
+                C${cx + s},${sY + 14} ${cx + c},${bY - 10} ${cx + c},${bY}
+                C${cx + c},${bY + 16} ${cx + w},${wY - 14} ${cx + w},${wY + 4}
+                L${cx - w},${wY + 4}
+                C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY}
+                C${cx - c},${bY - 10} ${cx - s},${sY + 14} ${cx - s},${sY} Z"/>
+              <ellipse cx="${cx - s - 2}" cy="${sY + 8}" rx="11" ry="9" stroke="#000000" stroke-opacity="0.15" stroke-width="1"/>
+              <ellipse cx="${cx + s + 2}" cy="${sY + 8}" rx="11" ry="9" stroke="#000000" stroke-opacity="0.15" stroke-width="1"/>
+              ${neck}
+              <rect x="${cx - w}" y="${wY - 3}" width="${w * 2}" height="7" fill="#ffffff" opacity="0.9"/>
+              <path d="M${cx},${wY} L${cx - 13},${wY - 7} L${cx - 13},${wY + 7} Z M${cx},${wY} L${cx + 13},${wY - 7} L${cx + 13},${wY + 7} Z" fill="#ffffff"/>
+              <circle cx="${cx}" cy="${wY}" r="3" fill="#ffffff" stroke="#e7d6e0" stroke-width="1"/>
+              <path d="M${cx - s + 7},${sY + 8} L${cx - w + 2},${wY}" fill="none" stroke="#ffffff" stroke-width="5" opacity="0.15" stroke-linecap="round"/>`;
+    } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -1261,6 +1299,21 @@ const PETS = [
              <path d="M76,130 L74,150 M74,150 l-6,0 M74,150 l5,0"/>
              <path d="M90,130 L92,150 M92,150 l-5,0 M92,150 l6,0"/>
            </g>` },
+  { id: 'fish', label: 'Fish', emoji: '🐠', color: '#ff9a5c', collar: { x: 98, y: 76 }, hat: { x: 92, y: 52 },
+    body: `<path d="M44,92 L14,68 Q20,92 14,116 Z"/>
+           <path d="M74,62 Q92,36 112,58 Z"/>
+           <path d="M76,120 Q90,138 104,118 Z"/>
+           <ellipse cx="86" cy="92" rx="44" ry="31"/>`,
+    details: `<path d="M70,64 Q60,92 70,120 L80,121 Q70,92 80,63 Z" fill="#ffffff" opacity="0.9"/>
+           <path d="M100,62 Q92,92 100,122 L108,120 Q100,92 108,64 Z" fill="#ffffff" opacity="0.9"/>
+           <path d="M40,92 L22,78 M40,92 L20,92 M40,92 L22,106" fill="none" stroke="shade" stroke-width="1.5" opacity="0.6"/>
+           <circle cx="114" cy="84" r="7" fill="#ffffff"/>
+           <circle cx="116" cy="84" r="4" fill="#2b2b2b"/>
+           <circle cx="117.5" cy="82.5" r="1.4" fill="#ffffff"/>
+           <path d="M124,100 Q128,104 124,107" fill="none" stroke="#2b2b2b" stroke-width="1.6" stroke-linecap="round"/>
+           <ellipse cx="112" cy="98" rx="4" ry="2.4" fill="#ff8fa3" opacity="0.6"/>
+           <circle cx="140" cy="62" r="4" fill="none" stroke="#bfe9ff" stroke-width="1.4"/>
+           <circle cx="148" cy="48" r="2.6" fill="none" stroke="#bfe9ff" stroke-width="1.2"/>` },
   { id: 'giraffe', label: 'Giraffe', emoji: '🦒', color: '#e8c468', collar: { x: 100, y: 60 }, hat: { x: 118, y: 8 },
     body: `<rect x="42" y="98" width="9" height="50" rx="4"/>
            <rect x="58" y="100" width="9" height="48" rx="4"/>
@@ -1299,6 +1352,7 @@ function buildPetSVG(petDef, color, idSuffix) {
     .replace(/fill="mane"/g, `fill="${darken(color, 0.5)}"`)
     .replace(/fill="spot"/g, `fill="${darken(color, 0.45)}"`)
     .replace(/fill="shade"/g, `fill="${darken(color, 0.3)}"`)
+    .replace(/stroke="shade"/g, `stroke="${darken(color, 0.3)}"`)
     .replace(/fill="belly"/g, `fill="${lighten(color, 0.6)}"`);
   return `
     <defs>
@@ -1547,11 +1601,13 @@ const WARDROBE_PRESETS = [
   { id: 'ocean-princess', label: 'Ocean Princess', theme: 'mermaid',
     look: { bodyType: 'feminine', skin: SKIN_TONES[1], hair: { style: 'mermaid-waves', color: '#e0558f' },
       outfit: { style: 'mermaid-tail', color: '#8c5ce0' }, shoes: { style: 'flats', color: '#5cc4e0' },
-      accessories: { 'shell-top': true, 'starfish-clip': true }, background: 'under-the-sea' } },
+      accessories: { 'shell-top': true, 'starfish-clip': true }, pet: { species: 'fish', color: '#ff9a5c', accessory: 'bow' },
+      background: 'under-the-sea' } },
   { id: 'coral-mermaid', label: 'Coral Mermaid', theme: 'mermaid',
     look: { bodyType: 'neutral', skin: SKIN_TONES[4], hair: { style: 'mermaid-waves', color: '#d9b45a' },
       outfit: { style: 'ocean-sparkle-tail', color: '#3fb8c9' }, shoes: { style: 'flats', color: '#5cc4e0' },
-      accessories: { 'pearl-shell-top': true }, background: 'coral-reef', face: { mouth: 'grin' } } },
+      accessories: { 'pearl-shell-top': true }, pet: { species: 'fish', color: '#5cc4e0', accessory: 'none' },
+      background: 'coral-reef', face: { mouth: 'grin' } } },
   { id: 'sea-king', label: 'Sea King', theme: 'mermaid',
     look: { bodyType: 'masculine', skin: SKIN_TONES[2], hair: { style: 'mermaid-waves', color: '#5cc4e0' },
       outfit: { style: 'mermaid-tail', color: '#43b581' }, shoes: { style: 'flats', color: '#43b581' },
@@ -2558,7 +2614,7 @@ function renderShop(message) {
     const card = document.createElement('div');
     card.className = 'shop-card' + (owned.has(item.id) ? ' owned' : '');
     const bg = kind === 'background' ? item.gradient : (currentBg ? currentBg.gradient : '#f7eefb');
-    const kindLabel = kind === 'outfit' ? (item.id === 'jester-suit' ? 'Costume' : 'Gown') : { accessory: 'Accessory', background: 'Backdrop' }[kind];
+    const kindLabel = kind === 'outfit' ? (item.id === 'jester-suit' ? 'Costume' : item.id === 'ruffle-dress' ? 'Dress' : 'Gown') : { accessory: 'Accessory', background: 'Backdrop' }[kind];
     card.innerHTML = `
       <div class="thumb" style="background:${bg}">
         <svg viewBox="0 0 300 520">${buildDollSVG(previewLook(item, kind), `shop-${item.id}`)}</svg>
