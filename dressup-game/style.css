@@ -1467,3 +1467,42 @@ body {
 .pose-msg { margin: 0; color: #fff; font-weight: 700; text-align: center; }
 
 .mg-menu[hidden], .mg-game[hidden] { display: none; }
+
+/* ---------- Mini Salon ---------- */
+.salon-modal { max-width: 860px; }
+.salon-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 18px;
+  align-items: start;
+}
+@media (max-width: 700px) {
+  .salon-layout { grid-template-columns: 1fr; }
+}
+.salon-mirror-wrap { position: sticky; top: 0; display: grid; gap: 10px; }
+.salon-mirror {
+  aspect-ratio: 1 / 0.96;
+  border-radius: 50% 50% 18px 18px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 40%, #fff6fb 0%, #ffe0ef 70%, #f6c6dd 100%);
+  border: 8px solid #f2c94c;
+  box-shadow: 0 0 0 4px #fff3c4, 0 10px 30px rgba(224, 85, 143, 0.25), inset 0 0 30px rgba(255, 255, 255, 0.7);
+}
+.salon-mirror svg { width: 100%; height: 100%; display: block; }
+.salon-mirror-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.salon-tools h3 {
+  margin: 12px 0 6px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.salon-tools h3:first-child { margin-top: 0; }
+.swatch-none {
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}

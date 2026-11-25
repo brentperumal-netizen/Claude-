@@ -207,6 +207,10 @@
           <g id="layer-acc-flower-crown"></g>
           <g id="layer-acc-tiara"></g>
           <g id="layer-acc-crown"></g>
+          <g id="layer-acc-sheet-mask"></g>
+          <g id="layer-acc-clay-mask"></g>
+          <g id="layer-acc-cucumber-eyes"></g>
+          <g id="layer-acc-sleeping-mask"></g>
           <g id="layer-acc-glasses"></g>
           <g id="layer-acc-hero-mask"></g>
           <g id="layer-acc-pineapple-glasses"></g>
@@ -253,6 +257,7 @@
         <button id="shop-btn" class="btn btn-ghost">🛍️ Shop</button>
         <button id="passes-btn" class="btn btn-ghost">🎟️ Passes</button>
         <button id="minigames-btn" class="btn btn-ghost">🎮 Mini Games</button>
+        <button id="salon-btn" class="btn btn-ghost">💄 Salon</button>
         <button id="show-btn" class="btn btn-primary">🎬 Runway Run</button>
         <button id="catwalk-btn" class="btn btn-primary">💃 Catwalk Show</button>
       </div>
@@ -309,6 +314,35 @@
     </div>
     <p class="modal-subtitle">Pick a complete look and try it on all at once.</p>
     <div class="wardrobe-grid" id="wardrobe-grid"></div>
+  </div>
+</div>
+
+<!-- MINI SALON MODAL -->
+<div class="modal-overlay" id="salon-overlay" hidden>
+  <div class="modal salon-modal" role="dialog" aria-modal="true" aria-labelledby="salon-title">
+    <div class="modal-header">
+      <h2 id="salon-title">💄 Mini Salon</h2>
+      <button class="modal-close" id="salon-close" aria-label="Close salon">✕</button>
+    </div>
+    <p class="modal-subtitle">Tap a colour or style to try it on. Your look updates everywhere.</p>
+    <div class="salon-layout">
+      <div class="salon-mirror-wrap">
+        <div class="salon-mirror" id="salon-mirror"></div>
+        <div class="salon-mirror-actions">
+          <button class="btn btn-ghost" id="salon-wipe">🧽 Wipe Off</button>
+          <button class="btn btn-primary" id="salon-done">✅ Done</button>
+        </div>
+      </div>
+      <div class="salon-tools">
+        <h3>Eyeshadow</h3><div class="swatch-row" id="salon-shadow"></div>
+        <h3>Lashes</h3><div class="option-row walk-picker" id="salon-lashes"></div>
+        <h3>Blush</h3><div class="swatch-row" id="salon-blush"></div>
+        <h3>Lipstick</h3><div class="swatch-row" id="salon-lips"></div>
+        <h3>Sparkle</h3><div class="option-row walk-picker" id="salon-extras"></div>
+        <h3>Face Paint</h3><div class="option-row walk-picker" id="salon-cheek"></div>
+        <h3>Spa Masks</h3><div class="option-row walk-picker" id="salon-spa"></div>
+      </div>
+    </div>
   </div>
 </div>
 
