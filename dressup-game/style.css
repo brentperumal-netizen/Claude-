@@ -975,3 +975,58 @@ body {
   20%  { opacity: 1; transform: scale(1.2); }
   100% { opacity: 0; transform: scale(1.6); }
 }
+
+/* ---------- Mermaid: animated hair, tail fin, seaweed and bubbles ---------- */
+
+.hair-sway {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: hair-sway 3.2s ease-in-out infinite;
+}
+.hair-sway-right { animation-delay: -1.6s; }
+
+@keyframes hair-sway {
+  0%, 100% { transform: rotate(2.5deg) skewX(-3deg); }
+  50%      { transform: rotate(-2.5deg) skewX(4deg); }
+}
+
+.tail-fin {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: fin-swish 2.4s ease-in-out infinite;
+}
+
+@keyframes fin-swish {
+  0%, 100% { transform: rotate(-7deg); }
+  50%      { transform: rotate(7deg); }
+}
+
+.seaweed {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: seaweed-sway 3.6s ease-in-out infinite;
+}
+
+@keyframes seaweed-sway {
+  0%, 100% { transform: rotate(-6deg); }
+  50%      { transform: rotate(6deg); }
+}
+
+.ambient-bubble {
+  position: absolute;
+  bottom: -16px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), rgba(255,255,255,0.05) 60%);
+  animation: bubble-up linear forwards;
+}
+
+@keyframes bubble-up {
+  0%   { bottom: -16px; transform: translateX(0); opacity: 0.9; }
+  50%  { transform: translateX(8px); }
+  100% { bottom: 105%; transform: translateX(-6px); opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hair-sway, .tail-fin, .seaweed { animation: none; }
+}

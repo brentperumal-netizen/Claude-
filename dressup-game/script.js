@@ -76,6 +76,7 @@ const THEMES = [
   { id: 'halloween', label: 'Halloween', emoji: '🎃' },
   { id: 'birds', label: 'Birds', emoji: '🐦' },
   { id: 'metgala', label: 'Met Gala', emoji: '🌹' },
+  { id: 'mermaid', label: 'Mermaid', emoji: '🧜‍♀️' },
 ];
 
 const SKIN_TONES = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5a3825'];
@@ -164,12 +165,71 @@ const HAIR_STYLES = [
             <circle cx="-1.2" cy="-8.5" r="0.9" fill="#e05c5c" stroke="none"/>
             <circle cx="1.2" cy="-8.5" r="0.9" fill="#e05c5c" stroke="none"/>
           </g>` },
+  { id: 'mermaid-waves', label: 'Mermaid Waves', emoji: '🌊',
+    // The two side strands carry the "hair-sway" class, which CSS animates so the waves gently drift.
+    svg: (() => {
+      const left = 'M92,84 L114,84 C122,118 104,140 112,170 C120,200 102,226 110,256 C114,274 104,288 94,296 C88,272 100,256 92,232 C84,204 102,190 94,160 C86,130 100,114 92,84 Z';
+      const mirror = (d) => d.replace(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g, (_, x, y) => `${300 - Number(x)},${y}`);
+      const shine = 'M100,100 C106,124 98,142 104,166 C110,190 98,212 104,238';
+      return `<g class="hair-sway hair-sway-left"><path d="${left}"/>
+                <path d="${shine}" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.22"/></g>
+              <g class="hair-sway hair-sway-right"><path d="${mirror(left)}"/>
+                <path d="${mirror(shine)}" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.22"/></g>
+              <path d="M96,84 A60,60 0 0 1 204,84 Q192,70 176,72 Q164,60 150,66 Q136,60 124,72 Q108,70 96,84 Z"/>
+              <path d="M110,64 Q127,52 146,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>`;
+    })() },
   { id: 'crop', label: 'Short Crop', emoji: '💈',
     svg: `<path d="M100,78 A52,52 0 0 1 200,78 L198,96 A50,42 0 0 0 102,96 Z"/>
           <path d="M116,64 Q128,56 140,60" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>` },
 ];
 
 const HAIR_COLORS = ['#2b2b2b', '#4b2e1e', '#8a5a2b', '#d9b45a', '#e0558f', '#8c5ce0', '#5cc4e0', '#e0e0e0'];
+
+// Draws a mermaid tail from the waist down: scaled body, pearl belt and a fin
+// (class "tail-fin", which CSS animates into a gentle swish). With colors=null
+// the tail takes the outfit color from the group's gradient fill.
+function mermaidTailSVG(bt, colors) {
+  const cx = 150;
+  const { waist: wY, hip: hY } = TORSO_Y;
+  const w = bt.waistHalf + 4, h = bt.hipHalf + 4;
+  const fill = (c) => (colors ? ` fill="${c}"` : '');
+  const scaleColor = colors ? colors.scale : '#000000';
+  const scaleOpacity = colors ? 0.55 : 0.22;
+  const profile = [[wY, w], [hY, h], [330, h * 0.78], [362, h * 0.56], [402, 24], [436, 12]];
+  const halfAt = (y) => {
+    for (let i = 1; i < profile.length; i++) {
+      const [y0, h0] = profile[i - 1], [y1, h1] = profile[i];
+      if (y <= y1) return h0 + (h1 - h0) * (y - y0) / (y1 - y0);
+    }
+    return 12;
+  };
+  let scales = '';
+  let row = 0;
+  for (let y = wY + 14; y < 430; y += 9, row++) {
+    const half = halfAt(y) - 5;
+    for (let x = cx - half + (row % 2 ? 4.5 : 0); x <= cx + half; x += 9) {
+      scales += `M${(x - 4).toFixed(1)},${y} Q${x.toFixed(1)},${y + 5} ${(x + 4).toFixed(1)},${y} `;
+    }
+  }
+  const pearls = Array.from({ length: 9 }, (_, i) => {
+    const x = cx - w + (2 * w * i) / 8;
+    return `<circle cx="${x.toFixed(1)}" cy="${wY + 1}" r="3" fill="${colors ? colors.belt : '#fff7ef'}" stroke="#d9c7b8" stroke-width="0.5"/>`;
+  }).join('');
+  return `<g class="tail-fin">
+            <path d="M${cx - 12},430 Q${cx - 40},450 ${cx - 66},498 Q${cx - 34},488 ${cx},474 Q${cx + 34},488 ${cx + 66},498 Q${cx + 40},450 ${cx + 12},430 Z"${fill(colors && colors.fin)}/>
+            <path d="M${cx - 6},440 L${cx - 40},486 M${cx - 4},446 L${cx - 22},482 M${cx + 6},440 L${cx + 40},486 M${cx + 4},446 L${cx + 22},482" fill="none" stroke="${colors ? colors.finLine : '#000000'}" stroke-width="1.4" opacity="${colors ? 0.6 : 0.2}" stroke-linecap="round"/>
+          </g>
+          <path d="M${cx - w},${wY} C${cx - w},${wY + 16} ${cx - h},${hY - 18} ${cx - h},${hY}
+            C${cx - h},${hY + 40} ${cx - h * 0.78},318 ${cx - h * 0.56},362
+            C${cx - 30},398 ${cx - 16},418 ${cx - 12},438 L${cx + 12},438
+            C${cx + 16},418 ${cx + 30},398 ${cx + h * 0.56},362
+            C${cx + h * 0.78},318 ${cx + h},${hY + 40} ${cx + h},${hY}
+            C${cx + h},${hY - 18} ${cx + w},${wY + 16} ${cx + w},${wY} Z"${fill(colors && colors.body)}/>
+          <path d="${scales}" fill="none" stroke="${scaleColor}" stroke-width="1.1" opacity="${scaleOpacity}"/>
+          <path d="M${cx - w + 8},${wY + 10} C${cx - h + 10},${hY} ${cx - h * 0.6},330 ${cx - 20},400" fill="none" stroke="#ffffff" stroke-width="5" opacity="0.18" stroke-linecap="round"/>
+          ${colors ? [[-14, 270], [18, 300], [-6, 340], [10, 380], [-20, 230]].map(([x, y]) => `<path d="M${cx + x},${y - 4} L${cx + x + 1.2},${y - 1.2} L${cx + x + 4},${y} L${cx + x + 1.2},${y + 1.2} L${cx + x},${y + 4} L${cx + x - 1.2},${y + 1.2} L${cx + x - 4},${y} L${cx + x - 1.2},${y - 1.2} Z" fill="#ffffff" opacity="0.9"/>`).join('') : ''}
+          ${pearls}`;
+}
 
 const OUTFIT_STYLES = [
   { id: 'aline', label: 'A-Line Dress', emoji: '👗',
@@ -492,6 +552,11 @@ const OUTFIT_STYLES = [
               <path d="M${cx - s + 8},${sY + 10} L${cx - w + 8},${jacketHemY - 10}" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.12" stroke-linecap="round"/>
               ${gems.join('')}
               ${gem(cx - c + 12, bY + 30, 3.4)}${gem(cx + c - 14, bY + 44, 3)}${gem(cx - c + 18, wY + 20, 2.6)}` } },
+  { id: 'mermaid-tail', label: 'Mermaid Tail', emoji: '🧜‍♀️', theme: 'mermaid',
+    hidesLegs: true,
+    svg: (bt) => mermaidTailSVG(bt, null) },
+  { id: 'ocean-sparkle-tail', label: 'Ocean Sparkle Tail', emoji: '🐚', theme: 'mermaid', fixedColor: true, hidesLegs: true,
+    svg: (bt) => mermaidTailSVG(bt, { body: '#3fb8c9', scale: '#1f7a8c', fin: '#9b6be0', finLine: '#6b3fb0', belt: '#ffd6ec' }) },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -741,6 +806,30 @@ const ACCESSORIES = [
       const t = i / 12;
       return `<circle cx="${(130 + 40 * t).toFixed(1)}" cy="${(155 + 18 * Math.sin(Math.PI * t)).toFixed(1)}" r="2.7" stroke="#d9d0c0" stroke-width="0.6"/>`;
     }).join('') + `<circle cx="150" cy="178" r="4" stroke="#d9d0c0" stroke-width="0.6"/><circle cx="149" cy="177" r="1.2" fill="#ffffff" stroke="none"/>` },
+  { id: 'shell-top', label: 'Seashell Top', emoji: '🐚', theme: 'mermaid', color: '#ff9fc7',
+    svg: `<path d="M140,152 L137,165 M160,152 L163,165 M146,175 L154,175" fill="none" stroke="#e0558f" stroke-width="1.6"/>
+          <g fill="#ff9fc7" stroke="#e0558f" stroke-width="1.2"><path d="M133,190 L120,175 Q121,164 133,163 Q145,164 146,175 Z"/>
+          <path d="M133,189 L125,168 M133,189 L133,164 M133,189 L141,168 M133,189 L121,175 M133,189 L145,175" fill="none" stroke-width="1" opacity="0.6"/>
+          <path d="M129,191 L137,191 L133,187 Z"/><path d="M167,190 L154,175 Q155,164 167,163 Q179,164 180,175 Z"/>
+          <path d="M167,189 L159,168 M167,189 L167,164 M167,189 L175,168 M167,189 L155,175 M167,189 L179,175" fill="none" stroke-width="1" opacity="0.6"/>
+          <path d="M163,191 L171,191 L167,187 Z"/></g>
+          <ellipse cx="128" cy="170" rx="3" ry="2" fill="#ffffff" stroke="none" opacity="0.6"/>
+          <ellipse cx="162" cy="170" rx="3" ry="2" fill="#ffffff" stroke="none" opacity="0.6"/>` },
+  { id: 'pearl-shell-top', label: 'Pearl Shell Top', emoji: '🦪', theme: 'mermaid', color: '#c9a6ff',
+    svg: `<g fill="#fff7ef" stroke="#d9c7b8" stroke-width="0.5">
+            ${[0, 1, 2, 3, 4].map((i) => `<circle cx="${139 - i * 0.6}" cy="${153 + i * 2.8}" r="1.8"/><circle cx="${161 + i * 0.6}" cy="${153 + i * 2.8}" r="1.8"/>`).join('')}
+            <circle cx="146" cy="176" r="1.8"/><circle cx="150" cy="176.5" r="1.8"/><circle cx="154" cy="176" r="1.8"/>
+          </g>
+          <g fill="#c9a6ff" stroke="#8c5ce0" stroke-width="1.2"><path d="M133,190 L120,175 Q121,164 133,163 Q145,164 146,175 Z"/>
+          <path d="M133,189 L125,168 M133,189 L133,164 M133,189 L141,168 M133,189 L121,175 M133,189 L145,175" fill="none" stroke-width="1" opacity="0.6"/>
+          <path d="M129,191 L137,191 L133,187 Z"/><path d="M167,190 L154,175 Q155,164 167,163 Q179,164 180,175 Z"/>
+          <path d="M167,189 L159,168 M167,189 L167,164 M167,189 L175,168 M167,189 L155,175 M167,189 L179,175" fill="none" stroke-width="1" opacity="0.6"/>
+          <path d="M163,191 L171,191 L167,187 Z"/></g>
+          <circle cx="133" cy="184" r="2.6" fill="#fff7ef" stroke="#d9c7b8" stroke-width="0.5"/>
+          <circle cx="167" cy="184" r="2.6" fill="#fff7ef" stroke="#d9c7b8" stroke-width="0.5"/>` },
+  { id: 'starfish-clip', label: 'Starfish Clip', emoji: '⭐', theme: 'mermaid', color: '#ff9a5c',
+    svg: `<path d="M186,46 L190,56 L201,57 L192,63 L195,74 L186,68 L177,74 L180,63 L171,57 L182,56 Z" stroke="#e0703a" stroke-width="1.2" stroke-linejoin="round"/>
+          <g fill="#ffd2b0" stroke="none"><circle cx="186" cy="54" r="1"/><circle cx="192" cy="60" r="1"/><circle cx="180" cy="60" r="1"/><circle cx="183" cy="67" r="1"/><circle cx="189" cy="67" r="1"/><circle cx="186" cy="61" r="1.3"/></g>` },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 L150,4 L192,58 Z"/>
           <ellipse cx="150" cy="58" rx="44" ry="13" fill="#f4f4f4"/>
@@ -1076,6 +1165,10 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #8fd3ff 0%, #c4ecff 55%, #a8e0a0 100%)' },
   { id: 'sunset-flock', label: 'Sunset Flock', emoji: '🌅', theme: 'birds', ambient: 'birds',
     gradient: 'linear-gradient(180deg, #ffb38a 0%, #ff8fab 50%, #9b7ad8 100%)' },
+  { id: 'under-the-sea', label: 'Under the Sea', emoji: '🫧', theme: 'mermaid', ambient: 'bubbles', decor: 'seabed',
+    gradient: 'linear-gradient(180deg, #5fd0e8 0%, #2a8fc4 50%, #164f8a 100%)' },
+  { id: 'coral-reef', label: 'Coral Reef', emoji: '🪸', theme: 'mermaid', ambient: 'bubbles', decor: 'reef',
+    gradient: 'linear-gradient(180deg, #a8f0e8 0%, #4cc9c0 50%, #2a8f9c 100%)' },
   { id: 'met-steps', label: 'Met Gala Steps', emoji: '📸', theme: 'metgala', price: 50, ambient: 'flash', decor: 'carpet',
     gradient: 'linear-gradient(180deg, #1e1a2e 0%, #3b2f4f 60%, #5a4a6a 100%)' },
   { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
@@ -1095,6 +1188,7 @@ const JUDGE_COMMENTS = [
   "So good it's scary!",
   "Tweet-tastic! The judges are all aflutter.",
   "Met Gala ready! The cameras can't stop flashing.",
+  "Fin-tastic! Making waves on the runway.",
 ];
 
 const WARDROBE_PRESETS = [
@@ -1145,6 +1239,18 @@ const WARDROBE_PRESETS = [
       outfit: { style: 'feather-dress', color: '#f2c94c' }, shoes: { style: 'sneakers', color: '#ffffff' },
       accessories: { 'feather-wings': true, 'nest-hat': true }, pet: { species: 'bird', color: '#e05c5c', accessory: 'party-hat' },
       background: 'treetop-sky', face: { mouth: 'grin' } } },
+  { id: 'ocean-princess', label: 'Ocean Princess', theme: 'mermaid',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[1], hair: { style: 'mermaid-waves', color: '#e0558f' },
+      outfit: { style: 'mermaid-tail', color: '#8c5ce0' }, shoes: { style: 'flats', color: '#5cc4e0' },
+      accessories: { 'shell-top': true, 'starfish-clip': true }, background: 'under-the-sea' } },
+  { id: 'coral-mermaid', label: 'Coral Mermaid', theme: 'mermaid',
+    look: { bodyType: 'neutral', skin: SKIN_TONES[4], hair: { style: 'mermaid-waves', color: '#d9b45a' },
+      outfit: { style: 'ocean-sparkle-tail', color: '#3fb8c9' }, shoes: { style: 'flats', color: '#5cc4e0' },
+      accessories: { 'pearl-shell-top': true }, background: 'coral-reef', face: { mouth: 'grin' } } },
+  { id: 'sea-king', label: 'Sea King', theme: 'mermaid',
+    look: { bodyType: 'masculine', skin: SKIN_TONES[2], hair: { style: 'mermaid-waves', color: '#5cc4e0' },
+      outfit: { style: 'mermaid-tail', color: '#43b581' }, shoes: { style: 'flats', color: '#43b581' },
+      accessories: { 'starfish-clip': true }, background: 'coral-reef', face: { eyebrowShape: 'thick' } } },
   { id: 'pumpkin-pal', label: 'Pumpkin Pal', theme: 'halloween',
     look: { bodyType: 'neutral', skin: SKIN_TONES[2], hair: { style: 'curly', color: '#4b2e1e' },
       outfit: { style: 'pumpkin-costume', color: '#f28c28' }, shoes: { style: 'sneakers', color: '#2b2b2b' },
@@ -1540,6 +1646,9 @@ function render() {
     setGradient('outfitGradient', state.outfit.color, 0.4, 0.3);
     outfitLayer.setAttribute('fill', 'url(#outfitGradient)');
   }
+  // A mermaid tail replaces the legs and feet.
+  ['leg-left', 'leg-right', 'leg-left-outline', 'leg-right-outline', 'leg-left-shine', 'leg-right-shine', 'layer-shoes']
+    .forEach((id) => { document.getElementById(id).style.display = outfitDef.hidesLegs ? 'none' : ''; });
   document.getElementById('outfit-color-label').hidden = !!outfitDef.fixedColor;
   document.getElementById('outfit-colors').hidden = !!outfitDef.fixedColor;
   document.getElementById('outfit-fixed-note').hidden = !outfitDef.fixedColor;
@@ -1640,6 +1749,7 @@ function setAmbient(type, decor) {
     if (type === 'bats' && Math.random() < 0.2) spawnBat();
     if (type === 'birds' && Math.random() < 0.2) spawnBat(BIRD_SVG);
     if (type === 'flash' && Math.random() < 0.35) spawnFlash();
+    if (type === 'bubbles' && Math.random() < 0.45) spawnBubble();
   }, 350);
 }
 
@@ -1660,6 +1770,20 @@ function addDecor(decor) {
   if (decor === 'pumpkins') {
     el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
       ${pumpkinSVG(228, 56, 1.15, true)}${pumpkinSVG(272, 62, 0.8, false)}${pumpkinSVG(24, 64, 0.7, true)}
+    </svg>`;
+  } else if (decor === 'seabed' || decor === 'reef') {
+    const weed = (x, h, d) => `<path class="seaweed" style="animation-delay:${d}s" d="M${x},96 C${x - 8},${96 - h * 0.3} ${x + 8},${96 - h * 0.55} ${x},${96 - h * 0.75} C${x - 6},${96 - h * 0.85} ${x + 4},${96 - h * 0.95} ${x},${96 - h}" fill="none" stroke="#2f9e5a" stroke-width="5" stroke-linecap="round"/>`;
+    const coral = (x, col) => `<g stroke="${col}" stroke-width="5" stroke-linecap="round" fill="none">
+        <path d="M${x},92 L${x},62 M${x},78 L${x - 12},64 L${x - 14},54 M${x},70 L${x + 10},58 L${x + 10},48 M${x - 12},64 L${x - 20},60"/></g>`;
+    const star = (x, y) => `<path d="M${x},${y - 6} L${x + 1.8},${y - 1.8} L${x + 6},${y - 1.6} L${x + 2.8},${y + 1.4} L${x + 3.8},${y + 5.6} L${x},${y + 3.2} L${x - 3.8},${y + 5.6} L${x - 2.8},${y + 1.4} L${x - 6},${y - 1.6} L${x - 1.8},${y - 1.8} Z" fill="#ff9a5c"/>`;
+    const reef = decor === 'reef';
+    el.innerHTML = `<svg viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+      ${weed(16, 70, 0)}${weed(34, 50, -1.2)}${weed(268, 80, -0.6)}${weed(286, 56, -2)}
+      ${reef ? coral(60, '#ff6f91') + coral(244, '#ff9a5c') + coral(214, '#b79cff') : coral(240, '#ff6f91')}
+      <path d="M0,88 Q60,78 120,86 Q190,94 240,84 Q280,78 300,86 L300,100 L0,100 Z" fill="#f2dfb0"/>
+      ${star(80, 92)}
+      <path d="M200,95 L192,86 Q200,80 208,86 Z" fill="#ffd6ec" stroke="#e0a0c0" stroke-width="0.8"/>
+      ${reef ? star(256, 94) : ''}
     </svg>`;
   } else if (decor === 'carpet') {
     let steps = '';
@@ -1705,6 +1829,18 @@ const BAT_SVG = `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
 const BIRD_SVG = `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
   <path d="M4,10 Q16,4 30,16 Q44,4 56,10 Q44,8 30,20 Q16,8 4,10 Z" fill="#3a3550" opacity="0.75"/>
 </svg>`;
+
+function spawnBubble() {
+  const bubble = document.createElement('div');
+  bubble.className = 'ambient-bubble';
+  const size = 5 + Math.random() * 10;
+  bubble.style.width = `${size}px`;
+  bubble.style.height = `${size}px`;
+  bubble.style.left = `${Math.random() * 96}%`;
+  bubble.style.animationDuration = `${4 + Math.random() * 3}s`;
+  ambientLayer.appendChild(bubble);
+  setTimeout(() => bubble.remove(), 7500);
+}
 
 function spawnFlash() {
   const flash = document.createElement('div');
@@ -1884,12 +2020,14 @@ function buildDollSVG(look, idSuffix = '') {
         <line x1="-0.4" y1="6" x2="-0.4" y2="14" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"/>
         <line x1="-4.4" y1="6" x2="-4.4" y2="12" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"/>
       </g>
+      ${outfitDef.hidesLegs ? '' : `
       <path d="${capsulePath(133, 248, rUpper + outlineGrow, 127, 445, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
       <path d="${capsulePath(167, 248, rUpper + outlineGrow, 173, 445, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
       <path d="${capsulePath(133, 248, rUpper, 127, 445, rLower)}"/>
       <path d="${capsulePath(167, 248, rUpper, 173, 445, rLower)}"/>
       <line x1="133" y1="248" x2="127" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
       <line x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
+      `}
       <path d="${bodyTorsoPath(bt)}" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
       <rect x="137" y="132" width="26" height="26" rx="8" stroke="rgba(40,28,20,0.18)" stroke-width="1.5"/>
       <ellipse cx="104" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"/>
@@ -1899,7 +2037,7 @@ function buildDollSVG(look, idSuffix = '') {
     </g>
     <g fill="url(#${hairGrad})" stroke="${hairDark}">${hairDef.svg}</g>
     <g>${buildFaceSVG(face, look.hair.color)}</g>
-    <g fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g>
+    ${outfitDef.hidesLegs ? '' : `<g fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g>`}
     <g fill="${outfitFill}">${typeof outfitDef.svg === 'function' ? outfitDef.svg(bt) : outfitDef.svg}</g>
     ${accSvg}
   `;
@@ -2098,7 +2236,7 @@ const GAME_MODES = {
 
 function computeGameMode() {
   const outfitDef = OUTFIT_STYLES.find((o) => o.id === state.outfit.style);
-  if (outfitDef && outfitDef.id === 'mermaid') return 'swim';
+  if (outfitDef && ['mermaid', 'mermaid-tail', 'ocean-sparkle-tail'].includes(outfitDef.id)) return 'swim';
   if (state.pet.species === 'horse') return 'ride';
   if (state.accessories['fairy-wings'] || state.accessories['feather-wings']) return 'fly';
   return 'walk';
