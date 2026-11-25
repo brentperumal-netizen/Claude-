@@ -2464,6 +2464,8 @@ function renderCash() {
   document.getElementById('cash-badge').textContent = `💵 $${cash}`;
   const shopCash = document.getElementById('shop-cash');
   if (shopCash) shopCash.textContent = `💵 $${cash}`;
+  const mgCash = document.getElementById('mg-cash');
+  if (mgCash) mgCash.textContent = `💵 $${cash}`;
   const passesCash = document.getElementById('passes-cash');
   if (passesCash) passesCash.textContent = `💵 $${cash}`;
 }
@@ -3436,6 +3438,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !wardrobeOverlay.hidden) closeWardrobe();
   if (e.key === 'Escape' && !shopOverlay.hidden) closeShop();
   if (e.key === 'Escape' && !passesOverlay.hidden) closePasses();
+  if (e.key === 'Escape' && !mgOverlay.hidden) closeMiniGames();
   if (e.key === 'Escape' && !catwalkOverlay.hidden) closeCatwalk();
 });
 
@@ -3675,6 +3678,320 @@ document.getElementById('passes-btn').addEventListener('click', openPasses);
 document.getElementById('passes-close').addEventListener('click', closePasses);
 passesOverlay.addEventListener('click', (e) => {
   if (e.target === passesOverlay) closePasses();
+});
+
+// ---------- Mini Games ----------
+// Three quick games that earn pass points (for every pass you own) and a little cash.
+
+const mgOverlay = document.getElementById('minigames-overlay');
+const mgMenu = document.getElementById('mg-menu');
+const mgGame = document.getElementById('mg-game');
+const mgArea = document.getElementById('mg-area');
+const mgHud = document.getElementById('mg-hud-text');
+const mgResult = document.getElementById('mg-result');
+
+const MINI_GAMES = [
+  { id: 'memory', label: 'Outfit Memory', emoji: '👗', blurb: 'Flip cards and find the matching pairs. Fewer flips = more points!', reward: 'Up to 6 pass points + $10' },
+  { id: 'catch', label: 'Fashion Catch', emoji: '🛍️', blurb: 'Move the bag to catch falling fashion. Dodge the stinky socks!', reward: 'Up to 8 pass points + $20' },
+  { id: 'poses', label: 'Pose Party', emoji: '💃', blurb: 'Watch the poses light up, then copy the pattern. It gets longer!', reward: 'Up to 8 pass points + $16' },
+];
+
+let mgCurrent = null;
+let mgCleanup = null;
+
+function renderMiniMenu() {
+  mgMenu.innerHTML = '';
+  const hasPass = PASSES.some((x) => passOwned(x.id));
+  document.getElementById('mg-subtitle').textContent = hasPass
+    ? 'Play to earn pass points for your passes, plus a little cash.'
+    : 'Play to earn cash. Get a pass in 🎟️ Passes to earn pass points from mini games too!';
+  MINI_GAMES.forEach((g) => {
+    const card = document.createElement('button');
+    card.className = 'mg-card';
+    card.innerHTML = `<span class="mg-emoji">${g.emoji}</span><span class="mg-name">${g.label}</span>
+      <span class="mg-blurb">${g.blurb}</span><span class="mg-reward">🎟️ ${g.reward}</span>`;
+    card.addEventListener('click', () => startMiniGame(g.id));
+    mgMenu.appendChild(card);
+  });
+}
+
+function stopMiniGame() {
+  if (mgCleanup) mgCleanup();
+  mgCleanup = null;
+}
+
+function startMiniGame(id) {
+  stopMiniGame();
+  mgCurrent = id;
+  mgMenu.hidden = true;
+  mgGame.hidden = false;
+  mgResult.hidden = true;
+  mgArea.innerHTML = '';
+  mgArea.className = `mg-area mg-area-${id}`;
+  if (id === 'memory') startMemory();
+  if (id === 'catch') startCatch();
+  if (id === 'poses') startPoses();
+}
+
+function showMiniMenu() {
+  stopMiniGame();
+  mgGame.hidden = true;
+  mgMenu.hidden = false;
+  renderMiniMenu();
+}
+
+function finishMiniGame(title, points, cashWon) {
+  stopMiniGame();
+  cash += cashWon;
+  saveShop();
+  renderCash();
+  const hasPass = PASSES.some((x) => passOwned(x.id));
+  let text = `💵 +$${cashWon} (now $${cash})`;
+  if (hasPass && points > 0) {
+    const unlocked = addPassPoints(points);
+    text += ` · 🎟️ +${points} pass points`;
+    if (unlocked.length) text += ` · Unlocked ${unlocked.join(' & ')}!`;
+    rebuildThemedLists();
+    render();
+  } else if (!hasPass) {
+    text += ' · Get a pass to earn pass points too!';
+  }
+  document.getElementById('mg-result-title').textContent = title;
+  document.getElementById('mg-result-text').textContent = text;
+  mgResult.hidden = false;
+  if (points >= 6) {
+    const layer = document.getElementById('mg-confetti');
+    layer.innerHTML = '';
+    launchConfetti(layer);
+  }
+}
+
+// --- Outfit Memory ---
+function startMemory() {
+  const faces = ['👗', '👠', '👜', '💄', '👑', '🕶️'];
+  const deck = [...faces, ...faces].sort(() => Math.random() - 0.5);
+  let flipped = [];
+  let matched = 0;
+  let flips = 0;
+  let busy = false;
+  const update = () => { mgHud.textContent = `👆 ${flips} flips · ✅ ${matched} / ${faces.length} pairs`; };
+  update();
+  deck.forEach((face, i) => {
+    const card = document.createElement('button');
+    card.className = 'mem-card';
+    card.dataset.face = face;
+    card.setAttribute('aria-label', `Card ${i + 1}`);
+    card.innerHTML = `<span class="mem-back">✨</span><span class="mem-front">${face}</span>`;
+    card.addEventListener('click', () => {
+      if (busy || card.classList.contains('flipped')) return;
+      card.classList.add('flipped');
+      flipped.push(card);
+      if (flipped.length < 2) return;
+      flips += 1;
+      const [a, b] = flipped;
+      if (a.dataset.face === b.dataset.face) {
+        a.classList.add('matched');
+        b.classList.add('matched');
+        flipped = [];
+        matched += 1;
+        update();
+        if (matched === faces.length) {
+          const points = flips <= 9 ? 6 : flips <= 12 ? 5 : flips <= 16 ? 4 : 3;
+          setTimeout(() => finishMiniGame(`🎉 All pairs in ${flips} flips!`, points, 10), 400);
+        }
+      } else {
+        busy = true;
+        update();
+        setTimeout(() => {
+          a.classList.remove('flipped');
+          b.classList.remove('flipped');
+          flipped = [];
+          busy = false;
+        }, 750);
+      }
+    });
+    mgArea.appendChild(card);
+  });
+}
+
+// --- Fashion Catch ---
+function startCatch() {
+  const GOOD = ['👗', '👠', '💍', '👜', '💄', '⭐', '🎀', '🕶️'];
+  const BAD = ['🧦', '🐛'];
+  const DURATION = 30;
+  mgArea.innerHTML = '<div class="catch-bag" id="catch-bag">🛍️</div>';
+  const bag = document.getElementById('catch-bag');
+  let bagX = 0.5;
+  let caught = 0;
+  let items = [];
+  let raf = null;
+  let last = 0;
+  let spawnIn = 0;
+  let timeLeft = DURATION;
+  const keys = { left: false, right: false };
+  const place = () => { bag.style.left = `${bagX * 100}%`; };
+  place();
+  const onMove = (e) => {
+    const r = mgArea.getBoundingClientRect();
+    bagX = Math.min(0.95, Math.max(0.05, (e.clientX - r.left) / r.width));
+    place();
+  };
+  const onKey = (down) => (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') { keys.left = down; e.preventDefault(); }
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') { keys.right = down; e.preventDefault(); }
+  };
+  const kd = onKey(true), ku = onKey(false);
+  const noTouch = (e) => e.preventDefault();
+  mgArea.addEventListener('pointermove', onMove);
+  mgArea.addEventListener('pointerdown', onMove);
+  mgArea.addEventListener('touchstart', noTouch, { passive: false });
+  mgArea.addEventListener('touchmove', noTouch, { passive: false });
+  document.addEventListener('keydown', kd);
+  document.addEventListener('keyup', ku);
+
+  const tick = (ts) => {
+    if (!last) last = ts;
+    const dt = Math.min(0.05, (ts - last) / 1000);
+    last = ts;
+    timeLeft -= dt;
+    if (keys.left) bagX = Math.max(0.05, bagX - dt * 0.9);
+    if (keys.right) bagX = Math.min(0.95, bagX + dt * 0.9);
+    place();
+    spawnIn -= dt;
+    if (spawnIn <= 0) {
+      spawnIn = 0.55 + Math.random() * 0.35;
+      const bad = Math.random() < 0.22;
+      const el = document.createElement('div');
+      el.className = 'catch-item';
+      el.textContent = bad ? BAD[Math.floor(Math.random() * BAD.length)] : GOOD[Math.floor(Math.random() * GOOD.length)];
+      const item = { el, x: 0.06 + Math.random() * 0.88, y: -0.08, speed: 0.32 + Math.random() * 0.22 + (DURATION - timeLeft) * 0.006, bad };
+      el.style.left = `${item.x * 100}%`;
+      mgArea.appendChild(el);
+      items.push(item);
+    }
+    items = items.filter((it) => {
+      it.y += it.speed * dt;
+      it.el.style.top = `${it.y * 100}%`;
+      if (it.y > 0.8 && it.y < 0.92 && Math.abs(it.x - bagX) < 0.09) {
+        if (it.bad) caught = Math.max(0, caught - 2);
+        else caught += 1;
+        bag.classList.remove('bump');
+        void bag.offsetWidth;
+        bag.classList.add(it.bad ? 'bump-bad' : 'bump');
+        setTimeout(() => bag.classList.remove('bump', 'bump-bad'), 250);
+        it.el.remove();
+        return false;
+      }
+      if (it.y > 1.05) { it.el.remove(); return false; }
+      return true;
+    });
+    mgHud.textContent = `⏱️ ${Math.max(0, Math.ceil(timeLeft))}s · 🛍️ ${caught} caught`;
+    if (timeLeft <= 0) {
+      const points = Math.min(8, Math.ceil(caught / 3));
+      finishMiniGame(`🛍️ You caught ${caught}!`, points, Math.min(20, caught));
+      return;
+    }
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+  mgCleanup = () => {
+    if (raf) cancelAnimationFrame(raf);
+    mgArea.removeEventListener('pointermove', onMove);
+    mgArea.removeEventListener('pointerdown', onMove);
+    mgArea.removeEventListener('touchstart', noTouch);
+    mgArea.removeEventListener('touchmove', noTouch);
+    document.removeEventListener('keydown', kd);
+    document.removeEventListener('keyup', ku);
+    items.forEach((it) => it.el.remove());
+  };
+}
+
+// --- Pose Party ---
+function startPoses() {
+  const POSES = [
+    { emoji: '💅', label: 'Slay', color: '#e0558f' },
+    { emoji: '👑', label: 'Diva', color: '#f2c94c' },
+    { emoji: '💃', label: 'Dance', color: '#8c5ce0' },
+    { emoji: '✨', label: 'Sparkle', color: '#5cc4e0' },
+  ];
+  const MAX_ROUNDS = 8;
+  let seq = [];
+  let input = 0;
+  let accepting = false;
+  let timers = [];
+  const later = (fn, ms) => { timers.push(setTimeout(fn, ms)); };
+  mgArea.innerHTML = '<div class="pose-grid" id="pose-grid"></div><p class="pose-msg" id="pose-msg"></p>';
+  const grid = document.getElementById('pose-grid');
+  const msg = document.getElementById('pose-msg');
+  const btns = POSES.map((pose, i) => {
+    const b = document.createElement('button');
+    b.className = 'pose-btn';
+    b.style.setProperty('--pose-color', pose.color);
+    b.innerHTML = `<span>${pose.emoji}</span><small>${pose.label}</small>`;
+    b.addEventListener('click', () => press(i));
+    grid.appendChild(b);
+    return b;
+  });
+  const flash = (i, ms = 420) => {
+    btns[i].classList.add('lit');
+    later(() => btns[i].classList.remove('lit'), ms);
+  };
+  const rounds = () => seq.length - 1;
+  const update = () => { mgHud.textContent = `💃 Round ${seq.length} · ✅ ${Math.max(0, rounds())} copied`; };
+  const playSeq = () => {
+    accepting = false;
+    input = 0;
+    msg.textContent = '👀 Watch the poses...';
+    update();
+    seq.forEach((p, k) => later(() => flash(p), 700 + k * 650));
+    later(() => { accepting = true; msg.textContent = '👆 Your turn! Copy the pattern.'; }, 700 + seq.length * 650);
+  };
+  const nextRound = () => {
+    seq.push(Math.floor(Math.random() * POSES.length));
+    playSeq();
+  };
+  const press = (i) => {
+    if (!accepting) return;
+    flash(i, 220);
+    if (i !== seq[input]) {
+      accepting = false;
+      const done = rounds();
+      later(() => finishMiniGame(done > 0 ? `💃 You copied ${done} pattern${done === 1 ? '' : 's'}!` : '💃 Nice try!', done, done * 2), 400);
+      return;
+    }
+    input += 1;
+    if (input === seq.length) {
+      accepting = false;
+      if (seq.length >= MAX_ROUNDS) {
+        later(() => finishMiniGame('🏆 Perfect Pose Party!', MAX_ROUNDS, MAX_ROUNDS * 2), 400);
+        return;
+      }
+      msg.textContent = '🎉 Yes! Here comes a longer one...';
+      later(nextRound, 700);
+    }
+  };
+  nextRound();
+  mgCleanup = () => { timers.forEach(clearTimeout); timers = []; accepting = false; };
+}
+
+function openMiniGames() {
+  renderCash();
+  showMiniMenu();
+  mgOverlay.hidden = false;
+}
+
+function closeMiniGames() {
+  stopMiniGame();
+  mgOverlay.hidden = true;
+}
+
+document.getElementById('minigames-btn').addEventListener('click', openMiniGames);
+document.getElementById('mg-close').addEventListener('click', closeMiniGames);
+document.getElementById('mg-back').addEventListener('click', showMiniMenu);
+document.getElementById('mg-done').addEventListener('click', showMiniMenu);
+document.getElementById('mg-again').addEventListener('click', () => startMiniGame(mgCurrent));
+mgOverlay.addEventListener('click', (e) => {
+  if (e.target === mgOverlay) closeMiniGames();
 });
 
 // ---------- Catwalk Show (walk styles) ----------

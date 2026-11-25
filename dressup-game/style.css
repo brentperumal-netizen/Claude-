@@ -1330,3 +1330,140 @@ body {
 }
 .tier-action:disabled { background: var(--border); color: var(--muted); cursor: default; }
 .tier-action:focus-visible, .pass-buy:focus-visible { outline: 3px solid #8c5ce0; outline-offset: 2px; }
+
+/* ---------- Mini Games ---------- */
+.mg-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+.mg-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+  padding: 14px;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff, #f6f0ff);
+  cursor: pointer;
+  font: inherit;
+  color: var(--ink);
+}
+.mg-card:hover { border-color: var(--accent); }
+.mg-card:focus-visible { outline: 3px solid #8c5ce0; outline-offset: 2px; }
+.mg-emoji { font-size: 2rem; }
+.mg-name { font-weight: 800; font-size: 1.05rem; color: var(--accent-dark); }
+.mg-blurb { font-size: 0.82rem; color: var(--muted); }
+.mg-reward { font-size: 0.78rem; font-weight: 700; color: #5a3aa8; margin-top: 4px; }
+
+.mg-hud { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.mg-back { padding: 6px 12px; font-size: 0.85rem; }
+.mg-hud-text { font-weight: 700; color: var(--accent-dark); }
+
+.mg-stage { position: relative; }
+.mg-area {
+  position: relative;
+  border-radius: 14px;
+  min-height: 320px;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.mg-stage .game-result { border-radius: 14px; z-index: 5; }
+
+/* Outfit Memory */
+.mg-area-memory {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 10px;
+  background: linear-gradient(160deg, #ffe6f2, #efe4ff);
+}
+.mem-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: clamp(1.6rem, 6vw, 2.6rem);
+  background: linear-gradient(135deg, #e0558f, #8c5ce0);
+  color: #fff;
+  touch-action: manipulation;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.mem-card .mem-front { display: none; }
+.mem-card.flipped { background: #ffffff; transform: rotateY(180deg) scaleX(-1); }
+.mem-card.flipped .mem-front { display: inline; }
+.mem-card.flipped .mem-back { display: none; }
+.mem-card.matched { background: #e3f6e9; box-shadow: 0 0 0 3px #43b581 inset; }
+.mem-card:focus-visible { outline: 3px solid #8c5ce0; outline-offset: 2px; }
+
+/* Fashion Catch */
+.mg-area-catch {
+  aspect-ratio: 4 / 3;
+  min-height: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffd6ec 0%, #f4e6ff 70%, #e6d6ff 100%);
+  touch-action: none;
+  cursor: grab;
+}
+.catch-bag {
+  position: absolute;
+  bottom: 4%;
+  transform: translateX(-50%);
+  font-size: clamp(2.4rem, 8vw, 3.4rem);
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+.catch-bag.bump { transform: translateX(-50%) scale(1.25); }
+.catch-bag.bump-bad { transform: translateX(-50%) rotate(-12deg); filter: grayscale(0.6); }
+.catch-item {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: clamp(1.6rem, 5.5vw, 2.3rem);
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Pose Party */
+.mg-area-poses {
+  padding: 12px;
+  background: linear-gradient(160deg, #2a1650, #5a2a8a);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.pose-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: min(100%, 420px);
+}
+.pose-btn {
+  aspect-ratio: 1.3 / 1;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  background: var(--pose-color);
+  opacity: 0.55;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  touch-action: manipulation;
+  transition: opacity 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
+}
+.pose-btn span { font-size: clamp(2rem, 8vw, 3rem); }
+.pose-btn.lit { opacity: 1; transform: scale(1.06); box-shadow: 0 0 24px var(--pose-color); }
+.pose-btn:focus-visible { outline: 3px solid #ffffff; outline-offset: 2px; }
+.pose-msg { margin: 0; color: #fff; font-weight: 700; text-align: center; }
+
+.mg-menu[hidden], .mg-game[hidden] { display: none; }
