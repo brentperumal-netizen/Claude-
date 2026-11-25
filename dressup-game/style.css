@@ -1191,3 +1191,29 @@ body {
 
 /* Snowflakes stay visible on light, snowy backdrops */
 .ambient-snow { box-shadow: 0 0 3px rgba(70, 110, 160, 0.55); }
+
+/* ---------- Superhero ---------- */
+
+.cape-flutter {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: cape-flutter 2.6s ease-in-out infinite;
+}
+@keyframes cape-flutter {
+  0%, 100% { transform: skewX(-3deg) scaleX(1); }
+  50%      { transform: skewX(3deg) scaleX(1.04); }
+}
+
+.searchlight {
+  transform-box: view-box;
+  transform-origin: 150px 420px;
+  animation: searchlight-sweep 6s ease-in-out infinite alternate;
+}
+@keyframes searchlight-sweep {
+  from { transform: rotate(-6deg); }
+  to   { transform: rotate(10deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cape-flutter, .searchlight { animation: none; }
+}

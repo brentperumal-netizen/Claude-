@@ -80,6 +80,7 @@ const THEMES = [
   { id: 'school', label: 'School', emoji: '🎒' },
   { id: 'summer', label: 'Summer', emoji: '☀️' },
   { id: 'party', label: 'Party', emoji: '🎉' },
+  { id: 'superhero', label: 'Superhero', emoji: '🦸' },
 ];
 
 const SKIN_TONES = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5a3825'];
@@ -873,6 +874,44 @@ const OUTFIT_STYLES = [
               <circle cx="${cx - c + 14}" cy="${bY + 4}" r="2.6" fill="#ff3b3b"/><circle cx="${cx - c + 18}" cy="${bY + 6}" r="2.6" fill="#ff3b3b"/>
               <circle cx="${cx}" cy="${wY}" r="4" fill="#f2c94c"/>`;
     } },
+  { id: 'hero-suit', label: 'Hero Suit', emoji: '🦸', theme: 'superhero',
+    svg: (bt) => {
+      const cx = 150, sY = TORSO_Y.shoulder, wY = TORSO_Y.waist;
+      const rUpper = bt.limbWidth / 2 * 1.15 + 4;
+      const rLower = bt.limbWidth / 2 * 0.68 * 0.9 + 3;
+      const legL = capsulePath(133, 248, rUpper, 127, 418, rLower);
+      const legR = capsulePath(167, 248, rUpper, 173, 418, rLower);
+      const bootL = capsulePath(128.5, 372, rLower + 3.5, 127, 424, rLower + 3);
+      const bootR = capsulePath(171.5, 372, rLower + 3.5, 173, 424, rLower + 3);
+      const w = bt.waistHalf + 4;
+      return `<path d="${legL}"/><path d="${legR}"/>
+              <path d="${bootL}" fill="#2b2b4a"/><path d="${bootR}" fill="#2b2b4a"/>
+              <path d="M${128.5 - rLower - 4},374 L${128.5 + rLower + 4},374 L${128.5 + rLower + 2},382 L${128.5 - rLower - 2},382 Z M${171.5 - rLower - 4},374 L${171.5 + rLower + 4},374 L${171.5 + rLower + 2},382 L${171.5 - rLower - 2},382 Z" fill="#f2c94c"/>
+              <path d="${bodyTorsoPath(bt, 3)}"/>
+              <path d="M${cx - torsoHalfAt(bt, 180) - 3},180 L${cx - torsoHalfAt(bt, 180) + 8},196 L${cx - torsoHalfAt(bt, 214) - 3},214 L${cx - torsoHalfAt(bt, 214) + 6},236 M${cx + torsoHalfAt(bt, 180) + 3},180 L${cx + torsoHalfAt(bt, 180) - 8},196 L${cx + torsoHalfAt(bt, 214) + 3},214 L${cx + torsoHalfAt(bt, 214) - 6},236" fill="none" stroke="#f2c94c" stroke-width="3" stroke-linejoin="round"/>
+              <circle cx="${cx}" cy="${sY + 30}" r="17" fill="#ffffff" stroke="#f2c94c" stroke-width="3"/>
+              <path d="M${cx},${sY + 17} L${cx + 4},${sY + 26} L${cx + 13},${sY + 27} L${cx + 6},${sY + 33} L${cx + 8},${sY + 42} L${cx},${sY + 37} L${cx - 8},${sY + 42} L${cx - 6},${sY + 33} L${cx - 13},${sY + 27} L${cx - 4},${sY + 26} Z" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>
+              <rect x="${cx - w}" y="${wY + 10}" width="${w * 2}" height="9" rx="2" fill="#f2c94c"/>
+              <rect x="${cx - 8}" y="${wY + 8}" width="16" height="13" rx="3" fill="#ffd76a" stroke="#c98f1f" stroke-width="1"/>
+              <path d="M${cx - bt.chestHalf + 6},158 L${cx - bt.waistHalf + 2},${wY + 6}" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.16" stroke-linecap="round"/>`;
+    } },
+  { id: 'hero-dress', label: 'Hero Dress', emoji: '⚡', theme: 'superhero',
+    svg: (bt) => {
+      const cx = 150, sY = TORSO_Y.shoulder, wY = TORSO_Y.waist;
+      const w = bt.waistHalf + 4, hemY = 300, hemHalf = bt.hipHalf + 36;
+      let zig = '';
+      const n = 8, step = (hemHalf * 2) / n;
+      for (let k = 0; k < n; k++) {
+        const x0 = cx + hemHalf - step * k;
+        zig += ` L${(x0 - step / 2).toFixed(1)},${hemY + 12} L${(x0 - step).toFixed(1)},${hemY}`;
+      }
+      return `<path d="M${cx - w},${wY + 4} L${cx + w},${wY + 4} L${cx + hemHalf},${hemY}${zig} Z"/>
+              <path d="M${cx - w + 6},${wY + 8} L${cx - hemHalf + 14},${hemY - 4}" fill="none" stroke="#ffffff" stroke-width="5" opacity="0.15" stroke-linecap="round"/>
+              ${fittedTopSVG(bt, wY + 8, null)}
+              <path d="M${cx + 4},${sY + 14} L${cx - 10},${sY + 34} L${cx},${sY + 34} L${cx - 6},${sY + 52} L${cx + 12},${sY + 28} L${cx + 2},${sY + 28} Z" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>
+              <rect x="${cx - w}" y="${wY - 1}" width="${w * 2}" height="9" rx="2" fill="#f2c94c"/>
+              <circle cx="${cx}" cy="${wY + 3.5}" r="5" fill="#ffd76a" stroke="#c98f1f" stroke-width="1"/>`;
+    } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -1228,6 +1267,31 @@ const ACCESSORIES = [
           <path d="M84,216 L89,212 M84,221 L89,217 M84,226 L89,222" stroke="#ffffff" stroke-width="1.2"/>
           <path class="candle-flame" d="M86.5,211 Q81,204 86.5,196 Q92,204 86.5,211 Z" fill="#f2c94c" stroke="#f28c28" stroke-width="1"/>
           <circle cx="78" cy="231" r="3" fill="#e05c5c" stroke="none"/>` },
+  { id: 'hero-cape', label: 'Hero Cape', emoji: '🧣', theme: 'superhero', color: '#d93b4a',
+    behindSvg: `<g class="cape-flutter">
+            <path d="M112,150 Q86,280 66,432 Q86,440 108,428 Q128,440 150,428 Q172,440 192,428 Q214,440 234,432 Q214,280 188,150 Z" stroke="#9e1f2c" stroke-width="2"/>
+            <path d="M120,170 Q104,290 92,420 M150,160 L150,424 M180,170 Q196,290 208,420" fill="none" stroke="#9e1f2c" stroke-width="2" opacity="0.4"/>
+          </g>`,
+    svg: `<path d="M118,146 L106,166 L128,156 Z M182,146 L194,166 L172,156 Z" stroke="#9e1f2c" stroke-width="1.2"/>
+          <circle cx="128" cy="152" r="5" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>
+          <circle cx="172" cy="152" r="5" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>` },
+  { id: 'hero-mask', label: 'Hero Mask', emoji: '🎭', theme: 'superhero', color: '#5a3aa8',
+    svg: `<path fill-rule="evenodd" d="M112,88 Q114,76 132,78 Q144,79 150,86 Q156,79 168,78 Q186,76 188,88 Q186,100 168,99 Q156,99 150,93 Q144,99 132,99 Q114,100 112,88 Z
+            M122,90 Q125,83 132,83 Q140,83 142,90 Q139,96 132,96 Q125,96 122,90 Z
+            M158,90 Q161,83 168,83 Q175,83 178,90 Q175,96 168,96 Q161,96 158,90 Z" stroke="#3a2470" stroke-width="1.2"/>
+          <path d="M112,86 L100,80 L104,90 Z M188,86 L200,80 L196,90 Z"/>` },
+  { id: 'hero-sword', label: 'Hero Sword', emoji: '🗡️', theme: 'superhero', color: '#dfe6ee',
+    svg: `<path d="M210,150 L218,150 L218,256 L214,262 L210,256 Z" stroke="#9aa6b4" stroke-width="1.2"/>
+          <path d="M214,154 L214,252" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
+          <path d="M209,150 L214,140 L219,150 Z" stroke="#9aa6b4" stroke-width="1.2"/>
+          <rect x="200" y="256" width="28" height="7" rx="3" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>
+          <rect x="210" y="263" width="8" height="22" rx="2" fill="#7a3fbf" stroke="none"/>
+          <circle cx="214" cy="289" r="5" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>
+          <circle cx="214" cy="259.5" r="2.4" fill="#5cc4e0" stroke="none"/>` },
+  { id: 'hero-shield', label: 'Hero Shield', emoji: '🛡️', theme: 'superhero', color: '#5c7ce0',
+    svg: `<path d="M60,236 L104,236 L104,262 Q104,288 82,300 Q60,288 60,262 Z" stroke="#3a55a8" stroke-width="2"/>
+          <path d="M66,242 L98,242 L98,262 Q98,282 82,292 Q66,282 66,262 Z" fill="#f2c94c" stroke="none" opacity="0.95"/>
+          <path d="M86,248 L76,266 L83,266 L78,284 L90,262 L83,262 Z" fill="#5c7ce0" stroke="#3a55a8" stroke-width="1"/>` },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 C110,26 136,8 160,10 C186,12 206,36 214,72 C202,58 192,46 180,40 C186,46 190,52 192,58 Z" stroke="#8e1b20" stroke-width="1.2"/>
           <path d="M124,46 C128,30 142,20 158,18" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
@@ -1602,6 +1666,8 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #fff0f6 0%, #f4e6ff 60%, #e6d6ff 60%, #d6c2f5 100%)' },
   { id: 'disco-party', label: 'Dance Party', emoji: '🪩', theme: 'party', ambient: 'confetti', decor: 'disco',
     gradient: 'linear-gradient(180deg, #2a1650 0%, #5a2a8a 55%, #8c3aa8 100%)' },
+  { id: 'hero-city', label: 'Hero City', emoji: '🌃', theme: 'superhero', ambient: 'sparkle', decor: 'skyline',
+    gradient: 'linear-gradient(180deg, #141a3a 0%, #2a2f6a 55%, #5a4a9a 100%)' },
   { id: 'met-steps', label: 'Met Gala Steps', emoji: '📸', theme: 'metgala', price: 50, ambient: 'flash', decor: 'carpet',
     gradient: 'linear-gradient(180deg, #1e1a2e 0%, #3b2f4f 60%, #5a4a6a 100%)' },
   { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
@@ -1625,6 +1691,7 @@ const JUDGE_COMMENTS = [
   "Top of the class! A+ for style.",
   "Making a splash! Summer style on point.",
   "Life of the party! Hip hip hooray!",
+  "Super style! Saving the day, one runway at a time.",
 ];
 
 const WARDROBE_PRESETS = [
@@ -1679,6 +1746,14 @@ const WARDROBE_PRESETS = [
     look: { bodyType: 'neutral', skin: SKIN_TONES[4], hair: { style: 'curly', color: '#8c5ce0' },
       outfit: { style: 'polka-party-dress', color: '#5cc4e0' }, shoes: { style: 'sneakers', color: '#ffffff' },
       accessories: { 'party-hat': true }, background: 'disco-party', face: { eyeShape: 'wide' } } },
+  { id: 'super-star', label: 'Super Star', theme: 'superhero',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[2], hair: { style: 'ponytail', color: '#2b2b2b' },
+      outfit: { style: 'hero-dress', color: '#8c5ce0' }, shoes: { style: 'boots', color: '#f2c94c' },
+      accessories: { 'hero-cape': true, 'hero-mask': true, 'hero-sword': true }, background: 'hero-city', face: { eyebrowShape: 'thick', mouth: 'grin' } } },
+  { id: 'captain-courage', label: 'Captain Courage', theme: 'superhero',
+    look: { bodyType: 'masculine', skin: SKIN_TONES[4], hair: { style: 'crop', color: '#2b2b2b' },
+      outfit: { style: 'hero-suit', color: '#5c7ce0' }, shoes: { style: 'boots', color: '#2b2b2b' },
+      accessories: { 'hero-cape': true, 'hero-shield': true }, background: 'hero-city', face: { eyebrowShape: 'thick' } } },
   { id: 'santas-helper', label: "Santa's Helper", theme: 'christmas',
     look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'ponytail', color: '#8a5a2b' },
       outfit: { style: 'elf-costume', color: '#1e7a46' }, shoes: { style: 'boots', color: '#8a5a2b' },
@@ -2142,6 +2217,8 @@ function render() {
     const backLayer = acc.behindSvg ? document.getElementById(`layer-acc-${acc.id}-back`) : null;
     if (backLayer) {
       backLayer.innerHTML = state.accessories[acc.id] ? acc.behindSvg : '';
+      backLayer.setAttribute('fill', acc.color);
+      backLayer.setAttribute('stroke', acc.color);
       backLayer.style.display = state.accessories[acc.id] ? '' : 'none';
     }
     if (state.accessories[acc.id]) {
@@ -2251,6 +2328,22 @@ function addDecor(decor) {
   if (decor === 'pumpkins') {
     el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
       ${pumpkinSVG(228, 56, 1.15, true)}${pumpkinSVG(272, 62, 0.8, false)}${pumpkinSVG(24, 64, 0.7, true)}
+    </svg>`;
+  } else if (decor === 'skyline') {
+    const builds = [[0, 70, 40], [38, 40, 30], [66, 96, 34], [98, 56, 28], [124, 80, 30], [152, 44, 26], [176, 104, 36], [210, 62, 30], [238, 86, 34], [270, 52, 30]];
+    let city = '';
+    builds.forEach(([x, h, w], i) => {
+      city += `<rect x="${x}" y="${140 - h}" width="${w}" height="${h}" fill="${i % 2 ? '#1f2450' : '#262c5e'}"/>`;
+      for (let wy = 140 - h + 8; wy < 134; wy += 12) for (let wx = x + 5; wx < x + w - 6; wx += 9) {
+        if ((wx * 7 + wy * 3 + i) % 5 < 3) city += `<rect x="${wx}" y="${wy}" width="4" height="6" fill="#ffd76a" opacity="0.85"/>`;
+      }
+    });
+    el.classList.add('ambient-decor-full');
+    el.innerHTML = `<svg viewBox="0 0 300 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice">
+      <path class="searchlight" d="M150,420 L40,40 L110,30 Z" fill="#fff7d6" opacity="0.12"/>
+      <g transform="translate(64,62)"><circle cx="0" cy="0" r="22" fill="#fff7d6" opacity="0.5"/>
+        <path d="M0,-12 L3.5,-4 L12,-3.6 L5.6,2 L7.4,10.5 L0,6 L-7.4,10.5 L-5.6,2 L-12,-3.6 L-3.5,-4 Z" fill="#2a2f6a" opacity="0.8"/></g>
+      <g transform="translate(0,280)">${city}</g>
     </svg>`;
   } else if (decor === 'snowscene') {
     const tree = (x, y, sc) => `<g transform="translate(${x},${y}) scale(${sc})">
@@ -3126,7 +3219,7 @@ function computeGameMode() {
   const outfitDef = OUTFIT_STYLES.find((o) => o.id === state.outfit.style);
   if (outfitDef && ['mermaid', 'mermaid-tail', 'ocean-sparkle-tail'].includes(outfitDef.id)) return 'swim';
   if (state.pet.species === 'horse') return 'ride';
-  if (state.accessories['fairy-wings'] || state.accessories['feather-wings']) return 'fly';
+  if (state.accessories['fairy-wings'] || state.accessories['feather-wings'] || state.accessories['hero-cape']) return 'fly';
   return 'walk';
 }
 
