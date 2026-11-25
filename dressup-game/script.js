@@ -1238,14 +1238,14 @@ const OUTFIT_STYLES = [
       const cx = 150, sY = TORSO_Y.shoulder;
       const rUpper = bt.limbWidth / 2 * 1.15 + 5;
       const rLower = bt.limbWidth / 2 * 0.68 * 0.9 + 6;
-      const legL = capsulePath(133, 248, rUpper, 127, 432, rLower);
-      const legR = capsulePath(167, 248, rUpper, 173, 432, rLower);
+      const legL = capsulePath(133, 248, rUpper, 127, 412, rLower);
+      const legR = capsulePath(167, 248, rUpper, 173, 412, rLower);
       const moon = (x, y) => `<path d="M${x + 3},${y - 4} A4.5,4.5 0 1 0 ${x + 3},${y + 4} A3.4,3.4 0 1 1 ${x + 3},${y - 4} Z" fill="#fff7d6" opacity="0.9"/>`;
       const star = (x, y) => `<path d="M${x},${y - 3} L${x + 0.9},${y - 0.9} L${x + 3},${y} L${x + 0.9},${y + 0.9} L${x},${y + 3} L${x - 0.9},${y + 0.9} L${x - 3},${y} L${x - 0.9},${y - 0.9} Z" fill="#ffffff" opacity="0.9"/>`;
       return `<path d="${legL}"/><path d="${legR}"/>
-              <rect x="${127 - rLower - 1}" y="${424}" width="${rLower * 2 + 2}" height="8" rx="3" fill="#ffffff"/>
-              <rect x="${173 - rLower - 1}" y="${424}" width="${rLower * 2 + 2}" height="8" rx="3" fill="#ffffff"/>
-              ${moon(126, 300)}${star(134, 350)}${moon(170, 330)}${star(166, 386)}${star(124, 400)}${moon(176, 280)}
+              <rect x="${127 - rLower - 1}" y="${404}" width="${rLower * 2 + 2}" height="8" rx="3" fill="#ffffff"/>
+              <rect x="${173 - rLower - 1}" y="${404}" width="${rLower * 2 + 2}" height="8" rx="3" fill="#ffffff"/>
+              ${moon(126, 300)}${star(134, 350)}${moon(170, 330)}${star(166, 386)}${star(124, 392)}${moon(176, 280)}
               ${fittedTopSVG(bt, 250, null)}
               <path d="M${cx - 16},${sY - 1} L${cx},${sY + 14} L${cx + 16},${sY - 1}" fill="none" stroke="#ffffff" stroke-width="3"/>
               <line x1="${cx}" y1="${sY + 14}" x2="${cx}" y2="248" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
@@ -1440,6 +1440,43 @@ SHOE_STYLES.push({ id: 'sprinkle-sneakers', label: 'Sprinkle Sneakers', emoji: '
         <path d="M${106 + dx},444 Q${106 + dx},428 ${124 + dx},425 Q${144 + dx},423 ${150 + dx},438 Q${152 + dx},444 ${148 + dx},446 L${106 + dx},446 Z"/>
         ${[[114, 438, '#e05c5c', 20], [124, 432, '#5cc4e0', -30], [134, 438, '#f2c94c', 50], [142, 434, '#43b581', -10], [128, 441, '#9b6be0', 70]].map(([x, y, c, r]) =>
           `<rect x="${x + dx - 2.5}" y="${y - 0.9}" width="5" height="1.8" rx="0.9" fill="${c}" stroke="none" transform="rotate(${r} ${x + dx} ${y})"/>`).join('')}`).join('') });
+SHOE_STYLES.push({ id: 'fluffy-slippers', label: 'Fluffy Slippers', emoji: '☁️', theme: 'sleepy',
+  svg: [127, 173].map((x) => `
+        <ellipse cx="${x}" cy="458" rx="18" ry="5" fill="#000000" opacity="0.15" stroke="none"/>
+        <ellipse cx="${x}" cy="450" rx="16" ry="9"/>
+        ${Array.from({ length: 9 }, (_, i) => {
+          const a = Math.PI + (i / 8) * Math.PI;
+          return `<circle cx="${(x + Math.cos(a) * 15).toFixed(1)}" cy="${(447 + Math.sin(a) * 9).toFixed(1)}" r="5" stroke="none"/>`;
+        }).join('')}
+        <circle cx="${x}" cy="436" r="6" fill="#ffffff" stroke="none" opacity="0.9"/>
+        <circle cx="${x - 2}" cy="434" r="2" fill="#ffffff" stroke="none"/>`).join('') });
+SHOE_STYLES.push({ id: 'unicorn-slippers', label: 'Unicorn Slippers', emoji: '🦄', theme: 'sleepy',
+  svg: [127, 173].map((x) => `
+        <ellipse cx="${x}" cy="458" rx="17" ry="5" fill="#000000" opacity="0.15" stroke="none"/>
+        <path d="M${x - 2},436 L${x},418 L${x + 3},436 Z" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.8"/>
+        <path d="M${x - 1},430 L${x + 2},428 M${x - 1.5},425 L${x + 1.5},423" stroke="#c98f1f" stroke-width="0.8"/>
+        <path d="M${x - 10},440 L${x - 13},429 L${x - 5},436 Z M${x + 10},440 L${x + 13},429 L${x + 5},436 Z"/>
+        <ellipse cx="${x}" cy="448" rx="16" ry="10"/>
+        <path d="M${x + 9},440 Q${x + 18},444 ${x + 15},454" fill="none" stroke="#ff8fc7" stroke-width="3" stroke-linecap="round"/>
+        <path d="M${x + 11},442 Q${x + 19},448 ${x + 13},457" fill="none" stroke="#c9a6ff" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M${x - 7},446 q2,2 4,0 M${x + 3},446 q2,2 4,0" fill="none" stroke="#2b2b2b" stroke-width="1.2" stroke-linecap="round"/>
+        <ellipse cx="${x - 8}" cy="450" rx="2.4" ry="1.4" fill="#ff8fa3" stroke="none" opacity="0.7"/><ellipse cx="${x + 8}" cy="450" rx="2.4" ry="1.4" fill="#ff8fa3" stroke="none" opacity="0.7"/>`).join('') });
+SHOE_STYLES.push({ id: 'bear-slippers', label: 'Teddy Bear Slippers', emoji: '🧸', theme: 'sleepy',
+  svg: [127, 173].map((x) => `
+        <ellipse cx="${x}" cy="458" rx="17" ry="5" fill="#000000" opacity="0.15" stroke="none"/>
+        <circle cx="${x - 11}" cy="438" r="5.5"/><circle cx="${x + 11}" cy="438" r="5.5"/>
+        <circle cx="${x - 11}" cy="438" r="2.6" fill="#ffd6b0" stroke="none"/><circle cx="${x + 11}" cy="438" r="2.6" fill="#ffd6b0" stroke="none"/>
+        <ellipse cx="${x}" cy="448" rx="16" ry="10"/>
+        <ellipse cx="${x}" cy="451" rx="6" ry="4.4" fill="#ffd6b0" stroke="none"/>
+        <ellipse cx="${x}" cy="449.4" rx="2" ry="1.4" fill="#3a2a1a" stroke="none"/>
+        <circle cx="${x - 5.5}" cy="445" r="1.5" fill="#2b2b2b" stroke="none"/><circle cx="${x + 5.5}" cy="445" r="1.5" fill="#2b2b2b" stroke="none"/>`).join('') });
+SHOE_STYLES.push({ id: 'heart-slippers', label: 'Heart Slippers', emoji: '💗', theme: 'sleepy',
+  svg: [127, 173].map((x) => `
+        <ellipse cx="${x}" cy="458" rx="17" ry="5" fill="#000000" opacity="0.15" stroke="none"/>
+        <ellipse cx="${x}" cy="450" rx="15" ry="8.5"/>
+        <path d="M${x - 15},450 Q${x},440 ${x + 15},450" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.8"/>
+        <path d="M${x},450 C${x - 10},443 ${x - 9},434 ${x - 4},434.6 C${x - 2},434.8 ${x},436.6 ${x},438 C${x},436.6 ${x + 2},434.8 ${x + 4},434.6 C${x + 9},434 ${x + 10},443 ${x},450 Z" fill="#ff3b7a" stroke="#c0245e" stroke-width="1"/>
+        <path d="M${x - 5},438 Q${x - 3.5},436.6 ${x - 2},437.4" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.7" stroke-linecap="round"/>`).join('') });
 SHOE_STYLES.push({ id: 'bunny-slippers', label: 'Bunny Slippers', emoji: '🐰', theme: 'sleepy',
   svg: [127, 173].map((x) => `
         <ellipse cx="${x}" cy="456" rx="17" ry="5" fill="#000000" opacity="0.15" stroke="none"/>
@@ -2460,11 +2497,11 @@ const WARDROBE_PRESETS = [
       accessories: { 'cucumber-eyes': true }, background: 'cozy-bedroom', face: { mouth: 'grin' } } },
   { id: 'sweet-dreams', label: 'Sweet Dreams', theme: 'sleepy',
     look: { bodyType: 'neutral', skin: SKIN_TONES[4], hair: { style: 'long', color: '#2b2b2b' },
-      outfit: { style: 'nightgown', color: '#5cc4e0' }, shoes: { style: 'bunny-slippers', color: '#ffb3d6' },
+      outfit: { style: 'nightgown', color: '#5cc4e0' }, shoes: { style: 'unicorn-slippers', color: '#ffffff' },
       accessories: { 'sleeping-mask': true }, background: 'dreamland', face: { eyeShape: 'closed', lashes: 'long' } } },
   { id: 'spa-night', label: 'Spa Night', theme: 'sleepy',
     look: { bodyType: 'masculine', skin: SKIN_TONES[1], hair: { style: 'crop', color: '#8a5a2b' },
-      outfit: { style: 'cozy-pajamas', color: '#43b581' }, shoes: { style: 'bunny-slippers', color: '#d6d6d6' },
+      outfit: { style: 'cozy-pajamas', color: '#43b581' }, shoes: { style: 'bear-slippers', color: '#a8763f' },
       accessories: { 'clay-mask': true }, background: 'cozy-bedroom', face: { eyeShape: 'closed' } } },
   { id: 'santas-helper', label: "Santa's Helper", theme: 'christmas',
     look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'ponytail', color: '#8a5a2b' },
