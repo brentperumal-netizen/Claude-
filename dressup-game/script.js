@@ -81,6 +81,7 @@ const THEMES = [
   { id: 'summer', label: 'Summer', emoji: '☀️' },
   { id: 'party', label: 'Party', emoji: '🎉' },
   { id: 'superhero', label: 'Superhero', emoji: '🦸' },
+  { id: 'ballet', label: 'Ballet', emoji: '🩰' },
 ];
 
 const SKIN_TONES = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5a3825'];
@@ -298,6 +299,36 @@ function swimsuitSVG(bt, fill) {
             C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY + 4}
             C${cx - c},${bY + 6} ${cx - c},${bY} ${cx - t},${topY} Z"${f}/>
           <path d="M${cx - c + 6},${bY + 8} L${cx - w + 4},${wY + 20}" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.18" stroke-linecap="round"/>`;
+}
+
+// A leotard with a stiff, flat "pancake" tutu around the hips. colors=null uses the outfit colour.
+function balletTutuSVG(bt, colors) {
+  const cx = 150, y = TORSO_Y.hip - 10;
+  const rx = bt.hipHalf + 62;
+  const f = (c) => (colors ? ` fill="${c}"` : '');
+  const layers = [0, 1, 2].map((i) => {
+    const r = rx - i * 8, yy = y - i * 4;
+    let edge = '';
+    const n = 16;
+    for (let k = 0; k <= n; k++) {
+      const a = Math.PI * (k / n);
+      const x0 = cx - r * Math.cos(a), y0 = yy + 12 * Math.sin(a);
+      edge += `${k ? 'L' : 'M'}${x0.toFixed(1)},${(y0 + (k % 2 ? 5 : 0)).toFixed(1)} `;
+    }
+    return `<ellipse cx="${cx}" cy="${yy}" rx="${r}" ry="15"${f(colors && colors.tutu)} stroke="${colors ? colors.trim : '#000000'}" stroke-opacity="${colors ? 1 : 0.18}" stroke-width="1"/>
+            <path d="${edge}" fill="none" stroke="${colors ? colors.trim : '#000000'}" stroke-opacity="${colors ? 0.8 : 0.15}" stroke-width="1"/>
+            <ellipse cx="${cx}" cy="${yy}" rx="${r}" ry="15" fill="#ffffff" opacity="${colors ? 0 : 0.28}"/>`;
+  }).join('');
+  const net = Array.from({ length: 9 }, (_, i) => {
+    const x = cx - rx + 14 + i * ((rx * 2 - 28) / 8);
+    return `<line x1="${x.toFixed(1)}" y1="${y - 6}" x2="${(x + (x - cx) * 0.08).toFixed(1)}" y2="${y + 12}" stroke="#ffffff" stroke-width="1" opacity="0.5"/>`;
+  }).join('');
+  const sparkles = [[-12, 180], [10, 196], [-4, 214], [16, 172]].map(([x, yy]) =>
+    `<circle cx="${cx + x}" cy="${yy}" r="1.8" fill="${colors ? colors.sparkle : '#ffffff'}" opacity="0.9"/>`).join('');
+  return `${swimsuitSVG(bt, colors ? colors.suit : null)}
+          ${sparkles}
+          ${layers}${net}
+          <path d="M${cx - bt.waistHalf - 3},${TORSO_Y.waist} L${cx + bt.waistHalf + 3},${TORSO_Y.waist}" stroke="${colors ? colors.trim : '#ffffff'}" stroke-width="3" opacity="0.8"/>`;
 }
 
 const OUTFIT_STYLES = [
@@ -1031,6 +1062,10 @@ const OUTFIT_STYLES = [
               <rect x="${cx - 2.5}" y="${sY + 18}" width="5" height="8" rx="1" fill="#d6d6d6"/>
               <path d="M${cx - bt.shoulderHalf - 14},${sY + 22} L${cx - bt.shoulderHalf + 8},${sY + 22} M${cx + bt.shoulderHalf - 8},${sY + 22} L${cx + bt.shoulderHalf + 14},${sY + 22}" stroke="#2b2b2b" stroke-width="4"/>`;
     } },
+  { id: 'ballet-tutu', label: 'Ballerina Tutu', emoji: '🩰', theme: 'ballet',
+    svg: (bt) => balletTutuSVG(bt, null) },
+  { id: 'swan-tutu', label: 'Swan Tutu', emoji: '🦢', theme: 'ballet', fixedColor: true,
+    svg: (bt) => balletTutuSVG(bt, { suit: '#fdfdfd', tutu: '#ffffff', trim: '#d9d0c0', sparkle: '#c9a6ff' }) },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -1190,6 +1225,13 @@ const SHOE_STYLES = [
           <line x1="176" y1="442" x2="192" y2="438" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>` },
 ];
 
+SHOE_STYLES.push({ id: 'ballet-slippers', label: 'Ballet Shoes', emoji: '🩰', theme: 'ballet',
+  svg: [127, 173].map((x) => `
+        <ellipse cx="${x}" cy="462" rx="9" ry="3" fill="#000000" opacity="0.18" stroke="none"/>
+        <path d="M${x - 8},${404} L${x + 8},${420} M${x + 8},${404} L${x - 8},${420} M${x - 8},${420} L${x + 8},${436} M${x + 8},${420} L${x - 8},${436}" fill="none" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M${x - 10},440 Q${x - 10},428 ${x},428 Q${x + 10},428 ${x + 10},440 L${x + 7},456 Q${x},464 ${x - 7},456 Z" stroke-width="1.2"/>
+        <path d="M${x - 6},438 Q${x},434 ${x + 6},438" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.5"/>
+        <rect x="${x - 4}" y="456" width="8" height="5" rx="2" stroke="none" opacity="0.8"/>`).join('') });
 SHOE_STYLES.push({ id: 'light-up-sneakers', label: 'Light-Up Sneakers', emoji: '💡', price: 40,
   svg: [0, 46].map((dx) => `
         <rect class="light-sole" x="${104 + dx}" y="446" width="46" height="10" rx="5" fill="#ff6fb0" stroke="none"/>
@@ -1437,6 +1479,32 @@ const ACCESSORIES = [
           <ellipse cx="200" cy="100" rx="11" ry="15" fill="#f2c94c" stroke="#c98f1f" stroke-width="1.5"/>
           <ellipse cx="100" cy="100" rx="5" ry="8" fill="#ff8fc7" stroke="none"/>
           <ellipse cx="200" cy="100" rx="5" ry="8" fill="#ff8fc7" stroke="none"/>` },
+  { id: 'feather-headpiece', label: 'Feather Headpiece', emoji: '🪶', theme: 'ballet', unlockLevel: 2, color: '#ffffff',
+    svg: `${[-50, -25, 0, 25, 50].map((a) => `<g transform="rotate(${a} 180 60)">
+            <path d="M180,60 Q172,38 180,16 Q188,38 180,60 Z" fill="#ffffff" stroke="#d9d0c0" stroke-width="1"/>
+            <path d="M180,58 L180,20" stroke="#d9d0c0" stroke-width="0.8"/></g>`).join('')}
+          <path d="M114,62 Q150,40 186,62" fill="none" stroke="#f2c94c" stroke-width="3"/>
+          ${[120, 132, 144, 156, 168].map((x, i) => `<circle cx="${x}" cy="${[58, 52, 49, 49, 52][i]}" r="2.6" fill="#fff7ef" stroke="#d9c7b8" stroke-width="0.5"/>`).join('')}
+          <circle cx="180" cy="60" r="5" fill="#c9a6ff" stroke="#9b6be0" stroke-width="1"/>` },
+  { id: 'feather-boa', label: 'Feather Boa', emoji: '🎀', theme: 'ballet', unlockLevel: 3, color: '#ff8fc7',
+    svg: (() => {
+      const pts = [];
+      for (let i = 0; i <= 22; i++) {
+        const t = i / 22;
+        // drapes from the left hip, over the shoulders behind the neck, down to the right hip
+        const x = 108 + 84 * t;
+        const y = 250 - 100 * Math.sin(Math.PI * t) - (t > 0.25 && t < 0.75 ? 0 : 0);
+        pts.push([x, y]);
+      }
+      return pts.map(([x, y], i) => `<circle cx="${(x + (i % 2 ? 2 : -2)).toFixed(1)}" cy="${y.toFixed(1)}" r="${i % 3 ? 7 : 8}" fill="${i % 2 ? '#ff8fc7' : '#ffb3d6'}" stroke="none"/>`).join('') +
+        pts.filter((_, i) => i % 2).map(([x, y]) => `<path d="M${x},${y} q-6,6 -10,4 M${x},${y} q6,6 10,4" fill="none" stroke="#ffd6ec" stroke-width="1.2"/>`).join('');
+    })() },
+  { id: 'feather-fan', label: 'Feather Fan', emoji: '🪭', theme: 'ballet', unlockLevel: 4, color: '#c9a6ff',
+    svg: `${[-60, -36, -12, 12, 36, 60].map((a, i) => `<g transform="rotate(${a} 214 268)">
+            <path d="M214,268 Q206,238 214,212 Q222,238 214,268 Z" fill="${i % 2 ? '#c9a6ff' : '#ffffff'}" stroke="#9b6be0" stroke-width="1"/>
+            <path d="M214,264 L214,216" stroke="#9b6be0" stroke-width="0.7" opacity="0.7"/></g>`).join('')}
+          <circle cx="214" cy="268" r="5" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>
+          <rect x="211" y="268" width="6" height="16" rx="2" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.8"/>` },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 C110,26 136,8 160,10 C186,12 206,36 214,72 C202,58 192,46 180,40 C186,46 190,52 192,58 Z" stroke="#8e1b20" stroke-width="1.2"/>
           <path d="M124,46 C128,30 142,20 158,18" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
@@ -1813,6 +1881,10 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #2a1650 0%, #5a2a8a 55%, #8c3aa8 100%)' },
   { id: 'hero-city', label: 'Hero City', emoji: '🌃', theme: 'superhero', ambient: 'sparkle', decor: 'skyline',
     gradient: 'linear-gradient(180deg, #141a3a 0%, #2a2f6a 55%, #5a4a9a 100%)' },
+  { id: 'ballet-stage', label: 'Ballet Stage', emoji: '🎭', theme: 'ballet', ambient: 'sparkle', decor: 'curtains',
+    gradient: 'linear-gradient(180deg, #3a1630 0%, #5a2448 60%, #c9935a 60%, #a8763f 100%)' },
+  { id: 'dance-studio', label: 'Dance Studio', emoji: '🪞', theme: 'ballet', decor: 'studio',
+    gradient: 'linear-gradient(180deg, #ffeef5 0%, #f6e6ff 58%, #e0b98a 58%, #cfa274 100%)' },
   { id: 'met-steps', label: 'Met Gala Steps', emoji: '📸', theme: 'metgala', price: 50, ambient: 'flash', decor: 'carpet',
     gradient: 'linear-gradient(180deg, #1e1a2e 0%, #3b2f4f 60%, #5a4a6a 100%)' },
   { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
@@ -1837,6 +1909,7 @@ const JUDGE_COMMENTS = [
   "Making a splash! Summer style on point.",
   "Life of the party! Hip hip hooray!",
   "Super style! Saving the day, one runway at a time.",
+  "Bravo! Graceful as a swan.",
 ];
 
 const WARDROBE_PRESETS = [
@@ -1899,6 +1972,14 @@ const WARDROBE_PRESETS = [
     look: { bodyType: 'masculine', skin: SKIN_TONES[4], hair: { style: 'crop', color: '#2b2b2b' },
       outfit: { style: 'hero-suit', color: '#5c7ce0' }, shoes: { style: 'boots', color: '#2b2b2b' },
       accessories: { 'hero-cape': true, 'hero-shield': true }, background: 'hero-city', face: { eyebrowShape: 'thick' } } },
+  { id: 'prima-ballerina', label: 'Prima Ballerina', theme: 'ballet',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[1], hair: { style: 'bun', color: '#4b2e1e' },
+      outfit: { style: 'ballet-tutu', color: '#ff8fc7' }, shoes: { style: 'ballet-slippers', color: '#ffb3d6' },
+      accessories: {}, background: 'ballet-stage', face: { eyeShape: 'almond' } } },
+  { id: 'swan-dancer', label: 'Swan Dancer', theme: 'ballet',
+    look: { bodyType: 'neutral', skin: SKIN_TONES[4], hair: { style: 'bun', color: '#2b2b2b' },
+      outfit: { style: 'swan-tutu', color: '#ffffff' }, shoes: { style: 'ballet-slippers', color: '#ffffff' },
+      accessories: {}, background: 'dance-studio', face: { eyeShape: 'sleepy' } } },
   { id: 'santas-helper', label: "Santa's Helper", theme: 'christmas',
     look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'ponytail', color: '#8a5a2b' },
       outfit: { style: 'elf-costume', color: '#1e7a46' }, shoes: { style: 'boots', color: '#8a5a2b' },
@@ -2473,6 +2554,32 @@ function addDecor(decor) {
   if (decor === 'pumpkins') {
     el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
       ${pumpkinSVG(228, 56, 1.15, true)}${pumpkinSVG(272, 62, 0.8, false)}${pumpkinSVG(24, 64, 0.7, true)}
+    </svg>`;
+  } else if (decor === 'curtains') {
+    const folds = (x0, dir) => Array.from({ length: 5 }, (_, i) => `<path d="M${x0 + dir * i * 11},0 Q${x0 + dir * (i * 11 + 6)},210 ${x0 + dir * (i * 13 + 4)},420" fill="none" stroke="#7a0f2a" stroke-width="3" opacity="0.6"/>`).join('');
+    let valance = '';
+    for (let i = 0; i < 10; i++) valance += `<path d="M${i * 30},0 L${i * 30 + 30},0 L${i * 30 + 30},26 Q${i * 30 + 15},44 ${i * 30},26 Z" fill="#b0123f"/>`;
+    el.classList.add('ambient-decor-full');
+    el.innerHTML = `<svg viewBox="0 0 300 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <path d="M150,30 L70,420 L230,420 Z" fill="#fff7d6" opacity="0.14"/>
+      <ellipse cx="150" cy="404" rx="80" ry="14" fill="#fff7d6" opacity="0.22"/>
+      <path d="M0,0 L66,0 Q50,160 60,250 Q30,330 0,420 Z" fill="#b0123f"/>${folds(10, 1)}
+      <path d="M300,0 L234,0 Q250,160 240,250 Q270,330 300,420 Z" fill="#b0123f"/>${folds(290, -1)}
+      <path d="M60,250 Q40,256 30,250 M240,250 Q260,256 270,250" stroke="#f2c94c" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="58" cy="252" r="6" fill="#f2c94c"/><circle cx="242" cy="252" r="6" fill="#f2c94c"/>
+      ${valance}
+      <path d="M0,26 Q150,40 300,26" fill="none" stroke="#f2c94c" stroke-width="3"/>
+    </svg>`;
+  } else if (decor === 'studio') {
+    let mirrors = '';
+    for (let i = 0; i < 4; i++) mirrors += `<rect x="${8 + i * 72}" y="60" width="66" height="180" rx="3" fill="#e8f4ff" stroke="#c9b6d6" stroke-width="3"/>
+      <path d="M${20 + i * 72},90 L${44 + i * 72},70 M${20 + i * 72},120 L${60 + i * 72},86" stroke="#ffffff" stroke-width="4" opacity="0.7"/>`;
+    el.classList.add('ambient-decor-full');
+    el.innerHTML = `<svg viewBox="0 0 300 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      ${mirrors}
+      <rect x="0" y="196" width="300" height="5" rx="2" fill="#c9935a"/>
+      ${[20, 110, 190, 280].map((x) => `<rect x="${x - 2}" y="196" width="4" height="48" fill="#a8763f"/>`).join('')}
+      ${Array.from({ length: 8 }, (_, i) => `<line x1="${i * 40}" y1="244" x2="${i * 40 - 30}" y2="420" stroke="#b88a5a" stroke-width="1" opacity="0.5"/>`).join('')}
     </svg>`;
   } else if (decor === 'skyline') {
     const builds = [[0, 70, 40], [38, 40, 30], [66, 96, 34], [98, 56, 28], [124, 80, 30], [152, 44, 26], [176, 104, 36], [210, 62, 30], [238, 86, 34], [270, 52, 30]];
@@ -3110,6 +3217,8 @@ const WALK_STYLES = [
     walkArms: 'oneHip', finalArms: 'model', comment: 'Effortless strut, and that final pose? Iconic.' },
   { id: 'skip', label: 'Happy Skip', emoji: '🎈', duration: 4.5, cycle: 1.3, bob: 14, sway: 2, lift: 15, swing: 14,
     walkArms: 'sides', finalArms: 'tada', comment: 'So much joy! The crowd is bouncing with you.' },
+  { id: 'ballet', label: 'Ballet Twirl', emoji: '🩰', duration: 5.5, cycle: 0.7, bob: 6, sway: 1, lift: 12, swing: 0, spin: true,
+    walkArms: 'second', finalArms: 'arch', comment: 'Twirls, tiptoes and perfect arms. Bravo, ballerina!' },
   { id: 'wave', label: 'Royal Wave', emoji: '👋', duration: 5.5, cycle: 0.8, bob: 3, sway: 2, lift: 8, swing: 4,
     walkArms: 'wave', finalArms: 'wave', comment: 'Graceful and regal. Everyone waved back!' },
 ];
@@ -3136,6 +3245,12 @@ function armPose(kind, side, bt, s, t, swing) {
   if (kind === 'v') {
     return { e: [mx(98), 138], h: [mx(76), 98] };
   }
+  if (kind === 'out') {
+    return { e: [mx(96), 180 + Math.sin(t * 3) * 3], h: [mx(56), 186 + Math.sin(t * 3) * 6] };
+  }
+  if (kind === 'arch') {
+    return { e: [mx(96), 108], h: [mx(138), 46] };
+  }
   if (kind === 'waving') {
     return { e: [mx(88), 150], h: [mx(72) + Math.sin(t * 9) * 9, 100] };
   }
@@ -3150,6 +3265,8 @@ function walkArmKinds(kind) {
     case 'slay': return { L: 'hips', R: 'sides' };
     case 'model': return { L: 'hips', R: 'up' };
     case 'tada': return { L: 'v', R: 'v' };
+    case 'second': return { L: 'out', R: 'out' };
+    case 'arch': return { L: 'arch', R: 'arch' };
     default: return { L: 'sides', R: 'sides' };
   }
 }
@@ -3229,7 +3346,9 @@ function poseFrame(walk, u, t, finalK) {
   const scale = 0.42 + 0.58 * u;
   const bottom = lerp(58, 3, u);
   cwModel.style.bottom = `${bottom}%`;
-  cwModel.style.transform = `translateX(-50%) translateY(${(-bob * scale).toFixed(1)}px) scale(${scale.toFixed(3)}) rotate(${sway.toFixed(2)}deg)`;
+  // Ballet twirl: spin around (a squash of the width) while walking, ending face-forward.
+  const spin = walk.spin ? lerp(Math.cos(t * Math.PI * 1.2), 1, finalK) : 1;
+  cwModel.style.transform = `translateX(-50%) translateY(${(-bob * scale).toFixed(1)}px) scale(${scale.toFixed(3)}) scaleX(${spin.toFixed(3)}) rotate(${sway.toFixed(2)}deg)`;
 
   const liftL = Math.max(0, s) * walk.lift;
   const liftR = Math.max(0, -s) * walk.lift;
