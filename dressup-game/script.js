@@ -3237,7 +3237,7 @@ const WALK_STYLES = [
     walkArms: 'paws', finalArms: 'tada', comment: 'Hop, hop, hooray! The cutest walk on the runway.' },
   { id: 'power', label: 'Power Strut', emoji: '💪', price: 45, duration: 5, cycle: 0.95, bob: 6, sway: 1.5, lift: 13, swing: 10,
     walkArms: 'pump', finalArms: 'flex', comment: 'Strong and fierce! Total power move.' },
-  { id: 'kiss', label: 'Blow a Kiss', emoji: '😘', price: 30, duration: 5, cycle: 0.85, bob: 4, sway: 2.5, lift: 9, swing: 6,
+  { id: 'kiss', label: 'Blow a Kiss', emoji: '😘', price: 90, duration: 5, cycle: 0.85, bob: 4, sway: 2.5, lift: 9, swing: 6,
     walkArms: 'sides', finalArms: 'kiss', comment: 'Mwah! The crowd is blowing kisses back.' },
   { id: 'disco', label: 'Disco Strut', emoji: '🪩', price: 60, duration: 5.5, cycle: 1, bob: 6, sway: 4, lift: 11, swing: 0,
     walkArms: 'point', finalArms: 'disco', comment: 'Groovy! You turned the catwalk into a dance floor.' },
