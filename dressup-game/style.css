@@ -1123,3 +1123,5 @@ body {
   margin-top: 12px;
 }
 .cw-actions .btn:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+.ambient-decor.ambient-decor-mid { bottom: 40%; }
