@@ -3276,7 +3276,7 @@ function renderShop(message) {
     card.appendChild(btn);
     shopGrid.appendChild(card);
     // Walk cards show the model striking that walk's final pose.
-    if (kind === 'walk') poseLimbs(card.querySelector('.thumb'), item, 0, 1, false);
+    if (kind === 'walk') poseLimbs(card.querySelector('.thumb'), item, 0, item.previewMid ? 0 : 1, false);
   });
 }
 
@@ -3349,6 +3349,8 @@ const WALK_STYLES = [
     walkArms: 'point', finalArms: 'disco', comment: 'Groovy! You turned the catwalk into a dance floor.' },
   { id: 'spin-pose', label: 'Spin & Pose', emoji: '🌀', price: 90, spin: true, duration: 5.5, cycle: 0.9, bob: 4, sway: 2, lift: 10, swing: 0,
     walkArms: 'hips', finalArms: 'model', comment: 'A spin, a pose, a superstar moment!' },
+  { id: 'super-flight', label: 'Super Flight', emoji: '🦸', price: 90, flying: true, previewMid: true, duration: 5, cycle: 0.5, bob: 6, sway: 2, lift: 0, swing: 0,
+    walkArms: 'superman', finalArms: 'heroLand', comment: 'Up, up and away! A super landing!' },
   { id: 'wave', label: 'Royal Wave', emoji: '👋', duration: 5.5, cycle: 0.8, bob: 3, sway: 2, lift: 8, swing: 4,
     walkArms: 'wave', finalArms: 'wave', comment: 'Graceful and regal. Everyone waved back!' },
 ];
@@ -3395,6 +3397,9 @@ function armPose(kind, side, bt, s, t, swing) {
     const upNow = (s > 0) === (side === 'L');
     return upNow ? { e: [mx(94), 132], h: [mx(64), 90] } : { e: [mx(112 - spread * 0.5), 220], h: [mx(93 - spread), 268] };
   }
+  if (kind === 'fistUp') {
+    return { e: [mx(104), 122], h: [mx(96), 72] };
+  }
   if (kind === 'pointUp') {
     return { e: [mx(94), 132], h: [mx(64), 90] };
   }
@@ -3426,6 +3431,8 @@ function walkArmKinds(kind) {
     case 'kiss': return { L: 'hips', R: 'kiss' };
     case 'point': return { L: 'point', R: 'point' };
     case 'disco': return { L: 'hips', R: 'pointUp' };
+    case 'superman': return { L: 'sides', R: 'fistUp' };
+    case 'heroLand': return { L: 'hips', R: 'hips' };
     case 'arch': return { L: 'arch', R: 'arch' };
     default: return { L: 'sides', R: 'sides' };
   }
@@ -3503,7 +3510,8 @@ function poseFrame(walk, u, t, finalK) {
   cwModel.style.bottom = `${bottom}%`;
   // Ballet twirl: spin around (a squash of the width) while walking, ending face-forward.
   const spin = walk.spin ? lerp(Math.cos(t * Math.PI * 1.2), 1, finalK) : 1;
-  cwModel.style.transform = `translateX(-50%) translateY(${(-bob * scale).toFixed(1)}px) scale(${scale.toFixed(3)}) scaleX(${spin.toFixed(3)}) rotate(${sway.toFixed(2)}deg)`;
+  const hover = walk.flying ? (46 + Math.sin(t * 2.4) * 6) * (1 - finalK) : 0;
+  cwModel.style.transform = `translateX(-50%) translateY(${(-(bob + hover) * scale).toFixed(1)}px) scale(${scale.toFixed(3)}) scaleX(${spin.toFixed(3)}) rotate(${sway.toFixed(2)}deg)`;
 
   poseLimbs(cwModel, walk, t, finalK, true);
 }
@@ -3523,8 +3531,18 @@ function poseLimbs(root, walk, t, finalK, active) {
   const s = active ? walkSwing(walk, t) * (1 - finalK) : 0;
   const liftL = (walk.bothLegs ? Math.abs(s) : Math.max(0, s)) * walk.lift;
   const liftR = (walk.bothLegs ? Math.abs(s) : Math.max(0, -s)) * walk.lift;
-  root.querySelectorAll('.pl-left').forEach((g) => g.setAttribute('transform', `translate(0,${(-liftL).toFixed(1)})`));
-  root.querySelectorAll('.pl-right').forEach((g) => g.setAttribute('transform', `translate(0,${(-liftR).toFixed(1)})`));
+  if (walk.flying) {
+    // Legs stretched out behind: squash them toward the hips (they point away
+    // from us) and bring them together, easing back to standing on landing.
+    const k = 1 - finalK;
+    const sy = 1 - 0.5 * k, dx = 7 * k;
+    const legT = (d) => `translate(${(d * dx).toFixed(1)},248) scale(1,${sy.toFixed(3)}) translate(0,-248)`;
+    root.querySelectorAll('.pl-left').forEach((g) => g.setAttribute('transform', legT(1)));
+    root.querySelectorAll('.pl-right').forEach((g) => g.setAttribute('transform', legT(-1)));
+  } else {
+    root.querySelectorAll('.pl-left').forEach((g) => g.setAttribute('transform', `translate(0,${(-liftL).toFixed(1)})`));
+    root.querySelectorAll('.pl-right').forEach((g) => g.setAttribute('transform', `translate(0,${(-liftR).toFixed(1)})`));
+  }
   const walkK = walkArmKinds(walk.walkArms);
   const finK = walkArmKinds(walk.finalArms);
   ['L', 'R'].forEach((side) => {
@@ -3555,7 +3573,7 @@ function buildWalkPickerIn(containerId, onChange) {
 
 function refreshWalkPickers() {
   if (!catwalkOverlay.hidden) buildWalkPickerIn('walk-styles', resetCatwalk);
-  if (!gameOverlay.hidden) buildWalkPickerIn('game-walk-styles', updateGameWalkBadge);
+  if (!gameOverlay.hidden) buildWalkPickerIn('game-walk-styles', onGameWalkChange);
 }
 
 function spawnCwFlash() {
@@ -3679,6 +3697,7 @@ function computeGameMode() {
   if (outfitDef && ['mermaid', 'mermaid-tail', 'ocean-sparkle-tail'].includes(outfitDef.id)) return 'swim';
   if (state.pet.species === 'horse') return 'ride';
   if (['fairy-wings', 'feather-wings', 'hero-cape', 'rainbow-wings'].some((a) => state.accessories[a])) return 'fly';
+  if (currentWalk().flying) return 'fly';
   return 'walk';
 }
 
@@ -3728,6 +3747,13 @@ let starsCollected = 0;
 let rafId = null;
 let lastTs = 0;
 let gameWalkT = 0;
+
+// Switching walks can change how you move (Super Flight flies), so restart the run then.
+function onGameWalkChange() {
+  updateGameWalkBadge();
+  if (computeGameMode() !== gameMode) resetGameState();
+  else poseLimbs(gameCharacterEl, currentWalk(), gameWalkT, 0, false);
+}
 
 function updateGameWalkBadge() {
   const walk = currentWalk();
@@ -3973,7 +3999,7 @@ function onGameKeyUp(e) {
 function openGame() {
   resetGameState();
   gameOverlay.hidden = false;
-  buildWalkPickerIn('game-walk-styles', updateGameWalkBadge);
+  buildWalkPickerIn('game-walk-styles', onGameWalkChange);
   updateGameWalkBadge();
   document.addEventListener('keydown', onGameKeyDown);
   document.addEventListener('keyup', onGameKeyUp);
