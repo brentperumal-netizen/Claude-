@@ -1125,3 +1125,25 @@ body {
 .cw-actions .btn:disabled { opacity: 0.6; cursor: default; transform: none; }
 
 .ambient-decor.ambient-decor-mid { bottom: 40%; }
+
+/* ---------- Summer: pool waves and floats ---------- */
+
+.pool-wave { animation: pool-wave 3s linear infinite; }
+@keyframes pool-wave {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-30px); }
+}
+
+.float-bob {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: float-bob 2.8s ease-in-out infinite;
+}
+@keyframes float-bob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-3px) rotate(3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pool-wave, .float-bob { animation: none; }
+}

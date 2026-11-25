@@ -78,6 +78,7 @@ const THEMES = [
   { id: 'metgala', label: 'Met Gala', emoji: '🌹' },
   { id: 'mermaid', label: 'Mermaid', emoji: '🧜‍♀️' },
   { id: 'school', label: 'School', emoji: '🎒' },
+  { id: 'summer', label: 'Summer', emoji: '☀️' },
 ];
 
 const SKIN_TONES = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5a3825'];
@@ -179,6 +180,22 @@ const HAIR_STYLES = [
               <path d="M96,84 A60,60 0 0 1 204,84 Q192,70 176,72 Q164,60 150,66 Q136,60 124,72 Q108,70 96,84 Z"/>
               <path d="M110,64 Q127,52 146,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>`;
     })() },
+  { id: 'pigtails', label: 'Pigtails', emoji: '🎀',
+    svg: (() => {
+      const left = 'M106,70 C84,70 64,96 68,128 C70,150 84,164 94,154 C86,132 90,102 110,86 Z';
+      const mirror = (d) => d.replace(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g, (_, x, y) => `${300 - Number(x)},${y}`);
+      return `<g class="hair-sway hair-sway-left"><path d="${left}"/>
+                <path d="M84,96 C76,112 78,134 88,148" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.22"/></g>
+              <g class="hair-sway hair-sway-right"><path d="${mirror(left)}"/>
+                <path d="${mirror('M84,96 C76,112 78,134 88,148')}" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.22"/></g>
+              <path d="M98,82 A58,58 0 0 1 202,82 Z"/>
+              <rect x="98" y="80" width="12" height="18" rx="6"/>
+              <rect x="190" y="80" width="12" height="18" rx="6"/>
+              <path d="M150,38 L150,56" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.25"/>
+              <circle cx="106" cy="76" r="6" fill="#ff8fc7" stroke="#e0558f" stroke-width="1"/>
+              <circle cx="194" cy="76" r="6" fill="#ff8fc7" stroke="#e0558f" stroke-width="1"/>
+              <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>`;
+    })() },
   { id: 'crop', label: 'Short Crop', emoji: '💈',
     svg: `<path d="M100,78 A52,52 0 0 1 200,78 L198,96 A50,42 0 0 0 102,96 Z"/>
           <path d="M116,64 Q128,56 140,60" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>` },
@@ -257,6 +274,28 @@ function fittedTopSVG(bt, hemY, fill) {
             L${cx + hw},${hemY} L${cx - hw},${hemY} L${cx - w},${wY}
             C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY}
             C${cx - c},${bY - 10} ${cx - s},${sY + 14} ${cx - s},${sY} Z"${f}/>`;
+}
+
+// A one-piece swimsuit: straps, a straight neckline and high-cut leg openings.
+function swimsuitSVG(bt, fill) {
+  const cx = 150;
+  const { shoulder: sY, chest: bY, waist: wY, hip: hY } = TORSO_Y;
+  const f = fill ? ` fill="${fill}"` : '';
+  const topY = sY + 16;
+  const t = torsoHalfAt(bt, topY) + 3, c = bt.chestHalf + 3, w = bt.waistHalf + 3, h = bt.hipHalf + 3;
+  const sx = bt.shoulderHalf - 10;
+  return `<path d="M${cx - sx - 4},${sY} L${cx - sx + 3},${sY} L${cx - t + 12},${topY + 2} L${cx - t + 4},${topY + 2} Z"${f}/>
+          <path d="M${cx + sx + 4},${sY} L${cx + sx - 3},${sY} L${cx + t - 12},${topY + 2} L${cx + t - 4},${topY + 2} Z"${f}/>
+          <path d="M${cx - t},${topY} L${cx + t},${topY}
+            C${cx + c},${bY} ${cx + c},${bY + 6} ${cx + c},${bY + 4}
+            C${cx + c},${bY + 16} ${cx + w},${wY - 14} ${cx + w},${wY}
+            C${cx + w},${wY + 16} ${cx + h},${hY - 18} ${cx + h},${hY - 8}
+            Q${cx + 20},${hY - 2} ${cx + 10},${hY + 14} L${cx - 10},${hY + 14}
+            Q${cx - 20},${hY - 2} ${cx - h},${hY - 8}
+            C${cx - h},${hY - 18} ${cx - w},${wY + 16} ${cx - w},${wY}
+            C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY + 4}
+            C${cx - c},${bY + 6} ${cx - c},${bY} ${cx - t},${topY} Z"${f}/>
+          <path d="M${cx - c + 6},${bY + 8} L${cx - w + 4},${wY + 20}" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.18" stroke-linecap="round"/>`;
 }
 
 const OUTFIT_STYLES = [
@@ -688,6 +727,46 @@ const OUTFIT_STYLES = [
                 M157,90 Q160,82 168,82 Q176,82 179,90 Q176,97 168,97 Q160,97 157,90 Z" fill="${B}" stroke="${A}" stroke-width="1.6"/>
               <path d="M112,80 l3,-7 l3,7 Z M182,80 l3,-7 l3,7 Z" fill="${A}"/>
               <circle cx="150" cy="82" r="2.4" fill="${C}"/>` } },
+  { id: 'ruffle-swimsuit', label: 'Ruffle Swimsuit', emoji: '👙', theme: 'summer',
+    svg: (bt) => {
+      const cx = 150, topY = TORSO_Y.shoulder + 16;
+      const t = torsoHalfAt(bt, topY) + 3;
+      const ruffles = Array.from({ length: 7 }, (_, i) => {
+        const x = cx - t + 4 + i * ((2 * t - 8) / 6);
+        return `<circle cx="${x.toFixed(1)}" cy="${topY + 1}" r="5.5" stroke="#000000" stroke-opacity="0.15" stroke-width="1"/>`;
+      }).join('');
+      return `${swimsuitSVG(bt, null)}${ruffles}
+              <path d="M${cx},${topY + 8} L${cx - 9},${topY + 3} L${cx - 9},${topY + 13} Z M${cx},${topY + 8} L${cx + 9},${topY + 3} L${cx + 9},${topY + 13} Z" fill="#ffffff"/>
+              <circle cx="${cx}" cy="${topY + 8}" r="2.6" fill="#ffffff"/>`;
+    } },
+  { id: 'polka-swimsuit', label: 'Polka Dot Swimsuit', emoji: '🔴', theme: 'summer', fixedColor: true,
+    svg: (bt) => {
+      const cx = 150;
+      let dots = '';
+      for (let y = 178, r = 0; y <= 250; y += 14, r++) {
+        const half = torsoHalfAt(bt, y) - 2;
+        for (let x = -half + 6 + (r % 2) * 7; x <= half - 4; x += 14) dots += `<circle cx="${(cx + x).toFixed(1)}" cy="${y}" r="3.2" fill="#ffffff"/>`;
+      }
+      return `${swimsuitSVG(bt, '#e05c5c')}${dots}
+              <rect x="${cx - bt.waistHalf - 3}" y="${TORSO_Y.waist - 3}" width="${(bt.waistHalf + 3) * 2}" height="6" fill="#ffffff" opacity="0.9"/>`;
+    } },
+  { id: 'board-shorts', label: 'Surf Shorts & Rash Guard', emoji: '🏄', theme: 'summer',
+    svg: (bt) => {
+      const cx = 150, h = bt.hipHalf + 6;
+      const leg = (side) => {
+        const outer = cx + side * h, outerB = cx + side * (h + 4), inner = cx + side * 2;
+        return `<path d="M${outer},230 L${inner},230 L${inner},262 L${cx + side * 4},322 L${outerB},322 Z" stroke="#000000" stroke-opacity="0.2" stroke-width="1.2"/>`;
+      };
+      const flower = (x, y) => `<g fill="#ffffff" opacity="0.8">${[0, 72, 144, 216, 288].map((a) => `<ellipse cx="${x}" cy="${y - 4}" rx="2.4" ry="4.2" transform="rotate(${a} ${x} ${y})"/>`).join('')}</g><circle cx="${x}" cy="${y}" r="1.8" fill="#f2c94c"/>`;
+      const leaf = (x, y, r) => `<ellipse cx="${x}" cy="${y}" rx="7" ry="2.6" fill="#ffffff" opacity="0.45" transform="rotate(${r} ${x} ${y})"/>`;
+      return `${leg(-1)}${leg(1)}
+              <rect x="${cx - h}" y="226" width="${h * 2}" height="9"/>
+              <path d="M${cx - 6},230 L${cx - 2},242 M${cx + 6},230 L${cx + 2},242" stroke="#ffffff" stroke-width="1.4"/>
+              ${flower(cx - h + 14, 262)}${flower(cx + h - 12, 290)}${flower(cx - 14, 304)}${leaf(cx + 18, 254, 30)}${leaf(cx - h + 10, 300, -40)}${leaf(cx + h - 8, 312, 20)}
+              ${fittedTopSVG(bt, 230, '#ffffff')}
+              <path d="M${cx - torsoHalfAt(bt, 196) - 4},196 L${cx + torsoHalfAt(bt, 196) + 4},196 M${cx - torsoHalfAt(bt, 206) - 4},206 L${cx + torsoHalfAt(bt, 206) + 4},206" stroke="#5cc4e0" stroke-width="5"/>
+              <path d="M${cx - 12},${TORSO_Y.shoulder} Q${cx},${TORSO_Y.shoulder + 12} ${cx + 12},${TORSO_Y.shoulder}" fill="none" stroke="#5cc4e0" stroke-width="3"/>`;
+    } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -847,6 +926,16 @@ const SHOE_STYLES = [
           <line x1="176" y1="442" x2="192" y2="438" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>` },
 ];
 
+SHOE_STYLES.push({ id: 'flip-flops', label: 'Flip-Flops', emoji: '🩴', theme: 'summer',
+  svg: `<ellipse cx="127" cy="454" rx="15" ry="6" fill="#000000" opacity="0.18"/>
+        <ellipse cx="127" cy="450" rx="14" ry="6.5"/>
+        <path d="M117,450 Q120,440 127,438 Q134,440 137,450" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="127" cy="439" r="3.6" fill="#ff8fc7" stroke="none"/>
+        <ellipse cx="173" cy="454" rx="15" ry="6" fill="#000000" opacity="0.18"/>
+        <ellipse cx="173" cy="450" rx="14" ry="6.5"/>
+        <path d="M163,450 Q166,440 173,438 Q180,440 183,450" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="173" cy="439" r="3.6" fill="#ff8fc7" stroke="none"/>` });
+
 const SHOE_COLORS = ['#2b2b2b', '#8a5a2b', '#e0558f', '#ffffff', '#c68642', '#5cc4e0'];
 
 const ACCESSORIES = [
@@ -990,6 +1079,28 @@ const ACCESSORIES = [
           </g>
           <circle cx="106" cy="64" r="4" fill="#e0558f" stroke="none"/>
           <circle cx="194" cy="64" r="4" fill="#e0558f" stroke="none"/>` },
+  { id: 'sun-hat', label: 'Sun Hat', emoji: '👒', theme: 'summer', color: '#f2d68a',
+    svg: `<ellipse cx="150" cy="52" rx="74" ry="15" stroke="#c9a44e" stroke-width="1.5"/>
+          <path d="M112,52 Q112,16 150,14 Q188,16 188,52 Z" stroke="#c9a44e" stroke-width="1.5"/>
+          <path d="M113,40 Q150,48 187,40 L188,50 Q150,58 112,50 Z" fill="#ff8fc7" stroke="none"/>
+          <path d="M186,46 q18,6 22,20 M186,48 q8,10 6,24" fill="none" stroke="#ff8fc7" stroke-width="4" stroke-linecap="round"/>
+          <g fill="none" stroke="#c9a44e" stroke-width="0.8" opacity="0.6"><path d="M90,52 Q150,64 210,52 M100,58 Q150,68 200,58"/></g>` },
+  { id: 'flower-lei', label: 'Flower Lei', emoji: '🌺', theme: 'summer', color: '#ff6f91',
+    svg: Array.from({ length: 11 }, (_, i) => {
+      const t = i / 10;
+      const x = 124 + 52 * t, y = 154 + 24 * Math.sin(Math.PI * t);
+      const col = ['#ff6f91', '#f2c94c', '#b79cff', '#ff9a5c'][i % 4];
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.2" fill="${col}" stroke="none"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.6" fill="#fff7d6" stroke="none"/>`;
+    }).join('') },
+  { id: 'pineapple-glasses', label: 'Pineapple Glasses', emoji: '🍍', theme: 'summer', price: 50, color: '#f2c94c',
+    svg: [132, 168].map((x) => `
+          <path d="M${x - 8},74 L${x - 4},64 L${x},73 L${x + 4},62 L${x + 8},74 Z" fill="#4fae48" stroke="#2f7a2f" stroke-width="1"/>
+          <ellipse cx="${x}" cy="90" rx="14" ry="16" fill="#f2c94c" stroke="#c98f1f" stroke-width="1.5"/>
+          <path d="M${x - 10},82 L${+x + 6},98 M${x - 6},78 L${+x + 10},94 M${+x + 10},82 L${x - 6},98 M${+x + 6},78 L${x - 10},94" fill="none" stroke="#c98f1f" stroke-width="1" opacity="0.7"/>
+          <ellipse cx="${x}" cy="90" rx="9" ry="10" fill="#3a2a1a" stroke="none" opacity="0.82"/>
+          <path d="M${x - 5},85 Q${x - 2},82 ${+x + 1},84" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6" stroke-linecap="round"/>`).join('') +
+      `<path d="M146,90 Q150,86 154,90" fill="none" stroke="#c98f1f" stroke-width="2.5"/>
+       <line x1="118" y1="88" x2="105" y2="83" stroke="#c98f1f" stroke-width="3"/><line x1="182" y1="88" x2="195" y2="83" stroke="#c98f1f" stroke-width="3"/>` },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 L150,4 L192,58 Z"/>
           <ellipse cx="150" cy="58" rx="44" ry="13" fill="#f4f4f4"/>
@@ -1333,6 +1444,10 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #fff3d6 0%, #ffe6b0 62%, #c98f5a 62%, #b07a48 100%)' },
   { id: 'school-hallway', label: 'School Hallway', emoji: '🚪', theme: 'school', decor: 'lockers',
     gradient: 'linear-gradient(180deg, #e8f1ff 0%, #d4e4fb 60%, #b9c6d8 60%, #a8b6ca 100%)' },
+  { id: 'pool-party', label: 'Pool Runway', emoji: '🏊', theme: 'summer', ambient: 'sparkle', decor: 'pool',
+    gradient: 'linear-gradient(180deg, #7fd0ff 0%, #bfe9ff 50%, #f4e7cf 50%, #eadbc0 100%)' },
+  { id: 'sunny-beach', label: 'Sunny Beach', emoji: '🏖️', theme: 'summer', decor: 'beach',
+    gradient: 'linear-gradient(180deg, #ffd76a 0%, #8fd3ff 30%, #bfe9ff 58%, #3fa9d6 58%, #2a8fc4 66%, #f2dfb0 66%)' },
   { id: 'met-steps', label: 'Met Gala Steps', emoji: '📸', theme: 'metgala', price: 50, ambient: 'flash', decor: 'carpet',
     gradient: 'linear-gradient(180deg, #1e1a2e 0%, #3b2f4f 60%, #5a4a6a 100%)' },
   { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
@@ -1354,6 +1469,7 @@ const JUDGE_COMMENTS = [
   "Met Gala ready! The cameras can't stop flashing.",
   "Fin-tastic! Making waves on the runway.",
   "Top of the class! A+ for style.",
+  "Making a splash! Summer style on point.",
 ];
 
 const WARDROBE_PRESETS = [
@@ -1387,6 +1503,18 @@ const WARDROBE_PRESETS = [
     look: { bodyType: 'masculine', skin: SKIN_TONES[4], hair: { style: 'crop', color: '#2b2b2b' },
       outfit: { style: 'uniform-trousers', color: '#2b4a8a' }, shoes: { style: 'sneakers', color: '#2b2b2b' },
       accessories: { 'star-backpack': true, glasses: true }, background: 'school-hallway' } },
+  { id: 'pool-party-pal', label: 'Pool Party', theme: 'summer',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[2], hair: { style: 'pigtails', color: '#d9b45a' },
+      outfit: { style: 'ruffle-swimsuit', color: '#5cc4e0' }, shoes: { style: 'flip-flops', color: '#ff8fc7' },
+      accessories: { 'flower-lei': true }, background: 'pool-party', face: { mouth: 'grin', freckles: true } } },
+  { id: 'surf-star', label: 'Surf Star', theme: 'summer',
+    look: { bodyType: 'masculine', skin: SKIN_TONES[4], hair: { style: 'curly', color: '#2b2b2b' },
+      outfit: { style: 'board-shorts', color: '#f2994a' }, shoes: { style: 'flip-flops', color: '#43b581' },
+      accessories: { 'sun-hat': false }, background: 'sunny-beach', face: { mouth: 'grin' } } },
+  { id: 'beach-day', label: 'Beach Day', theme: 'summer',
+    look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'long', color: '#8a5a2b' },
+      outfit: { style: 'polka-swimsuit', color: '#e05c5c' }, shoes: { style: 'flip-flops', color: '#e05c5c' },
+      accessories: { 'sun-hat': true }, background: 'sunny-beach' } },
   { id: 'santas-helper', label: "Santa's Helper", theme: 'christmas',
     look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'ponytail', color: '#8a5a2b' },
       outfit: { style: 'elf-costume', color: '#1e7a46' }, shoes: { style: 'boots', color: '#8a5a2b' },
@@ -1953,6 +2081,41 @@ function addDecor(decor) {
     el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
       ${pumpkinSVG(228, 56, 1.15, true)}${pumpkinSVG(272, 62, 0.8, false)}${pumpkinSVG(24, 64, 0.7, true)}
     </svg>`;
+  } else if (decor === 'pool') {
+    const tiles = Array.from({ length: 16 }, (_, i) => `<line x1="${i * 20}" y1="16" x2="${i * 20}" y2="22" stroke="#ffffff" stroke-width="1"/>`).join('');
+    el.innerHTML = `<svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+      <rect x="0" y="16" width="300" height="134" fill="#3fb8e0"/>
+      <rect x="0" y="16" width="300" height="6" fill="#7fd6f0"/>${tiles}
+      <g class="pool-wave" fill="none" stroke="#bff0ff" stroke-width="2" opacity="0.8" stroke-linecap="round">
+        <path d="M-20,50 q15,-6 30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0"/>
+        <path d="M-10,90 q15,-6 30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0"/>
+        <path d="M-25,128 q15,-6 30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0"/>
+      </g>
+      <path d="M122,22 L178,22 L196,150 L104,150 Z" fill="#ffffff"/>
+      <path d="M122,22 L126,22 L110,150 L104,150 Z M178,22 L174,22 L190,150 L196,150 Z" fill="#ff8fc7"/>
+      <g class="float-bob">
+        <ellipse cx="46" cy="96" rx="26" ry="11" fill="#ff8fc7"/><ellipse cx="46" cy="94" rx="11" ry="4" fill="#3fb8e0"/>
+        <g fill="#ffffff"><rect x="28" y="92" width="5" height="2" rx="1" transform="rotate(20 30 93)"/><rect x="58" y="96" width="5" height="2" rx="1" transform="rotate(-30 60 97)"/><rect x="44" y="102" width="5" height="2" rx="1"/></g>
+      </g>
+      <g class="float-bob" style="animation-delay:-1.4s">
+        <ellipse cx="252" cy="118" rx="20" ry="9" fill="#f2c94c"/><circle cx="266" cy="106" r="7" fill="#f2c94c"/>
+        <path d="M272,106 L279,108 L272,110 Z" fill="#f28c28"/><circle cx="268" cy="104" r="1.3" fill="#2b2b2b"/>
+      </g>
+      <g stroke="#d6d6d6" stroke-width="3" fill="none"><path d="M224,4 L224,46 M240,4 L240,46"/><path d="M224,28 L240,28 M224,40 L240,40" stroke-width="2"/></g>
+    </svg>`;
+  } else if (decor === 'beach') {
+    el.innerHTML = `<svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+      <g transform="translate(244,28)">
+        <path d="M0,0 L-6,110" stroke="#8a5a2b" stroke-width="3"/>
+        <path d="M-50,10 Q0,-34 50,10 Z" fill="#ff6f91"/>
+        <path d="M-50,10 Q-30,-6 -16,-14 L-24,10 Z M16,-14 Q30,-6 50,10 L24,10 Z" fill="#ffffff"/>
+      </g>
+      <path d="M0,118 Q75,108 150,116 Q225,124 300,112 L300,140 L0,140 Z" fill="#f2dfb0"/>
+      <path d="M40,118 l4,-10 l4,10 Z" fill="#c98f1f"/>
+      <rect x="196" y="112" width="40" height="7" rx="3" fill="#5cc4e0"/>
+      <g transform="translate(70,124)"><path d="M0,-6 L1.8,-1.8 L6,-1.6 L2.8,1.4 L3.8,5.6 L0,3.2 L-3.8,5.6 L-2.8,1.4 L-6,-1.6 L-1.8,-1.8 Z" fill="#ff9a5c"/></g>
+      <circle cx="150" cy="128" r="8" fill="#ffffff"/><path d="M142,128 Q150,120 158,128" fill="none" stroke="#e05c5c" stroke-width="3"/><path d="M144,132 Q150,136 156,132" fill="none" stroke="#5cc4e0" stroke-width="3"/>
+    </svg>`;
   } else if (decor === 'chalkboard') {
     el.classList.add('ambient-decor-top');
     el.innerHTML = `<svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin meet">
@@ -2395,7 +2558,7 @@ function renderShop(message) {
     const card = document.createElement('div');
     card.className = 'shop-card' + (owned.has(item.id) ? ' owned' : '');
     const bg = kind === 'background' ? item.gradient : (currentBg ? currentBg.gradient : '#f7eefb');
-    const kindLabel = kind === 'outfit' ? (item.id === 'jester-suit' ? 'Costume' : 'Gown') : { accessory: 'Flowers & Extras', background: 'Backdrop' }[kind];
+    const kindLabel = kind === 'outfit' ? (item.id === 'jester-suit' ? 'Costume' : 'Gown') : { accessory: 'Accessory', background: 'Backdrop' }[kind];
     card.innerHTML = `
       <div class="thumb" style="background:${bg}">
         <svg viewBox="0 0 300 520">${buildDollSVG(previewLook(item, kind), `shop-${item.id}`)}</svg>
