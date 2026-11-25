@@ -73,6 +73,7 @@ const THEMES = [
   { id: 'classic', label: 'Classic', emoji: '⭐' },
   { id: 'christmas', label: 'Christmas', emoji: '🎄' },
   { id: 'fairy', label: 'Fairy Tale', emoji: '🧚' },
+  { id: 'halloween', label: 'Halloween', emoji: '🎃' },
 ];
 
 const SKIN_TONES = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5a3825'];
@@ -230,6 +231,61 @@ const OUTFIT_STYLES = [
           <circle cx="110" cy="260" r="3" fill="#ffe9a8"/>
           <circle cx="190" cy="300" r="3" fill="#ffe9a8"/>
           <circle cx="150" cy="360" r="3" fill="#ffe9a8"/>` },
+  { id: 'pumpkin-costume', label: 'Pumpkin Costume', emoji: '🎃', theme: 'halloween', fixedColor: true,
+    svg: (bt) => {
+      const cx = 150, cy = 232, ry = 82;
+      const rx = Math.max(bt.shoulderHalf, bt.hipHalf) + 30;
+      return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#f28c28" stroke="#c0621a" stroke-width="2"/>
+              <ellipse cx="${cx}" cy="${cy}" rx="${rx * 0.6}" ry="${ry - 1}" fill="none" stroke="#c0621a" stroke-width="2" opacity="0.6"/>
+              <ellipse cx="${cx}" cy="${cy}" rx="${rx * 0.22}" ry="${ry - 2}" fill="none" stroke="#c0621a" stroke-width="2" opacity="0.6"/>
+              <ellipse cx="${cx - rx * 0.5}" cy="${cy - 36}" rx="10" ry="22" fill="#ffffff" opacity="0.18" transform="rotate(20 ${cx - rx * 0.5} ${cy - 36})"/>
+              <path d="M${cx - 24},${cy - ry + 6} Q${cx},${cy - ry - 12} ${cx + 24},${cy - ry + 6} Q${cx},${cy - ry + 14} ${cx - 24},${cy - ry + 6} Z" fill="#3f8f3a"/>
+              <path d="M${cx + 20},${cy - ry + 4} q16,-10 24,2 q-12,8 -24,-2 Z" fill="#4fae48"/>
+              <path d="M${cx - 32},${cy - 10} L${cx - 20},${cy - 34} L${cx - 8},${cy - 10} Z" fill="#3a1f0a"/>
+              <path d="M${cx + 8},${cy - 10} L${cx + 20},${cy - 34} L${cx + 32},${cy - 10} Z" fill="#3a1f0a"/>
+              <path d="M${cx - 5},${cy + 2} L${cx},${cy - 7} L${cx + 5},${cy + 2} Z" fill="#3a1f0a"/>
+              <path d="M${cx - 38},${cy + 12} L${cx - 26},${cy + 22} L${cx - 13},${cy + 13} L${cx},${cy + 24} L${cx + 13},${cy + 13} L${cx + 26},${cy + 22} L${cx + 38},${cy + 12} Q${cx},${cy + 50} ${cx - 38},${cy + 12} Z" fill="#3a1f0a"/>` } },
+  { id: 'cat-costume', label: 'Cat Costume', emoji: '🐈‍⬛', theme: 'halloween', fixedColor: true,
+    svg: (bt) => {
+      const cx = 150;
+      const rUpper = bt.limbWidth / 2 * 1.15 + 4;
+      const rLower = bt.limbWidth / 2 * 0.68 * 0.9 + 3;
+      const legL = capsulePath(133, 248, rUpper, 127, 418, rLower);
+      const legR = capsulePath(167, 248, rUpper, 173, 418, rLower);
+      const tx = cx + bt.hipHalf;
+      return `<path d="M${tx - 6},240 Q${tx + 52},250 ${tx + 40},196 Q${tx + 34},176 ${tx + 48},168" fill="none" stroke="#2b2b2b" stroke-width="9" stroke-linecap="round"/>
+              <path d="${bodyTorsoPath(bt, 3)}" fill="#2b2b2b"/>
+              <path d="${legL}" fill="#2b2b2b"/>
+              <path d="${legR}" fill="#2b2b2b"/>
+              <ellipse cx="${cx}" cy="205" rx="${bt.waistHalf * 0.55}" ry="36" fill="#f4f4f4"/>
+              <path d="M110,64 L116,28 L140,50 Z" fill="#2b2b2b"/>
+              <path d="M117,56 L120,38 L132,50 Z" fill="#ff9fc7"/>
+              <path d="M190,64 L184,28 L160,50 Z" fill="#2b2b2b"/>
+              <path d="M183,56 L180,38 L168,50 Z" fill="#ff9fc7"/>
+              <path d="M146,100 L154,100 L150,105 Z" fill="#ff9fc7"/>
+              <g stroke="#2b2b2b" stroke-width="1.4" stroke-linecap="round" opacity="0.8">
+                <line x1="124" y1="101" x2="104" y2="97"/><line x1="124" y1="105" x2="104" y2="106"/>
+                <line x1="176" y1="101" x2="196" y2="97"/><line x1="176" y1="105" x2="196" y2="106"/>
+              </g>` } },
+  { id: 'car-costume', label: 'Car Costume', emoji: '🚗', theme: 'halloween', fixedColor: true,
+    svg: (bt) => {
+      const cx = 150;
+      const w = Math.max(bt.hipHalf, bt.shoulderHalf) + 38;
+      const sx = bt.shoulderHalf - 8;
+      return `<path d="${bodyTorsoPath(bt, 3)}" fill="#5cc4e0"/>
+              <line x1="${cx - sx}" y1="150" x2="${cx - sx}" y2="210" stroke="#2b2b2b" stroke-width="4"/>
+              <line x1="${cx + sx}" y1="150" x2="${cx + sx}" y2="210" stroke="#2b2b2b" stroke-width="4"/>
+              <path d="M${cx - 36},207 L${cx - 27},186 L${cx + 27},186 L${cx + 36},207 Z" fill="#bfe9ff" opacity="0.65" stroke="#7aa6b8" stroke-width="1.5"/>
+              <rect x="${cx - w}" y="205" width="${2 * w}" height="62" rx="18" fill="#e05c5c" stroke="#a83232" stroke-width="2"/>
+              <rect x="${cx - w + 2}" y="226" width="${2 * w - 4}" height="7" fill="#ffffff" opacity="0.85"/>
+              <circle cx="${cx - w + 14}" cy="249" r="7" fill="#fff3a8" stroke="#c98f1f" stroke-width="1"/>
+              <circle cx="${cx + w - 14}" cy="249" r="7" fill="#fff3a8" stroke="#c98f1f" stroke-width="1"/>
+              <circle cx="${cx}" cy="249" r="13" fill="#ffffff" stroke="#a83232" stroke-width="1.5"/>
+              <text x="${cx}" y="254.5" text-anchor="middle" font-size="15" font-weight="700" font-family="Arial, sans-serif" fill="#2b2b2b">8</text>
+              <circle cx="${cx - w + 28}" cy="270" r="14" fill="#2b2b2b"/>
+              <circle cx="${cx - w + 28}" cy="270" r="5" fill="#cfcfcf"/>
+              <circle cx="${cx + w - 28}" cy="270" r="14" fill="#2b2b2b"/>
+              <circle cx="${cx + w - 28}" cy="270" r="5" fill="#cfcfcf"/>` } },
   { id: 'sequin-gown', label: 'Sequin Gown', emoji: '💫', unlockLevel: 2, fixedColor: true,
     svg: `<path d="M106,150 L194,150 L196,400 Q150,414 104,400 Z" fill="#d94f8c"/>
           <circle cx="130" cy="200" r="3" fill="#fff7d6"/>
@@ -371,6 +427,22 @@ const ACCESSORIES = [
   { id: 'wand', label: 'Magic Wand', emoji: '✨', theme: 'fairy', color: '#f2c94c',
     svg: `<line x1="207" y1="272" x2="228" y2="240" stroke="#f2c94c" stroke-width="4" stroke-linecap="round"/>
           <path d="M228,240 l4,-8 l4,8 l8,4 l-8,4 l-4,8 l-4,-8 l-8,-4 Z" fill="#f2c94c"/>` },
+  { id: 'witch-hat', label: 'Witch Hat', emoji: '🧙', theme: 'halloween', color: '#3b2a5c',
+    svg: `<ellipse cx="150" cy="54" rx="62" ry="12"/>
+          <path d="M116,54 Q130,32 140,12 Q148,2 172,2 Q156,12 160,26 Q170,42 184,54 Z"/>
+          <path d="M118,47 Q150,57 182,47 L184,54 Q150,64 116,54 Z" fill="#f28c28" stroke="none"/>
+          <rect x="143" y="47" width="14" height="11" rx="2" fill="#f2c94c" stroke="none"/>` },
+  { id: 'candy-bag', label: 'Candy Bag', emoji: '🍭', theme: 'halloween', color: '#f28c28',
+    svg: `<path d="M197,294 Q214,262 231,294" fill="none" stroke="#3a2a1a" stroke-width="2.5"/>
+          <circle cx="206" cy="284" r="4.5" fill="#e0558f" stroke="none"/>
+          <circle cx="215" cy="281" r="4.5" fill="#5cc4e0" stroke="none"/>
+          <circle cx="223" cy="285" r="4" fill="#f2c94c" stroke="none"/>
+          <rect x="212" y="268" width="2" height="12" fill="#ffffff" stroke="none"/>
+          <circle cx="213" cy="267" r="5" fill="#8c5ce0" stroke="none"/>
+          <ellipse cx="214" cy="301" rx="19" ry="16" stroke="#c0621a" stroke-width="1.5"/>
+          <path d="M206,297 l3.5,-6 l3.5,6 Z" fill="#3a1f0a" stroke="none"/>
+          <path d="M215,297 l3.5,-6 l3.5,6 Z" fill="#3a1f0a" stroke="none"/>
+          <path d="M204,304 Q214,313 224,304 Q214,309 204,304 Z" fill="#3a1f0a" stroke="none"/>` },
   { id: 'tiara', label: 'Tiara', emoji: '👑', unlockLevel: 2, color: '#f2c94c',
     svg: `<path d="M112,50 L130,30 L150,42 L170,30 L188,50 Z" stroke="#c98f1f" stroke-width="2"/>
           <circle cx="150" cy="36" r="4" fill="#fff7d6"/>
@@ -453,6 +525,20 @@ const PETS = [
            <path d="M124,64 L116,60 L126,56 Z" fill="mane"/>
            <path d="M130,50 L124,46 L133,44 Z" fill="mane"/>
            <circle cx="151" cy="42" r="2.2" fill="#2b2b2b"/>` },
+  { id: 'bat', label: 'Bat', emoji: '🦇', color: '#4b3b63', collar: { x: 80, y: 74 }, hat: { x: 80, y: 44 },
+    body: `<path d="M64,80 Q34,48 8,68 Q20,76 18,92 Q30,86 34,102 Q46,90 64,98 Z"/>
+           <path d="M96,80 Q126,48 152,68 Q140,76 142,92 Q130,86 126,102 Q114,90 96,98 Z"/>
+           <ellipse cx="80" cy="90" rx="19" ry="24"/>
+           <path d="M66,52 L64,32 L76,46 Z"/>
+           <path d="M94,52 L96,32 L84,46 Z"/>
+           <circle cx="80" cy="60" r="16"/>`,
+    details: `<circle cx="74" cy="58" r="3.4" fill="#ffe066"/>
+           <circle cx="86" cy="58" r="3.4" fill="#ffe066"/>
+           <circle cx="74" cy="58.5" r="1.4" fill="#2b2b2b"/>
+           <circle cx="86" cy="58.5" r="1.4" fill="#2b2b2b"/>
+           <path d="M76,66 L77.5,70 L79,66 Z" fill="#ffffff"/>
+           <path d="M81,66 L82.5,70 L84,66 Z" fill="#ffffff"/>
+           <path d="M74,114 l-3,8 M86,114 l3,8" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round"/>` },
   { id: 'giraffe', label: 'Giraffe', emoji: '🦒', color: '#e8c468', collar: { x: 100, y: 60 }, hat: { x: 118, y: 8 },
     body: `<rect x="42" y="98" width="9" height="50" rx="4"/>
            <rect x="58" y="100" width="9" height="48" rx="4"/>
@@ -620,6 +706,10 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #0b2545 0%, #164a6b 55%, #2c7a9c 100%)' },
   { id: 'fairy-glade', label: 'Enchanted Glade', emoji: '🌌', theme: 'fairy', ambient: 'sparkle',
     gradient: 'linear-gradient(180deg, #1b3a2f 0%, #2d5a4a 45%, #6a3f8c 100%)' },
+  { id: 'pumpkin-patch', label: 'Pumpkin Patch', emoji: '🎃', theme: 'halloween', ambient: 'bats', decor: 'pumpkins',
+    gradient: 'linear-gradient(180deg, #2a1846 0%, #5a2a5e 50%, #e07a2c 100%)' },
+  { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
+    gradient: 'linear-gradient(180deg, #0d0b1f 0%, #241a3d 55%, #3d2b56 100%)' },
 ];
 
 const JUDGE_COMMENTS = [
@@ -631,6 +721,8 @@ const JUDGE_COMMENTS = [
   "Effortlessly chic.",
   "The crowd is on its feet!",
   "A star is born on this runway.",
+  "Spook-tacular! The judges are howling.",
+  "So good it's scary!",
 ];
 
 const WARDROBE_PRESETS = [
@@ -662,6 +754,26 @@ const WARDROBE_PRESETS = [
       outfit: { style: 'fairy-dress', color: '#c9a6ff' }, shoes: { style: 'flats', color: '#c9a6ff' },
       accessories: { 'fairy-wings': true, 'flower-crown': true, wand: true }, background: 'fairy-glade',
       face: { eyeShape: 'wide', eyeColor: '#4a7043', freckles: true } } },
+  { id: 'pumpkin-pal', label: 'Pumpkin Pal', theme: 'halloween',
+    look: { bodyType: 'neutral', skin: SKIN_TONES[2], hair: { style: 'curly', color: '#4b2e1e' },
+      outfit: { style: 'pumpkin-costume', color: '#f28c28' }, shoes: { style: 'sneakers', color: '#2b2b2b' },
+      accessories: { 'candy-bag': true }, pet: { species: 'bat', color: '#4b3b63', accessory: 'none' },
+      background: 'pumpkin-patch', face: { mouth: 'grin' } } },
+  { id: 'midnight-kitty', label: 'Midnight Kitty', theme: 'halloween',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[0], hair: { style: 'long', color: '#2b2b2b' },
+      outfit: { style: 'cat-costume', color: '#2b2b2b' }, shoes: { style: 'flats', color: '#2b2b2b' },
+      accessories: { 'candy-bag': true }, background: 'haunted-night',
+      face: { eyeShape: 'almond', eyeColor: '#4a7043' } } },
+  { id: 'race-car', label: 'Race Car', theme: 'halloween',
+    look: { bodyType: 'masculine', skin: SKIN_TONES[3], hair: { style: 'crop', color: '#2b2b2b' },
+      outfit: { style: 'car-costume', color: '#e05c5c' }, shoes: { style: 'sneakers', color: '#e05c5c' },
+      accessories: { 'candy-bag': true }, background: 'pumpkin-patch',
+      face: { mouth: 'grin', blush: false } } },
+  { id: 'spooky-witch', label: 'Spooky Witch', theme: 'halloween',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[4], hair: { style: 'long', color: '#8c5ce0' },
+      outfit: { style: 'aline', color: '#2b2b2b' }, shoes: { style: 'boots', color: '#2b2b2b' },
+      accessories: { 'witch-hat': true, 'candy-bag': true }, pet: { species: 'bat', color: '#4b3b63', accessory: 'bow' },
+      background: 'haunted-night', face: { lipColor: '#8c4a6b' } } },
 ];
 
 // ---------- Leveling / unlocks ----------
@@ -675,10 +787,11 @@ const LEVELS = [
 ];
 
 const STARS_STORAGE_KEY = 'runwayReady.totalStars';
-let totalStars = Number(localStorage.getItem(STARS_STORAGE_KEY)) || 0;
+let totalStars = 0;
+try { totalStars = Number(localStorage.getItem(STARS_STORAGE_KEY)) || 0; } catch (e) {}
 
 function saveTotalStars() {
-  localStorage.setItem(STARS_STORAGE_KEY, String(totalStars));
+  try { localStorage.setItem(STARS_STORAGE_KEY, String(totalStars)); } catch (e) {}
 }
 
 function getLevelInfo(total) {
@@ -1028,7 +1141,7 @@ function render() {
   // background
   const bgDef = BACKGROUNDS.find((b) => b.id === state.background);
   document.getElementById('stage').style.background = bgDef.gradient;
-  setAmbient(bgDef.ambient);
+  setAmbient(bgDef.ambient, bgDef.decor);
 
   // selection highlighting
   highlightSelection('#bodytype-pills', state.bodyType, 'id');
@@ -1069,18 +1182,72 @@ let ambientTimer = null;
 const ambientLayer = document.getElementById('ambient-layer');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function setAmbient(type) {
+let currentAmbientKey = null;
+
+function setAmbient(type, decor) {
+  const key = `${type || ''}|${decor || ''}`;
+  if (key === currentAmbientKey) return;
+  currentAmbientKey = key;
   if (ambientTimer) {
     clearInterval(ambientTimer);
     ambientTimer = null;
   }
   ambientLayer.innerHTML = '';
+  if (decor) addDecor(decor);
   if (!type || reduceMotion) return;
 
   ambientTimer = setInterval(() => {
     if (type === 'snow') spawnSnow();
     if (type === 'sparkle') spawnSparkle();
+    if (type === 'bats' && Math.random() < 0.2) spawnBat();
   }, 350);
+}
+
+function pumpkinSVG(x, y, s, face) {
+  return `<g transform="translate(${x},${y}) scale(${s})">
+    <ellipse cx="0" cy="0" rx="24" ry="19" fill="#f28c28" stroke="#c0621a" stroke-width="1.5"/>
+    <ellipse cx="0" cy="0" rx="13" ry="18.5" fill="none" stroke="#c0621a" stroke-width="1.5" opacity="0.7"/>
+    <ellipse cx="0" cy="0" rx="4" ry="18.5" fill="none" stroke="#c0621a" stroke-width="1.5" opacity="0.7"/>
+    <path d="M-2,-18 Q-3,-26 3,-28 L4,-25 Q1,-23 2,-18 Z" fill="#3f8f3a"/>
+    ${face ? `<path d="M-12,-3 L-7,-11 L-2,-3 Z M2,-3 L7,-11 L12,-3 Z" fill="#ffd23f"/>
+    <path d="M-13,4 L-8,8 L-4,5 L0,9 L4,5 L8,8 L13,4 Q0,18 -13,4 Z" fill="#ffd23f"/>` : ''}
+  </g>`;
+}
+
+function addDecor(decor) {
+  const el = document.createElement('div');
+  el.className = 'ambient-decor';
+  if (decor === 'pumpkins') {
+    el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+      ${pumpkinSVG(228, 56, 1.15, true)}${pumpkinSVG(272, 62, 0.8, false)}${pumpkinSVG(24, 64, 0.7, true)}
+    </svg>`;
+  } else if (decor === 'moon') {
+    el.classList.add('ambient-decor-top');
+    el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin meet">
+      <circle cx="248" cy="36" r="22" fill="#fff4c2" opacity="0.9"/>
+      <circle cx="240" cy="30" r="4" fill="#efe0a0"/><circle cx="254" cy="44" r="3" fill="#efe0a0"/>
+    </svg>`;
+  }
+  ambientLayer.appendChild(el);
+}
+
+const BAT_SVG = `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+  <path d="M30,10 Q20,0 4,6 Q10,10 8,16 Q16,13 18,20 Q24,14 30,18 Q36,14 42,20 Q44,13 52,16 Q50,10 56,6 Q40,0 30,10 Z" fill="#1a1226"/>
+  <circle cx="27" cy="11" r="1.3" fill="#ffe066"/><circle cx="33" cy="11" r="1.3" fill="#ffe066"/>
+</svg>`;
+
+function spawnBat() {
+  const bat = document.createElement('div');
+  bat.className = 'ambient-bat';
+  const size = 26 + Math.random() * 18;
+  bat.style.width = `${size}px`;
+  bat.style.height = `${size / 2}px`;
+  bat.style.top = `${5 + Math.random() * 45}%`;
+  bat.style.setProperty('--rise', `${(Math.random() - 0.5) * 80}px`);
+  bat.style.animationDuration = `${4 + Math.random() * 3}s`;
+  bat.innerHTML = BAT_SVG;
+  ambientLayer.appendChild(bat);
+  setTimeout(() => bat.remove(), 7500);
 }
 
 function spawnSnow() {
