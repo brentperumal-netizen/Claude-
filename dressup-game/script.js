@@ -74,6 +74,7 @@ const THEMES = [
   { id: 'christmas', label: 'Christmas', emoji: '🎄' },
   { id: 'fairy', label: 'Fairy Tale', emoji: '🧚' },
   { id: 'halloween', label: 'Halloween', emoji: '🎃' },
+  { id: 'birds', label: 'Birds', emoji: '🐦' },
 ];
 
 const SKIN_TONES = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5a3825'];
@@ -306,6 +307,77 @@ const OUTFIT_STYLES = [
                 <line x1="${cx + 12}" y1="${fy + 3}" x2="${cx + 26}" y2="${fy}"/><line x1="${cx + 12}" y1="${fy + 6}" x2="${cx + 26}" y2="${fy + 7}"/>
               </g>
               ${paw(cx - hemHalf + 26, 316)}${paw(cx + hemHalf - 26, 314)}${paw(cx - 40, 248)}${paw(cx + 42, 262)}` } },
+  { id: 'feather-dress', label: 'Feather Dress', emoji: '🪶', theme: 'birds',
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY, chest: bY, waist: wY } = TORSO_Y;
+      const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3, w = bt.waistHalf + 4;
+      const feather = (x, y, r) => `<path d="M${x},${y} C${x + r * 1.5},${y + r * 0.4} ${x + r * 1.1},${y + r * 2.2} ${x},${y + r * 2.7} C${x - r * 1.1},${y + r * 2.2} ${x - r * 1.5},${y + r * 0.4} ${x},${y} Z" stroke="#000000" stroke-opacity="0.18" stroke-width="1"/>
+          <line x1="${x}" y1="${y + 2}" x2="${x}" y2="${y + r * 2.4}" stroke="#ffffff" stroke-width="1" opacity="0.35"/>`;
+      const row = (y, half, count, r) => Array.from({ length: count }, (_, i) =>
+        feather(cx - half + (2 * half * i) / (count - 1), y, r)).join('');
+      const hip = bt.hipHalf;
+      return `<path d="M${cx - s},${sY} L${cx + s},${sY}
+                C${cx + s},${sY + 14} ${cx + c},${bY - 10} ${cx + c},${bY}
+                C${cx + c},${bY + 16} ${cx + w},${wY - 14} ${cx + w},${wY}
+                L${cx + hip + 34},318 L${cx - hip - 34},318 L${cx - w},${wY}
+                C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY}
+                C${cx - c},${bY - 10} ${cx - s},${sY + 14} ${cx - s},${sY} Z"/>
+              <path d="M${cx - s},${sY} L${cx + s},${sY} L${cx + s - 3},${sY + 14} L${cx - s + 3},${sY + 14} Z" fill="#000000" opacity="0.08"/>
+              ${row(wY + 96, hip + 36, 9, 15)}
+              ${row(wY + 64, hip + 24, 8, 14)}
+              ${row(wY + 32, hip + 12, 7, 13)}
+              ${row(wY - 2, w + 2, 6, 11)}
+              <path d="M${cx - s + 7},${sY + 6} L${cx - w + 2},${wY}" fill="none" stroke="#ffffff" stroke-width="6" opacity="0.15" stroke-linecap="round"/>` } },
+  { id: 'peacock-gown', label: 'Peacock Gown', emoji: '🦚', theme: 'birds', fixedColor: true,
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY, chest: bY, waist: wY } = TORSO_Y;
+      const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3, w = bt.waistHalf + 4;
+      const hemY = 404, hemHalf = bt.hipHalf + 62;
+      const eye = (x, y, k) => `<path d="M${cx},${wY + 6} Q${(cx + x) / 2},${(wY + y) / 2 + 20} ${x},${y}" fill="none" stroke="#9bd16a" stroke-width="1.2" opacity="0.55"/>
+          <ellipse cx="${x}" cy="${y}" rx="${11 * k}" ry="${13 * k}" fill="#e8c468"/>
+          <ellipse cx="${x}" cy="${y + 1}" rx="${8 * k}" ry="${9.5 * k}" fill="#2bb3a3"/>
+          <ellipse cx="${x}" cy="${y + 2}" rx="${5 * k}" ry="${6 * k}" fill="#1f3f9c"/>`;
+      const eyes = [];
+      for (let i = 0; i < 5; i++) eyes.push(eye(cx - hemHalf + 22 + i * (2 * hemHalf - 44) / 4, hemY - 22, 1));
+      for (let i = 0; i < 4; i++) eyes.push(eye(cx - hemHalf + 48 + i * (2 * hemHalf - 96) / 3, hemY - 70, 0.85));
+      for (let i = 0; i < 3; i++) eyes.push(eye(cx - 34 + i * 34, hemY - 116, 0.7));
+      return `<path d="M${cx - w},${wY} L${cx + w},${wY} L${cx + hemHalf},${hemY} Q${cx},${hemY + 22} ${cx - hemHalf},${hemY} Z" fill="#1f7a8c"/>
+              <path d="M${cx - w + 6},${wY} L${cx + w - 6},${wY} L${cx + hemHalf - 30},${hemY - 6} Q${cx},${hemY + 10} ${cx - hemHalf + 30},${hemY - 6} Z" fill="#2a9aa8" opacity="0.6"/>
+              ${eyes.join('')}
+              <path d="M${cx - s},${sY} L${cx + s},${sY}
+                C${cx + s},${sY + 14} ${cx + c},${bY - 10} ${cx + c},${bY}
+                C${cx + c},${bY + 16} ${cx + w},${wY - 14} ${cx + w},${wY + 4}
+                L${cx - w},${wY + 4}
+                C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY}
+                C${cx - c},${bY - 10} ${cx - s},${sY + 14} ${cx - s},${sY} Z" fill="#1f3f9c"/>
+              <path d="M${cx - s + 6},${sY + 4} Q${cx},${sY + 40} ${cx + s - 6},${sY + 4}" fill="none" stroke="#2bb3a3" stroke-width="3" opacity="0.8"/>
+              <rect x="${cx - w}" y="${wY - 2}" width="${w * 2}" height="7" fill="#e8c468"/>` } },
+  { id: 'owl-costume', label: 'Owl Costume', emoji: '🦉', theme: 'birds', fixedColor: true,
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY } = TORSO_Y;
+      const rUpper = bt.limbWidth / 2 * 1.15 + 4;
+      const rLower = bt.limbWidth / 2 * 0.68 * 0.9 + 3;
+      const legL = capsulePath(133, 248, rUpper, 127, 418, rLower);
+      const legR = capsulePath(167, 248, rUpper, 173, 418, rLower);
+      const lx = 93 - bt.armSpread, rx = 207 + bt.armSpread;
+      const s = bt.shoulderHalf;
+      const marks = [];
+      for (let r = 0; r < 4; r++) for (let i = -1; i <= 1; i++) {
+        const x = cx + i * 11 + (r % 2 ? 5 : 0) - 2, y = 186 + r * 13;
+        marks.push(`<path d="M${x - 4},${y} Q${x},${y + 5} ${x + 4},${y}" fill="none" stroke="#a8743c" stroke-width="1.6" stroke-linecap="round"/>`);
+      }
+      return `<path d="${legL}" fill="#7a4e26"/>
+              <path d="${legR}" fill="#7a4e26"/>
+              <path d="${bodyTorsoPath(bt, 3)}" fill="#8a5a2b"/>
+              <ellipse cx="${cx}" cy="205" rx="${bt.waistHalf * 0.75}" ry="40" fill="#f2dfc0"/>
+              ${marks.join('')}
+              <path d="M${cx - s},${sY + 2} Q${cx - s - 26},${sY + 56} ${lx - 6},282 L${lx + 4},270 L${lx + 10},284 L${lx + 16},268 Q${cx - s + 2},${sY + 60} ${cx - s + 8},${sY + 6} Z" fill="#6b4220"/>
+              <path d="M${cx + s},${sY + 2} Q${cx + s + 26},${sY + 56} ${rx + 6},282 L${rx - 4},270 L${rx - 10},284 L${rx - 16},268 Q${cx + s - 2},${sY + 60} ${cx + s - 8},${sY + 6} Z" fill="#6b4220"/>
+              <path d="M110,58 L108,26 L132,48 Z" fill="#6b4220"/>
+              <path d="M190,58 L192,26 L168,48 Z" fill="#6b4220"/>` } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -500,6 +572,27 @@ const ACCESSORIES = [
           <path d="M116,51 L118,33 L131,44 Z" fill="#ff9fc7" stroke="none"/>
           <path d="M190,58 L186,24 L162,44 Z"/>
           <path d="M184,51 L182,33 L169,44 Z" fill="#ff9fc7" stroke="none"/>` },
+  { id: 'feather-wings', label: 'Feather Wings', emoji: '🕊️', theme: 'birds', color: '#f7f4ee',
+    svg: `<g stroke="#c9c2b5" stroke-width="1.2">
+            <path d="M104,176 Q66,146 26,164 Q36,174 30,186 Q46,188 40,202 Q56,202 52,218 Q68,216 68,232 Q86,226 104,238 Z"/>
+            <path d="M196,176 Q234,146 274,164 Q264,174 270,186 Q254,188 260,202 Q244,202 248,218 Q232,216 232,232 Q214,226 196,238 Z"/>
+          </g>
+          <g fill="none" stroke="#c9c2b5" stroke-width="1" opacity="0.8">
+            <path d="M100,190 Q70,176 40,180 M100,204 Q72,196 50,200 M100,218 Q78,212 62,218"/>
+            <path d="M200,190 Q230,176 260,180 M200,204 Q228,196 250,200 M200,218 Q222,212 238,218"/>
+          </g>` },
+  { id: 'nest-hat', label: 'Nest Hat', emoji: '🪺', theme: 'birds', color: '#8a5a2b',
+    svg: `<ellipse cx="150" cy="44" rx="36" ry="13" fill="#8a5a2b" stroke="#5e3b1a" stroke-width="1.5"/>
+          <g fill="none" stroke="#5e3b1a" stroke-width="1.4" stroke-linecap="round" opacity="0.8">
+            <path d="M118,42 Q140,52 168,40 M122,50 Q150,56 180,46 M130,36 Q150,46 176,38"/>
+          </g>
+          <ellipse cx="138" cy="36" rx="6" ry="7.5" fill="#bfe9ff" stroke="#8ec9e0" stroke-width="1"/>
+          <ellipse cx="150" cy="34" rx="6" ry="7.5" fill="#d6f1ff" stroke="#8ec9e0" stroke-width="1"/>
+          <circle cx="166" cy="26" r="9" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>
+          <circle cx="170" cy="17" r="6" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>
+          <path d="M175,16 L181,18 L175,20 Z" fill="#f28c28" stroke="none"/>
+          <circle cx="171.5" cy="15.5" r="1.2" fill="#2b2b2b" stroke="none"/>
+          <path d="M158,26 Q162,20 168,26 Q162,30 158,26 Z" fill="#e0b13a" stroke="none"/>` },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 L150,4 L192,58 Z"/>
           <ellipse cx="150" cy="58" rx="44" ry="13" fill="#f4f4f4"/>
@@ -642,6 +735,24 @@ const PETS = [
            <path d="M76,66 L77.5,70 L79,66 Z" fill="#ffffff"/>
            <path d="M81,66 L82.5,70 L84,66 Z" fill="#ffffff"/>
            <path d="M74,114 l-3,8 M86,114 l3,8" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round"/>` },
+  { id: 'bird', label: 'Bird', emoji: '🐦', color: '#4aa3df', collar: { x: 102, y: 92 }, hat: { x: 106, y: 58 },
+    body: `<path d="M56,104 L18,88 L24,104 L16,116 Z"/>
+           <ellipse cx="80" cy="106" rx="32" ry="26"/>
+           <circle cx="106" cy="78" r="19"/>
+           <path d="M100,60 Q98,46 106,44 Q104,52 108,60 Z"/>
+           <path d="M106,60 Q110,46 118,48 Q112,54 112,62 Z"/>`,
+    details: `<ellipse cx="88" cy="114" rx="18" ry="14" fill="belly"/>
+           <path d="M58,100 Q78,84 100,98 Q90,124 58,100 Z" fill="shade"/>
+           <path d="M66,104 Q80,98 92,104" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.4"/>
+           <path d="M122,74 L138,80 L122,86 Z" fill="#f2a33a"/>
+           <circle cx="112" cy="74" r="4" fill="#ffffff"/>
+           <circle cx="113" cy="74" r="2.4" fill="#2b2b2b"/>
+           <circle cx="114" cy="73" r="0.8" fill="#ffffff"/>
+           <ellipse cx="112" cy="86" rx="4" ry="2.5" fill="#ff8fa3" opacity="0.6"/>
+           <g stroke="#f2a33a" stroke-width="3" stroke-linecap="round" fill="none">
+             <path d="M76,130 L74,150 M74,150 l-6,0 M74,150 l5,0"/>
+             <path d="M90,130 L92,150 M92,150 l-5,0 M92,150 l6,0"/>
+           </g>` },
   { id: 'giraffe', label: 'Giraffe', emoji: '🦒', color: '#e8c468', collar: { x: 100, y: 60 }, hat: { x: 118, y: 8 },
     body: `<rect x="42" y="98" width="9" height="50" rx="4"/>
            <rect x="58" y="100" width="9" height="48" rx="4"/>
@@ -678,7 +789,9 @@ function buildPetSVG(petDef, color, idSuffix) {
   const dark = darken(color, 0.28);
   const details = (petDef.details || '')
     .replace(/fill="mane"/g, `fill="${darken(color, 0.5)}"`)
-    .replace(/fill="spot"/g, `fill="${darken(color, 0.45)}"`);
+    .replace(/fill="spot"/g, `fill="${darken(color, 0.45)}"`)
+    .replace(/fill="shade"/g, `fill="${darken(color, 0.3)}"`)
+    .replace(/fill="belly"/g, `fill="${lighten(color, 0.6)}"`);
   return `
     <defs>
       <linearGradient id="${grad}" x1="0" y1="0" x2="1" y2="1">
@@ -811,6 +924,10 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #1b3a2f 0%, #2d5a4a 45%, #6a3f8c 100%)' },
   { id: 'pumpkin-patch', label: 'Pumpkin Patch', emoji: '🎃', theme: 'halloween', ambient: 'bats', decor: 'pumpkins',
     gradient: 'linear-gradient(180deg, #2a1846 0%, #5a2a5e 50%, #e07a2c 100%)' },
+  { id: 'treetop-sky', label: 'Treetop Sky', emoji: '🌳', theme: 'birds', ambient: 'birds', decor: 'branch',
+    gradient: 'linear-gradient(180deg, #8fd3ff 0%, #c4ecff 55%, #a8e0a0 100%)' },
+  { id: 'sunset-flock', label: 'Sunset Flock', emoji: '🌅', theme: 'birds', ambient: 'birds',
+    gradient: 'linear-gradient(180deg, #ffb38a 0%, #ff8fab 50%, #9b7ad8 100%)' },
   { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
     gradient: 'linear-gradient(180deg, #0d0b1f 0%, #241a3d 55%, #3d2b56 100%)' },
 ];
@@ -826,6 +943,7 @@ const JUDGE_COMMENTS = [
   "A star is born on this runway.",
   "Spook-tacular! The judges are howling.",
   "So good it's scary!",
+  "Tweet-tastic! The judges are all aflutter.",
 ];
 
 const WARDROBE_PRESETS = [
@@ -862,6 +980,20 @@ const WARDROBE_PRESETS = [
       outfit: { style: 'fairy-dress', color: '#c9a6ff' }, shoes: { style: 'flats', color: '#c9a6ff' },
       accessories: { 'fairy-wings': true, 'flower-crown': true, wand: true }, background: 'fairy-glade',
       face: { eyeShape: 'wide', eyeColor: '#4a7043', freckles: true } } },
+  { id: 'pretty-peacock', label: 'Pretty Peacock', theme: 'birds',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[3], hair: { style: 'bun', color: '#2b2b2b' },
+      outfit: { style: 'peacock-gown', color: '#1f7a8c' }, shoes: { style: 'heels', color: '#5cc4e0' },
+      accessories: { 'diamond-necklace': false }, pet: { species: 'bird', color: '#4aa3df', accessory: 'none' },
+      background: 'sunset-flock', face: { eyeShape: 'almond' } } },
+  { id: 'wise-owl', label: 'Wise Owl', theme: 'birds',
+    look: { bodyType: 'neutral', skin: SKIN_TONES[1], hair: { style: 'crop', color: '#8a5a2b' },
+      outfit: { style: 'owl-costume', color: '#8a5a2b' }, shoes: { style: 'boots', color: '#8a5a2b' },
+      accessories: { glasses: true }, background: 'treetop-sky', face: { eyeShape: 'wide' } } },
+  { id: 'songbird', label: 'Songbird', theme: 'birds',
+    look: { bodyType: 'masculine', skin: SKIN_TONES[5], hair: { style: 'curly', color: '#2b2b2b' },
+      outfit: { style: 'feather-dress', color: '#f2c94c' }, shoes: { style: 'sneakers', color: '#ffffff' },
+      accessories: { 'feather-wings': true, 'nest-hat': true }, pet: { species: 'bird', color: '#e05c5c', accessory: 'party-hat' },
+      background: 'treetop-sky', face: { mouth: 'grin' } } },
   { id: 'pumpkin-pal', label: 'Pumpkin Pal', theme: 'halloween',
     look: { bodyType: 'neutral', skin: SKIN_TONES[2], hair: { style: 'curly', color: '#4b2e1e' },
       outfit: { style: 'pumpkin-costume', color: '#f28c28' }, shoes: { style: 'sneakers', color: '#2b2b2b' },
@@ -1308,6 +1440,7 @@ function setAmbient(type, decor) {
     if (type === 'snow') spawnSnow();
     if (type === 'sparkle') spawnSparkle();
     if (type === 'bats' && Math.random() < 0.2) spawnBat();
+    if (type === 'birds' && Math.random() < 0.2) spawnBat(BIRD_SVG);
   }, 350);
 }
 
@@ -1329,6 +1462,20 @@ function addDecor(decor) {
     el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
       ${pumpkinSVG(228, 56, 1.15, true)}${pumpkinSVG(272, 62, 0.8, false)}${pumpkinSVG(24, 64, 0.7, true)}
     </svg>`;
+  } else if (decor === 'branch') {
+    el.classList.add('ambient-decor-top');
+    const leaf = (x, y, r) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="4.5" fill="#5bb04f" transform="rotate(${r} ${x} ${y})"/>`;
+    el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin meet">
+      <path d="M-4,18 Q60,30 120,22 Q100,30 86,40" fill="none" stroke="#7a5230" stroke-width="6" stroke-linecap="round"/>
+      ${leaf(30, 16, -20)}${leaf(54, 32, 25)}${leaf(80, 18, -10)}${leaf(104, 30, 30)}${leaf(92, 44, 60)}
+      <path d="M304,30 Q250,36 214,28" fill="none" stroke="#7a5230" stroke-width="5" stroke-linecap="round"/>
+      ${leaf(280, 26, 15)}${leaf(240, 38, -25)}${leaf(222, 22, 10)}
+      <g transform="translate(66,12)">
+        <ellipse cx="0" cy="0" rx="8" ry="6.5" fill="#e05c5c"/><circle cx="6" cy="-5" r="4.5" fill="#e05c5c"/>
+        <path d="M10,-5 L15,-4 L10,-2 Z" fill="#f2a33a"/><circle cx="7.4" cy="-6" r="1" fill="#2b2b2b"/>
+        <path d="M-7,0 L-14,-4 L-12,3 Z" fill="#b83c3c"/>
+      </g>
+    </svg>`;
   } else if (decor === 'moon') {
     el.classList.add('ambient-decor-top');
     el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin meet">
@@ -1344,7 +1491,11 @@ const BAT_SVG = `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
   <circle cx="27" cy="11" r="1.3" fill="#ffe066"/><circle cx="33" cy="11" r="1.3" fill="#ffe066"/>
 </svg>`;
 
-function spawnBat() {
+const BIRD_SVG = `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4,10 Q16,4 30,16 Q44,4 56,10 Q44,8 30,20 Q16,8 4,10 Z" fill="#3a3550" opacity="0.75"/>
+</svg>`;
+
+function spawnBat(svg = BAT_SVG) {
   const bat = document.createElement('div');
   bat.className = 'ambient-bat';
   const size = 26 + Math.random() * 18;
@@ -1353,7 +1504,7 @@ function spawnBat() {
   bat.style.top = `${5 + Math.random() * 45}%`;
   bat.style.setProperty('--rise', `${(Math.random() - 0.5) * 80}px`);
   bat.style.animationDuration = `${4 + Math.random() * 3}s`;
-  bat.innerHTML = BAT_SVG;
+  bat.innerHTML = svg;
   ambientLayer.appendChild(bat);
   setTimeout(() => bat.remove(), 7500);
 }
@@ -1622,7 +1773,7 @@ function computeGameMode() {
   const outfitDef = OUTFIT_STYLES.find((o) => o.id === state.outfit.style);
   if (outfitDef && outfitDef.id === 'mermaid') return 'swim';
   if (state.pet.species === 'horse') return 'ride';
-  if (state.accessories['fairy-wings']) return 'fly';
+  if (state.accessories['fairy-wings'] || state.accessories['feather-wings']) return 'fly';
   return 'walk';
 }
 
