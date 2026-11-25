@@ -1505,6 +1505,90 @@ const ACCESSORIES = [
             <path d="M214,264 L214,216" stroke="#9b6be0" stroke-width="0.7" opacity="0.7"/></g>`).join('')}
           <circle cx="214" cy="268" r="5" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>
           <rect x="211" y="268" width="6" height="16" rx="2" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.8"/>` },
+  { id: 'aviator-sunglasses', label: 'Aviator Sunglasses', emoji: '🕶️', price: 35, color: '#c98f1f',
+    svg: [132, 168].map((x) => `<path d="M${x - 14},83 Q${x},79 ${x + 14},83 Q${x + 15},97 ${x + 4},102 Q${x - 9},104 ${x - 14},93 Z" fill="#5a4a3a" fill-opacity="0.78" stroke="#c98f1f" stroke-width="1.8"/>
+          <path d="M${x - 9},86 Q${x - 5},83 ${x - 1},85" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6" stroke-linecap="round"/>`).join('') +
+      `<path d="M146,84 L154,84 M147,89 Q150,87 153,89" fill="none" stroke="#c98f1f" stroke-width="1.6"/>
+       <line x1="118" y1="85" x2="105" y2="82" stroke="#c98f1f" stroke-width="2.2"/><line x1="182" y1="85" x2="195" y2="82" stroke="#c98f1f" stroke-width="2.2"/>` },
+  { id: 'star-sunglasses', label: 'Star Sunglasses', emoji: '🌟', price: 40, color: '#f2c94c',
+    svg: [132, 168].map((x) => {
+      const star = (r) => Array.from({ length: 10 }, (_, i) => {
+        const a = -Math.PI / 2 + (i * Math.PI) / 5, rr = i % 2 ? r * 0.48 : r;
+        return `${i ? 'L' : 'M'}${(x + rr * Math.cos(a)).toFixed(1)},${(91 + rr * Math.sin(a)).toFixed(1)}`;
+      }).join(' ') + ' Z';
+      return `<path d="${star(17)}" fill="#f2c94c" stroke="#c98f1f" stroke-width="1.4" stroke-linejoin="round"/>
+              <path d="${star(11)}" fill="#3a2a1a" fill-opacity="0.82" stroke="none"/>`;
+    }).join('') +
+      `<path d="M146,89 Q150,86 154,89" fill="none" stroke="#c98f1f" stroke-width="2.4"/>
+       <line x1="116" y1="88" x2="105" y2="83" stroke="#c98f1f" stroke-width="2.6"/><line x1="184" y1="88" x2="195" y2="83" stroke="#c98f1f" stroke-width="2.6"/>` },
+  { id: 'cat-eye-sunglasses', label: 'Cat-Eye Sunglasses', emoji: '😼', price: 45, color: '#e0558f',
+    svg: [[132, -1], [168, 1]].map(([x, d]) => `<path d="M${x + d * 17},78 L${x - d * 11},85 Q${x - d * 13},98 ${x - d * 2},100 Q${x + d * 12},100 ${x + d * 14},90 Z" fill="#2b2b2b" fill-opacity="0.82" stroke="#e0558f" stroke-width="2.4" stroke-linejoin="round"/>
+          <circle cx="${x + d * 15}" cy="80" r="1.8" fill="#ffffff" stroke="none"/>
+          <path d="M${x - 5},87 Q${x - 1},84 ${x + 3},86" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.6" stroke-linecap="round"/>`).join('') +
+      `<path d="M146,88 Q150,85 154,88" fill="none" stroke="#e0558f" stroke-width="2.4"/>
+       <line x1="115" y1="84" x2="105" y2="81" stroke="#e0558f" stroke-width="2.6"/><line x1="185" y1="84" x2="195" y2="81" stroke="#e0558f" stroke-width="2.6"/>` },
+  { id: 'hoop-earrings', label: 'Hoop Earrings', emoji: '⭕', price: 25, color: '#f2c94c',
+    svg: `<circle cx="102" cy="116" r="8" fill="none" stroke="#f2c94c" stroke-width="2.6"/>
+          <circle cx="198" cy="116" r="8" fill="none" stroke="#f2c94c" stroke-width="2.6"/>
+          <path d="M96,112 Q98,109 101,108 M192,112 Q194,109 197,108" fill="none" stroke="#fff7d6" stroke-width="1.2"/>` },
+  { id: 'sparkle-scarf', label: 'Sparkle Scarf', emoji: '🧣', price: 35, color: '#5cc4e0',
+    svg: `<path d="M134,142 Q150,154 166,142 L170,156 Q150,168 130,156 Z" stroke="#3a9ac0" stroke-width="1.2"/>
+          <path d="M136,154 L130,214 L146,214 L146,158 Z" stroke="#3a9ac0" stroke-width="1.2"/>
+          <path d="M131,200 L145,200 M132,188 L145,188" stroke="#ffffff" stroke-width="3" opacity="0.8"/>
+          <path d="M131,214 l0,6 M135,214 l0,6 M139,214 l0,6 M143,214 l0,6" stroke="#3a9ac0" stroke-width="1.5"/>
+          <g fill="#ffffff" stroke="none"><circle cx="142" cy="150" r="1.3"/><circle cx="156" cy="152" r="1.3"/><circle cx="138" cy="176" r="1.3"/><circle cx="140" cy="206" r="1.3"/></g>` },
+  { id: 'beret', label: 'Beret', emoji: '🎨', price: 30, color: '#e05c5c',
+    svg: `<g transform="rotate(-12 146 50)">
+            <ellipse cx="146" cy="50" rx="54" ry="16" stroke="#a83232" stroke-width="1.5"/>
+            <path d="M104,52 Q146,64 188,52" fill="none" stroke="#a83232" stroke-width="2" opacity="0.6"/>
+            <path d="M144,34 L146,26 L150,34 Z" stroke="#a83232" stroke-width="1"/>
+            <ellipse cx="128" cy="44" rx="14" ry="4" fill="#ffffff" opacity="0.25" stroke="none"/>
+          </g>` },
+  { id: 'bow-tie', label: 'Bow Tie', emoji: '🎀', price: 20, color: '#8c5ce0',
+    svg: `<path d="M150,152 L134,143 L134,161 Z M150,152 L166,143 L166,161 Z" stroke="#5a3aa8" stroke-width="1.2"/>
+          <rect x="145" y="147" width="10" height="10" rx="3" fill="#5a3aa8" stroke="none"/>
+          <g fill="#ffffff" stroke="none" opacity="0.7"><circle cx="139" cy="149" r="1.2"/><circle cx="140" cy="155" r="1.2"/><circle cx="161" cy="149" r="1.2"/><circle cx="160" cy="155" r="1.2"/></g>` },
+  { id: 'sparkle-headband', label: 'Sparkle Headband', emoji: '💖', unlockLevel: 2, color: '#ff8fc7',
+    svg: `<path d="M104,72 Q104,30 150,28 Q196,30 196,72" fill="none" stroke="#ff8fc7" stroke-width="6" stroke-linecap="round"/>
+          ${[[112, 48], [124, 37], [138, 31], [150, 30], [162, 31], [176, 37], [188, 48]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i === 3 ? 4.5 : 3}" fill="${['#ffffff', '#c9a6ff', '#ffffff', '#f2c94c', '#ffffff', '#c9a6ff', '#ffffff'][i]}" stroke="none"/>`).join('')}` },
+  { id: 'neon-shades', label: 'Neon Shades', emoji: '😎', unlockLevel: 3, color: '#39d98a',
+    svg: [132, 168].map((x) => `<rect x="${x - 15}" y="82" width="30" height="17" rx="5" fill="#1b1b2e" fill-opacity="0.85" stroke="#39d98a" stroke-width="3"/>
+          <rect x="${x - 15}" y="82" width="30" height="17" rx="5" fill="none" stroke="#39d98a" stroke-width="7" opacity="0.25"/>
+          <path d="M${x - 10},86 L${x - 2},86" stroke="#ff6fb0" stroke-width="2" stroke-linecap="round"/>`).join('') +
+      `<path d="M147,88 L153,88" stroke="#39d98a" stroke-width="3"/>
+       <line x1="117" y1="87" x2="105" y2="83" stroke="#39d98a" stroke-width="3"/><line x1="183" y1="87" x2="195" y2="83" stroke="#39d98a" stroke-width="3"/>` },
+  { id: 'gold-chain', label: 'Gold Chain', emoji: '⛓️', unlockLevel: 4, color: '#f2c94c',
+    svg: Array.from({ length: 15 }, (_, i) => {
+      const t = i / 14, x = 128 + 44 * t, y = 154 + 22 * Math.sin(Math.PI * t);
+      return `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="3" ry="2" fill="none" stroke="#e0b13a" stroke-width="1.6" transform="rotate(${(Math.cos(Math.PI * t) * -40).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+    }).join('') + `<path d="M150,178 L153,185 L160,186 L155,191 L156,198 L150,194 L144,198 L145,191 L140,186 L147,185 Z" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>` },
+  { id: 'diamond-sunglasses', label: 'Diamond Sunglasses', emoji: '💎', unlockLevel: 5, color: '#dfe6ee',
+    svg: [132, 168].map((x) => `<path d="M${x},74 L${x + 16},90 L${x},106 L${x - 16},90 Z" fill="#9fd8f0" fill-opacity="0.8" stroke="#dfe6ee" stroke-width="2.6" stroke-linejoin="round"/>
+          <path d="M${x},74 L${x},106 M${x - 16},90 L${x + 16},90" stroke="#ffffff" stroke-width="0.8" opacity="0.6"/>
+          <path d="M${x + 12},76 l1.5,3.5 l3.5,1.5 l-3.5,1.5 l-1.5,3.5 l-1.5,-3.5 l-3.5,-1.5 l3.5,-1.5 Z" fill="#ffffff" stroke="none"/>`).join('') +
+      `<path d="M147,90 L153,90" stroke="#dfe6ee" stroke-width="2.6"/>
+       <line x1="116" y1="90" x2="105" y2="84" stroke="#dfe6ee" stroke-width="2.6"/><line x1="184" y1="90" x2="195" y2="84" stroke="#dfe6ee" stroke-width="2.6"/>` },
+  { id: 'angel-halo', label: 'Angel Halo', emoji: '😇', unlockLevel: 6, color: '#f2c94c',
+    svg: `<g class="float-bob">
+            <ellipse cx="150" cy="26" rx="36" ry="9" fill="none" stroke="#fff3a8" stroke-width="10" opacity="0.35"/>
+            <ellipse cx="150" cy="26" rx="34" ry="8" fill="none" stroke="#f2c94c" stroke-width="4"/>
+            <path d="M124,22 Q136,18 148,18" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.7"/>
+          </g>` },
+  { id: 'rainbow-wings', label: 'Rainbow Wings', emoji: '🌈', unlockLevel: 7, color: '#ff8fc7',
+    behindSvg: `<g class="cape-flutter">${[['#e05c5c', 0], ['#f2c94c', 9], ['#43b581', 18], ['#5c7ce0', 27], ['#9b6be0', 36]].map(([c, k]) => `
+            <path d="M120,180 Q${40 + k},${110 + k} ${18 + k},${180 + k * 0.4} Q${44 + k},${232 - k * 0.2} 120,224 Z" fill="${c}" opacity="0.95"/>
+            <path d="M180,180 Q${260 - k},${110 + k} ${282 - k},${180 + k * 0.4} Q${256 - k},${232 - k * 0.2} 180,224 Z" fill="${c}" opacity="0.95"/>`).join('')}
+            <g fill="#ffffff" opacity="0.8"><circle cx="60" cy="160" r="2"/><circle cx="240" cy="168" r="2"/><circle cx="76" cy="200" r="1.6"/><circle cx="226" cy="204" r="1.6"/></g>
+          </g>`,
+    svg: '' },
+  { id: 'star-crown', label: 'Star Crown', emoji: '✨', unlockLevel: 8, color: '#f2c94c',
+    svg: `${[-2, -1, 0, 1, 2].map((i) => {
+            const x = 150 + i * 18, y = 30 - (2 - Math.abs(i)) * 6, r = i === 0 ? 11 : 8;
+            const pts = Array.from({ length: 10 }, (_, k) => { const a = -Math.PI / 2 + (k * Math.PI) / 5, rr = k % 2 ? r * 0.45 : r; return `${(x + rr * Math.cos(a)).toFixed(1)},${(y + rr * Math.sin(a)).toFixed(1)}`; }).join(' ');
+            return `<polygon points="${pts}" fill="#f2c94c" stroke="#c98f1f" stroke-width="1" stroke-linejoin="round"/>`;
+          }).join('')}
+          <rect x="108" y="42" width="84" height="12" rx="4" stroke="#c98f1f" stroke-width="1.2"/>
+          <circle cx="132" cy="48" r="3" fill="#ff6f91" stroke="none"/><circle cx="150" cy="48" r="3.4" fill="#5cc4e0" stroke="none"/><circle cx="168" cy="48" r="3" fill="#9b6be0" stroke="none"/>` },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 C110,26 136,8 160,10 C186,12 206,36 214,72 C202,58 192,46 180,40 C186,46 190,52 192,58 Z" stroke="#8e1b20" stroke-width="1.2"/>
           <path d="M124,46 C128,30 142,20 158,18" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
@@ -2057,6 +2141,9 @@ const LEVELS = [
   { level: 3, name: 'Runway Regular', threshold: 24 },
   { level: 4, name: 'Style Icon', threshold: 48 },
   { level: 5, name: 'Legend', threshold: 80 },
+  { level: 6, name: 'Superstar', threshold: 120 },
+  { level: 7, name: 'Runway Royalty', threshold: 170 },
+  { level: 8, name: 'Hall of Fame', threshold: 240 },
 ];
 
 const STARS_STORAGE_KEY = 'runwayReady.totalStars';
@@ -3572,7 +3659,7 @@ function computeGameMode() {
   const outfitDef = OUTFIT_STYLES.find((o) => o.id === state.outfit.style);
   if (outfitDef && ['mermaid', 'mermaid-tail', 'ocean-sparkle-tail'].includes(outfitDef.id)) return 'swim';
   if (state.pet.species === 'horse') return 'ride';
-  if (state.accessories['fairy-wings'] || state.accessories['feather-wings'] || state.accessories['hero-cape']) return 'fly';
+  if (['fairy-wings', 'feather-wings', 'hero-cape', 'rainbow-wings'].some((a) => state.accessories[a])) return 'fly';
   return 'walk';
 }
 
