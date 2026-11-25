@@ -78,6 +78,22 @@ const THEMES = [
 
 const SKIN_TONES = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5a3825'];
 
+// Draws a little spiderweb (spokes + rings) centered at cx,cy for spooky hairstyles.
+function spiderWebSVG(cx, cy, r) {
+  const spokes = 8;
+  const pts = (rad) => Array.from({ length: spokes }, (_, i) => {
+    const a = (Math.PI * 2 * i) / spokes;
+    return [cx + rad * Math.cos(a), cy + rad * Math.sin(a)];
+  });
+  const outer = pts(r);
+  const lines = outer.map(([x, y]) => `M${cx},${cy} L${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+  const rings = [0.35, 0.68, 1].map((f) => {
+    const ring = pts(r * f);
+    return 'M' + ring.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' L') + ' Z';
+  }).join(' ');
+  return `<path d="${lines} ${rings}" fill="none" stroke="#ffffff" stroke-width="1" stroke-linejoin="round" opacity="0.85"/>`;
+}
+
 const HAIR_STYLES = [
   { id: 'bob', label: 'Bob', emoji: '💇‍♀️',
     svg: `<path d="M98,80 A58,58 0 0 1 202,80 Z"/>
@@ -110,6 +126,42 @@ const HAIR_STYLES = [
           <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
           <path d="M204,90 Q214,130 202,165" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.2"/>` },
   { id: 'none', label: 'Bald', emoji: '⚪', svg: `` },
+  { id: 'bun', label: 'Top Bun', emoji: '🍩',
+    svg: `<circle cx="150" cy="30" r="21"/>
+          <path d="M140,22 Q148,14 158,18" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>
+          <path d="M98,80 A58,58 0 0 1 202,80 Z"/>
+          <rect x="98" y="80" width="14" height="28" rx="7"/>
+          <rect x="188" y="80" width="14" height="28" rx="7"/>
+          <rect x="134" y="44" width="32" height="7" rx="3.5" fill="#2b2b2b" stroke="none" opacity="0.55"/>
+          <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
+  { id: 'half-up', label: 'Half Up', emoji: '🎀',
+    svg: `<circle cx="150" cy="40" r="14"/>
+          <rect x="92" y="82" width="22" height="165" rx="11"/>
+          <rect x="186" y="82" width="22" height="165" rx="11"/>
+          <path d="M96,82 A60,60 0 0 1 204,82 Z"/>
+          <path d="M150,34 L134,24 L134,44 Z" fill="#e0558f" stroke="#b83c6f" stroke-width="1"/>
+          <path d="M150,34 L166,24 L166,44 Z" fill="#e0558f" stroke="#b83c6f" stroke-width="1"/>
+          <circle cx="150" cy="34" r="4" fill="#b83c6f" stroke="none"/>
+          <path d="M110,64 Q127,52 146,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
+          <path d="M100,110 Q103,160 98,200" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.18"/>` },
+  { id: 'spiderweb', label: 'Spiderweb Waves', emoji: '🕸️', theme: 'halloween',
+    svg: `<path d="M96,82 A60,60 0 0 1 204,82 Z"/>
+          <rect x="92" y="82" width="22" height="180" rx="11"/>
+          <rect x="186" y="82" width="22" height="180" rx="11"/>
+          <path d="M110,64 Q127,52 146,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
+          ${spiderWebSVG(176, 60, 17)}
+          ${spiderWebSVG(103, 190, 10)}
+          <line x1="204" y1="84" x2="226" y2="122" stroke="#ffffff" stroke-width="1" opacity="0.85"/>
+          <g transform="translate(227,130)">
+            <g stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round" fill="none">
+              <path d="M-4,-4 l-7,-4 M-4,-1 l-8,0 M-4,2 l-7,4 M-4,4 l-5,6"/>
+              <path d="M4,-4 l7,-4 M4,-1 l8,0 M4,2 l7,4 M4,4 l5,6"/>
+            </g>
+            <ellipse cx="0" cy="0" rx="5.5" ry="6.5" fill="#1a1a1a" stroke="#ffffff" stroke-width="0.6" stroke-opacity="0.5"/>
+            <circle cx="0" cy="-8" r="3.4" fill="#1a1a1a" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.5"/>
+            <circle cx="-1.2" cy="-8.5" r="0.9" fill="#e05c5c" stroke="none"/>
+            <circle cx="1.2" cy="-8.5" r="0.9" fill="#e05c5c" stroke="none"/>
+          </g>` },
   { id: 'crop', label: 'Short Crop', emoji: '💈',
     svg: `<path d="M100,78 A52,52 0 0 1 200,78 L198,96 A50,42 0 0 0 102,96 Z"/>
           <path d="M116,64 Q128,56 140,60" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>` },
@@ -760,7 +812,7 @@ const WARDROBE_PRESETS = [
       accessories: { 'candy-bag': true }, pet: { species: 'bat', color: '#4b3b63', accessory: 'none' },
       background: 'pumpkin-patch', face: { mouth: 'grin' } } },
   { id: 'midnight-kitty', label: 'Midnight Kitty', theme: 'halloween',
-    look: { bodyType: 'feminine', skin: SKIN_TONES[0], hair: { style: 'long', color: '#2b2b2b' },
+    look: { bodyType: 'feminine', skin: SKIN_TONES[0], hair: { style: 'bun', color: '#2b2b2b' },
       outfit: { style: 'cat-costume', color: '#2b2b2b' }, shoes: { style: 'flats', color: '#2b2b2b' },
       accessories: { 'candy-bag': true }, background: 'haunted-night',
       face: { eyeShape: 'almond', eyeColor: '#4a7043' } } },
@@ -770,7 +822,7 @@ const WARDROBE_PRESETS = [
       accessories: { 'candy-bag': true }, background: 'pumpkin-patch',
       face: { mouth: 'grin', blush: false } } },
   { id: 'spooky-witch', label: 'Spooky Witch', theme: 'halloween',
-    look: { bodyType: 'feminine', skin: SKIN_TONES[4], hair: { style: 'long', color: '#8c5ce0' },
+    look: { bodyType: 'feminine', skin: SKIN_TONES[4], hair: { style: 'spiderweb', color: '#2b2b2b' },
       outfit: { style: 'aline', color: '#2b2b2b' }, shoes: { style: 'boots', color: '#2b2b2b' },
       accessories: { 'witch-hat': true, 'candy-bag': true }, pet: { species: 'bat', color: '#4b3b63', accessory: 'bow' },
       background: 'haunted-night', face: { lipColor: '#8c4a6b' } } },
