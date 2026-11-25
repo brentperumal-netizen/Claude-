@@ -1188,3 +1188,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .candle-flame, .disco-spin { animation: none; }
 }
+
+/* Snowflakes stay visible on light, snowy backdrops */
+.ambient-snow { box-shadow: 0 0 3px rgba(70, 110, 160, 0.55); }

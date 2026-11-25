@@ -839,6 +839,40 @@ const OUTFIT_STYLES = [
               <path d="M${cx - s + 7},${sY + 6} L${cx - w},${wY + 80}" fill="none" stroke="#ffffff" stroke-width="6" opacity="0.15" stroke-linecap="round"/>
               <rect x="${cx - w}" y="${wY - 4}" width="${w * 2}" height="9" rx="3" fill="#f2c94c"/>
               <path d="M${cx + w - 8},${wY} q14,-12 20,0 q-6,12 -20,0 Z M${cx + w - 8},${wY} l6,22 l5,-3 Z M${cx + w - 8},${wY} l14,18 l3,-5 Z" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.8"/>` } },
+  { id: 'christmas-dress', label: 'Christmas Party Dress', emoji: '🎄', theme: 'christmas', price: 100, fixedColor: true,
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY, chest: bY, waist: wY } = TORSO_Y;
+      const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3, w = bt.waistHalf + 4;
+      const hemY = 336, hemHalf = bt.hipHalf + 50;
+      const fur = (x0, x1, y, r) => {
+        let out = `<rect x="${x0}" y="${y - r}" width="${x1 - x0}" height="${r * 2}" rx="${r}" fill="#f8f8f8"/>`;
+        for (let x = x0 + r; x <= x1 - r; x += r * 1.4) out += `<circle cx="${x.toFixed(1)}" cy="${(y + ((x / r) % 2 > 1 ? -r * 0.5 : r * 0.5)).toFixed(1)}" r="${r}" fill="#f8f8f8"/>`;
+        return out;
+      };
+      const flake = (x, y, r) => `<g stroke="#f2c94c" stroke-width="1.3" stroke-linecap="round">
+          <line x1="${x - r}" y1="${y}" x2="${x + r}" y2="${y}"/><line x1="${x - r * 0.5}" y1="${y - r * 0.87}" x2="${x + r * 0.5}" y2="${y + r * 0.87}"/>
+          <line x1="${x - r * 0.5}" y1="${y + r * 0.87}" x2="${x + r * 0.5}" y2="${y - r * 0.87}"/></g>`;
+      return `<path d="M${cx - s},${sY} L${cx + s},${sY}
+                C${cx + s},${sY + 14} ${cx + c},${bY - 10} ${cx + c},${bY}
+                C${cx + c},${bY + 16} ${cx + w},${wY - 14} ${cx + w},${wY}
+                Q${cx + hemHalf - 12},${wY + 46} ${cx + hemHalf},${hemY} Q${cx},${hemY + 14} ${cx - hemHalf},${hemY}
+                Q${cx - hemHalf + 12},${wY + 46} ${cx - w},${wY}
+                C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY}
+                C${cx - c},${bY - 10} ${cx - s},${sY + 14} ${cx - s},${sY} Z" fill="#c1272d"/>
+              <path d="M${cx - s + 7},${sY + 6} L${cx - w},${wY + 90}" fill="none" stroke="#ffffff" stroke-width="6" opacity="0.15" stroke-linecap="round"/>
+              <path d="M${cx + 16},${wY + 10} Q${cx + 30},${wY + 70} ${cx + hemHalf - 16},${hemY - 6}" fill="none" stroke="#8e1b20" stroke-width="2" opacity="0.4"/>
+              ${flake(cx - 30, wY + 50, 6)}${flake(cx + 26, wY + 80, 5)}${flake(cx - 10, wY + 104, 5)}${flake(cx - hemHalf + 30, hemY - 20, 4)}${flake(cx + hemHalf - 34, wY + 40, 4)}
+              ${fur(cx - hemHalf - 2, cx + hemHalf + 2, hemY + 2, 6)}
+              ${fur(cx - s - 2, cx + s + 2, sY + 2, 5)}
+              <rect x="${cx - w}" y="${wY - 5}" width="${w * 2}" height="10" rx="3" fill="#1e7a46"/>
+              <path d="M${cx},${wY} q-16,-14 -22,0 q6,14 22,0 Z M${cx},${wY} q16,-14 22,0 q-6,14 -22,0 Z" fill="#1e7a46" stroke="#145c33" stroke-width="1"/>
+              <path d="M${cx - 6},${wY + 4} L${cx - 14},${wY + 26} L${cx - 8},${wY + 24} Z M${cx + 6},${wY + 4} L${cx + 14},${wY + 26} L${cx + 8},${wY + 24} Z" fill="#1e7a46"/>
+              <ellipse cx="${cx - c + 10}" cy="${bY + 2}" rx="7" ry="3.5" fill="#2e9e5a" transform="rotate(-25 ${cx - c + 10} ${bY + 2})"/>
+              <ellipse cx="${cx - c + 20}" cy="${bY - 2}" rx="7" ry="3.5" fill="#2e9e5a" transform="rotate(25 ${cx - c + 20} ${bY - 2})"/>
+              <circle cx="${cx - c + 14}" cy="${bY + 4}" r="2.6" fill="#ff3b3b"/><circle cx="${cx - c + 18}" cy="${bY + 6}" r="2.6" fill="#ff3b3b"/>
+              <circle cx="${cx}" cy="${wY}" r="4" fill="#f2c94c"/>`;
+    } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -1195,9 +1229,14 @@ const ACCESSORIES = [
           <path class="candle-flame" d="M86.5,211 Q81,204 86.5,196 Q92,204 86.5,211 Z" fill="#f2c94c" stroke="#f28c28" stroke-width="1"/>
           <circle cx="78" cy="231" r="3" fill="#e05c5c" stroke="none"/>` },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
-    svg: `<path d="M108,58 L150,4 L192,58 Z"/>
-          <ellipse cx="150" cy="58" rx="44" ry="13" fill="#f4f4f4"/>
-          <circle cx="150" cy="6" r="8" fill="#f4f4f4"/>` },
+    svg: `<path d="M108,58 C110,26 136,8 160,10 C186,12 206,36 214,72 C202,58 192,46 180,40 C186,46 190,52 192,58 Z" stroke="#8e1b20" stroke-width="1.2"/>
+          <path d="M124,46 C128,30 142,20 158,18" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
+          <path d="M186,30 C198,40 206,52 210,64" fill="none" stroke="#8e1b20" stroke-width="1.5" opacity="0.5"/>
+          <g fill="#f8f8f8" stroke="#dcdcdc" stroke-width="0.8">
+            <rect x="102" y="50" width="96" height="16" rx="8"/>
+            ${[106, 116, 126, 136, 146, 156, 166, 176, 186, 194].map((x, i) => `<circle cx="${x}" cy="${i % 2 ? 51 : 64}" r="5"/>`).join('')}
+            <circle cx="214" cy="76" r="8"/><circle cx="208" cy="80" r="5"/><circle cx="220" cy="81" r="5"/><circle cx="214" cy="69" r="5"/>
+          </g>` },
   { id: 'candy-cane', label: 'Candy Cane', emoji: '🍬', theme: 'christmas', color: '#e03131',
     svg: `<path d="M205,250 Q222,228 208,212" fill="none" stroke="#e03131" stroke-width="8" stroke-linecap="round"/>
           <path d="M205,250 Q222,228 208,212" fill="none" stroke="#ffffff" stroke-width="8" stroke-dasharray="6 6" stroke-linecap="round"/>` },
@@ -1535,6 +1574,8 @@ const BACKGROUNDS = [
   { id: 'night', label: 'Night Gala', emoji: '🌌', gradient: 'linear-gradient(180deg, #1b1035 0%, #3a1f5d 55%, #6a3093 100%)' },
   { id: 'gold', label: 'Gold Stage', emoji: '🌟', gradient: 'linear-gradient(180deg, #fff6d8 0%, #ffe08a 55%, #f6c453 100%)' },
   { id: 'spring', label: 'Spring Bloom', emoji: '🌸', gradient: 'linear-gradient(180deg, #eaffea 0%, #b9f2d0 55%, #8fe3b0 100%)' },
+  { id: 'winter-wonderland', label: 'Winter Wonderland', emoji: '⛄', theme: 'christmas', ambient: 'snow', decor: 'snowscene',
+    gradient: 'linear-gradient(180deg, #bfe3ff 0%, #e3f2ff 60%, #ffffff 100%)' },
   { id: 'christmas-snow', label: 'Snowy Night', emoji: '❄️', theme: 'christmas', ambient: 'snow',
     gradient: 'linear-gradient(180deg, #0b2545 0%, #164a6b 55%, #2c7a9c 100%)' },
   { id: 'fairy-glade', label: 'Enchanted Glade', emoji: '🌌', theme: 'fairy', ambient: 'sparkle',
@@ -1643,6 +1684,10 @@ const WARDROBE_PRESETS = [
       outfit: { style: 'elf-costume', color: '#1e7a46' }, shoes: { style: 'boots', color: '#8a5a2b' },
       accessories: { 'santa-hat': true, 'candy-cane': true }, background: 'christmas-snow',
       face: { mouth: 'grin' } } },
+  { id: 'snow-day', label: 'Snow Day', theme: 'christmas',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[3], hair: { style: 'half-up', color: '#4b2e1e' },
+      outfit: { style: 'aline', color: '#e05c5c' }, shoes: { style: 'boots', color: '#ffffff' },
+      accessories: { 'santa-hat': true, snowflake: true }, background: 'winter-wonderland', face: { mouth: 'grin' } } },
   { id: 'winter-belle', label: 'Winter Belle', theme: 'christmas',
     look: { bodyType: 'feminine', skin: SKIN_TONES[2], hair: { style: 'long', color: '#d9b45a' },
       outfit: { style: 'santa-dress', color: '#c1272d' }, shoes: { style: 'flats', color: '#ffffff' },
@@ -2207,6 +2252,28 @@ function addDecor(decor) {
     el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
       ${pumpkinSVG(228, 56, 1.15, true)}${pumpkinSVG(272, 62, 0.8, false)}${pumpkinSVG(24, 64, 0.7, true)}
     </svg>`;
+  } else if (decor === 'snowscene') {
+    const tree = (x, y, sc) => `<g transform="translate(${x},${y}) scale(${sc})">
+        <rect x="-4" y="0" width="8" height="12" fill="#7a5230"/>
+        <path d="M0,-70 L-22,-36 L-12,-36 L-30,-8 L-18,-8 L-36,12 L36,12 L18,-8 L30,-8 L12,-36 L22,-36 Z" fill="#2e7d4f"/>
+        <path d="M0,-70 L-12,-52 Q0,-48 12,-52 Z M-22,-36 Q0,-30 22,-36 L16,-40 Q0,-36 -16,-40 Z M-30,-8 Q0,-2 30,-8 L24,-12 Q0,-8 -24,-12 Z" fill="#ffffff"/>
+      </g>`;
+    el.innerHTML = `<svg viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+      <path d="M0,96 Q70,70 150,92 Q230,112 300,84 L300,160 L0,160 Z" fill="#f4f9ff"/>
+      ${tree(30, 104, 1)}${tree(66, 112, 0.7)}${tree(268, 100, 1.1)}
+      <path d="M0,124 Q90,108 170,122 Q240,134 300,118 L300,160 L0,160 Z" fill="#ffffff"/>
+      <g transform="translate(232,112)">
+        <circle cx="0" cy="22" r="18" fill="#ffffff" stroke="#d6e4f0" stroke-width="1.2"/>
+        <circle cx="0" cy="-4" r="13" fill="#ffffff" stroke="#d6e4f0" stroke-width="1.2"/>
+        <circle cx="0" cy="-24" r="10" fill="#ffffff" stroke="#d6e4f0" stroke-width="1.2"/>
+        <rect x="-9" y="-40" width="18" height="10" fill="#2b2b2b"/><rect x="-13" y="-32" width="26" height="3" fill="#2b2b2b"/>
+        <circle cx="-3.5" cy="-26" r="1.4" fill="#2b2b2b"/><circle cx="3.5" cy="-26" r="1.4" fill="#2b2b2b"/>
+        <path d="M0,-23 L10,-21 L0,-19 Z" fill="#f28c28"/>
+        <path d="M-10,-14 Q0,-10 10,-14 L12,-10 Q0,-6 -12,-10 Z" fill="#c1272d"/><path d="M6,-12 L10,0 L4,0 Z" fill="#c1272d"/>
+        <circle cx="0" cy="-2" r="1.6" fill="#2b2b2b"/><circle cx="0" cy="6" r="1.6" fill="#2b2b2b"/>
+        <path d="M-12,-6 L-28,-16 M12,-6 L28,-16" stroke="#7a5230" stroke-width="2" stroke-linecap="round"/>
+      </g>
+    </svg>`;
   } else if (decor === 'balloons' || decor === 'disco') {
     const balloon = (x, y, col, d) => `<g class="float-bob" style="animation-delay:${d}s">
         <path d="M${x},${y + 26} Q${x - 6},${y + 60} ${x + 4},${y + 96}" fill="none" stroke="#9a8aa8" stroke-width="1"/>
@@ -2721,7 +2788,7 @@ function renderShop(message) {
     const card = document.createElement('div');
     card.className = 'shop-card' + (owned.has(item.id) ? ' owned' : '');
     const bg = kind === 'background' ? item.gradient : (currentBg ? currentBg.gradient : '#f7eefb');
-    const kindLabel = kind === 'outfit' ? (item.id === 'jester-suit' ? 'Costume' : item.id === 'ruffle-dress' ? 'Dress' : 'Gown') : { accessory: 'Accessory', background: 'Backdrop' }[kind];
+    const kindLabel = kind === 'outfit' ? (item.id === 'jester-suit' ? 'Costume' : /Dress/.test(item.label) ? 'Dress' : 'Gown') : { accessory: 'Accessory', background: 'Backdrop' }[kind];
     card.innerHTML = `
       <div class="thumb" style="background:${bg}">
         <svg viewBox="0 0 300 520">${buildDollSVG(previewLook(item, kind), `shop-${item.id}`)}</svg>
