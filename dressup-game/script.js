@@ -79,6 +79,7 @@ const THEMES = [
   { id: 'mermaid', label: 'Mermaid', emoji: '🧜‍♀️' },
   { id: 'school', label: 'School', emoji: '🎒' },
   { id: 'summer', label: 'Summer', emoji: '☀️' },
+  { id: 'party', label: 'Party', emoji: '🎉' },
 ];
 
 const SKIN_TONES = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5a3825'];
@@ -805,6 +806,39 @@ const OUTFIT_STYLES = [
               <circle cx="${cx}" cy="${wY}" r="3" fill="#ffffff" stroke="#e7d6e0" stroke-width="1"/>
               <path d="M${cx - s + 7},${sY + 8} L${cx - w + 2},${wY}" fill="none" stroke="#ffffff" stroke-width="5" opacity="0.15" stroke-linecap="round"/>`;
     } },
+  { id: 'polka-party-dress', label: 'Polka Dot Party Dress', emoji: '🎉', theme: 'party',
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY, chest: bY, waist: wY } = TORSO_Y;
+      const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3, w = bt.waistHalf + 4;
+      const hemY = 330, hemHalf = bt.hipHalf + 54;
+      const halfAt = (y) => (y <= wY ? torsoHalfAt(bt, y) + 3 : w + (hemHalf - w) * Math.pow((y - wY) / (hemY - wY), 0.7));
+      let dots = '';
+      for (let y = sY + 18, r = 0; y < hemY - 6; y += 15, r++) {
+        const half = halfAt(y) - 6;
+        for (let x = -half + (r % 2) * 8; x <= half; x += 16) {
+          if (Math.abs(y - wY) < 6) continue;
+          dots += `<circle cx="${(cx + x).toFixed(1)}" cy="${y}" r="3.6" fill="#ffffff"/>`;
+        }
+      }
+      let tulle = '';
+      const n = 12, step = (hemHalf * 2 + 8) / n;
+      for (let k = 0; k < n; k++) {
+        const x0 = cx + hemHalf + 4 - step * k;
+        tulle += ` Q${(x0 - step / 2).toFixed(1)},${hemY + 16} ${(x0 - step).toFixed(1)},${hemY + 6}`;
+      }
+      return `<path d="M${cx - hemHalf - 4},${hemY - 6} L${cx + hemHalf + 4},${hemY - 6} L${cx + hemHalf + 4},${hemY + 6}${tulle} Z" fill="#ffffff" stroke="#e7d6e0" stroke-width="1"/>
+              <path d="M${cx - s},${sY} L${cx + s},${sY}
+                C${cx + s},${sY + 14} ${cx + c},${bY - 10} ${cx + c},${bY}
+                C${cx + c},${bY + 16} ${cx + w},${wY - 14} ${cx + w},${wY}
+                Q${cx + hemHalf - 10},${wY + 50} ${cx + hemHalf},${hemY} Q${cx},${hemY + 14} ${cx - hemHalf},${hemY}
+                Q${cx - hemHalf + 10},${wY + 50} ${cx - w},${wY}
+                C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY}
+                C${cx - c},${bY - 10} ${cx - s},${sY + 14} ${cx - s},${sY} Z"/>
+              ${dots}
+              <path d="M${cx - s + 7},${sY + 6} L${cx - w},${wY + 80}" fill="none" stroke="#ffffff" stroke-width="6" opacity="0.15" stroke-linecap="round"/>
+              <rect x="${cx - w}" y="${wY - 4}" width="${w * 2}" height="9" rx="3" fill="#f2c94c"/>
+              <path d="M${cx + w - 8},${wY} q14,-12 20,0 q-6,12 -20,0 Z M${cx + w - 8},${wY} l6,22 l5,-3 Z M${cx + w - 8},${wY} l14,18 l3,-5 Z" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.8"/>` } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -1139,6 +1173,27 @@ const ACCESSORIES = [
           <path d="M${x - 5},85 Q${x - 2},82 ${+x + 1},84" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6" stroke-linecap="round"/>`).join('') +
       `<path d="M146,90 Q150,86 154,90" fill="none" stroke="#c98f1f" stroke-width="2.5"/>
        <line x1="118" y1="88" x2="105" y2="83" stroke="#c98f1f" stroke-width="3"/><line x1="182" y1="88" x2="195" y2="83" stroke="#c98f1f" stroke-width="3"/>` },
+  { id: 'party-hat', label: 'Party Hat', emoji: '🥳', theme: 'party', color: '#8c5ce0',
+    svg: `<g transform="rotate(12 150 50)">
+            <path d="M124,54 L150,-4 L176,54 Z" stroke="#5a3aa8" stroke-width="1.5"/>
+            <path d="M133,34 L167,34 L170,42 L130,42 Z M140,18 L160,18 L162,24 L138,24 Z" fill="#f2c94c" stroke="none"/>
+            <circle cx="144" cy="48" r="2.6" fill="#ff8fc7" stroke="none"/><circle cx="158" cy="50" r="2.6" fill="#5cc4e0" stroke="none"/>
+            <circle cx="150" cy="30" r="2.2" fill="#ff8fc7" stroke="none"/>
+            <path d="M122,54 Q150,62 178,54" fill="none" stroke="#5a3aa8" stroke-width="3" stroke-linecap="round"/>
+            <g fill="#ff8fc7" stroke="none"><circle cx="150" cy="-6" r="6"/><circle cx="145" cy="-9" r="4"/><circle cx="155" cy="-9" r="4"/></g>
+          </g>` },
+  { id: 'cake', label: 'Birthday Cake', emoji: '🎂', theme: 'party', color: '#ffffff',
+    svg: `<ellipse cx="86" cy="264" rx="26" ry="6" fill="#ffffff" stroke="#d6d6d6" stroke-width="1"/>
+          <rect x="66" y="232" width="40" height="30" rx="4" fill="#ffd6ec" stroke="#e0a0c0" stroke-width="1"/>
+          <rect x="66" y="246" width="40" height="5" fill="#ffffff" stroke="none"/>
+          <path d="M66,236 Q66,228 86,228 Q106,228 106,236 L106,240 Q102,246 98,240 Q94,247 90,240 Q86,247 82,240 Q78,247 74,240 Q70,246 66,240 Z" fill="#ffffff" stroke="#e7d6e0" stroke-width="1"/>
+          <g stroke="none"><rect x="72" y="254" width="4" height="1.6" rx="0.8" fill="#5cc4e0" transform="rotate(30 74 255)"/>
+            <rect x="92" y="256" width="4" height="1.6" rx="0.8" fill="#f2c94c" transform="rotate(-20 94 257)"/>
+            <rect x="82" y="236" width="4" height="1.6" rx="0.8" fill="#e05c5c"/><rect x="96" y="233" width="4" height="1.6" rx="0.8" fill="#43b581" transform="rotate(40 98 234)"/></g>
+          <rect x="84" y="212" width="5" height="17" rx="1.5" fill="#5cc4e0" stroke="#3a8fb0" stroke-width="0.6"/>
+          <path d="M84,216 L89,212 M84,221 L89,217 M84,226 L89,222" stroke="#ffffff" stroke-width="1.2"/>
+          <path class="candle-flame" d="M86.5,211 Q81,204 86.5,196 Q92,204 86.5,211 Z" fill="#f2c94c" stroke="#f28c28" stroke-width="1"/>
+          <circle cx="78" cy="231" r="3" fill="#e05c5c" stroke="none"/>` },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 L150,4 L192,58 Z"/>
           <ellipse cx="150" cy="58" rx="44" ry="13" fill="#f4f4f4"/>
@@ -1502,6 +1557,10 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #7fd0ff 0%, #bfe9ff 50%, #f4e7cf 50%, #eadbc0 100%)' },
   { id: 'sunny-beach', label: 'Sunny Beach', emoji: '🏖️', theme: 'summer', decor: 'beach',
     gradient: 'linear-gradient(180deg, #ffd76a 0%, #8fd3ff 30%, #bfe9ff 58%, #3fa9d6 58%, #2a8fc4 66%, #f2dfb0 66%)' },
+  { id: 'party-room', label: 'Party Room', emoji: '🎈', theme: 'party', ambient: 'confetti', decor: 'balloons',
+    gradient: 'linear-gradient(180deg, #fff0f6 0%, #f4e6ff 60%, #e6d6ff 60%, #d6c2f5 100%)' },
+  { id: 'disco-party', label: 'Dance Party', emoji: '🪩', theme: 'party', ambient: 'confetti', decor: 'disco',
+    gradient: 'linear-gradient(180deg, #2a1650 0%, #5a2a8a 55%, #8c3aa8 100%)' },
   { id: 'met-steps', label: 'Met Gala Steps', emoji: '📸', theme: 'metgala', price: 50, ambient: 'flash', decor: 'carpet',
     gradient: 'linear-gradient(180deg, #1e1a2e 0%, #3b2f4f 60%, #5a4a6a 100%)' },
   { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
@@ -1524,6 +1583,7 @@ const JUDGE_COMMENTS = [
   "Fin-tastic! Making waves on the runway.",
   "Top of the class! A+ for style.",
   "Making a splash! Summer style on point.",
+  "Life of the party! Hip hip hooray!",
 ];
 
 const WARDROBE_PRESETS = [
@@ -1569,6 +1629,15 @@ const WARDROBE_PRESETS = [
     look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'long', color: '#8a5a2b' },
       outfit: { style: 'polka-swimsuit', color: '#e05c5c' }, shoes: { style: 'flip-flops', color: '#e05c5c' },
       accessories: { 'sun-hat': true }, background: 'sunny-beach' } },
+  { id: 'birthday-star', label: 'Birthday Star', theme: 'party',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[1], hair: { style: 'pigtails', color: '#8a5a2b' },
+      outfit: { style: 'polka-party-dress', color: '#e0558f' }, shoes: { style: 'flats', color: '#ffffff' },
+      accessories: { 'party-hat': true, cake: true }, pet: { species: 'dog', color: '#c68642', accessory: 'party-hat' },
+      background: 'party-room', face: { mouth: 'grin' } } },
+  { id: 'dance-party', label: 'Dance Party', theme: 'party',
+    look: { bodyType: 'neutral', skin: SKIN_TONES[4], hair: { style: 'curly', color: '#8c5ce0' },
+      outfit: { style: 'polka-party-dress', color: '#5cc4e0' }, shoes: { style: 'sneakers', color: '#ffffff' },
+      accessories: { 'party-hat': true }, background: 'disco-party', face: { eyeShape: 'wide' } } },
   { id: 'santas-helper', label: "Santa's Helper", theme: 'christmas',
     look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'ponytail', color: '#8a5a2b' },
       outfit: { style: 'elf-costume', color: '#1e7a46' }, shoes: { style: 'boots', color: '#8a5a2b' },
@@ -2116,6 +2185,7 @@ function setAmbient(type, decor) {
     if (type === 'birds' && Math.random() < 0.2) spawnBat(BIRD_SVG);
     if (type === 'flash' && Math.random() < 0.35) spawnFlash();
     if (type === 'bubbles' && Math.random() < 0.45) spawnBubble();
+    if (type === 'confetti' && Math.random() < 0.6) spawnConfetti();
   }, 350);
 }
 
@@ -2136,6 +2206,32 @@ function addDecor(decor) {
   if (decor === 'pumpkins') {
     el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
       ${pumpkinSVG(228, 56, 1.15, true)}${pumpkinSVG(272, 62, 0.8, false)}${pumpkinSVG(24, 64, 0.7, true)}
+    </svg>`;
+  } else if (decor === 'balloons' || decor === 'disco') {
+    const balloon = (x, y, col, d) => `<g class="float-bob" style="animation-delay:${d}s">
+        <path d="M${x},${y + 26} Q${x - 6},${y + 60} ${x + 4},${y + 96}" fill="none" stroke="#9a8aa8" stroke-width="1"/>
+        <ellipse cx="${x}" cy="${y}" rx="18" ry="22" fill="${col}"/>
+        <path d="M${x - 3},${y + 22} L${x + 3},${y + 22} L${x},${y + 27} Z" fill="${col}"/>
+        <ellipse cx="${x - 6}" cy="${y - 8}" rx="4" ry="7" fill="#ffffff" opacity="0.35"/></g>`;
+    const flags = Array.from({ length: 11 }, (_, i) => {
+      const x = 8 + i * 26, y = 18 + 10 * Math.sin((i / 10) * Math.PI);
+      const col = ['#e0558f', '#f2c94c', '#5cc4e0', '#43b581', '#8c5ce0'][i % 5];
+      return `<path d="M${x},${y} L${x + 22},${y + 2} L${x + 11},${y + 24} Z" fill="${col}"/>`;
+    }).join('');
+    const gift = (x, col, rib) => `<rect x="${x}" y="368" width="40" height="34" rx="3" fill="${col}"/><rect x="${x - 3}" y="362" width="46" height="10" rx="2" fill="${col}" stroke="#000000" stroke-opacity="0.12"/>
+        <rect x="${x + 17}" y="362" width="6" height="40" fill="${rib}"/><path d="M${x + 20},362 q-12,-12 -14,0 Z M${x + 20},362 q12,-12 14,0 Z" fill="${rib}"/>`;
+    const disco = decor === 'disco';
+    el.classList.add('ambient-decor-full');
+    el.innerHTML = `<svg viewBox="0 0 300 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      ${disco ? `<line x1="246" y1="0" x2="246" y2="20" stroke="#d6d6d6" stroke-width="2"/>
+        <g class="disco-spin"><circle cx="246" cy="42" r="22" fill="#c9d4e0"/>
+        ${Array.from({ length: 5 }, (_, r) => `<line x1="224" y1="${28 + r * 7}" x2="268" y2="${28 + r * 7}" stroke="#8a98aa" stroke-width="0.8"/>`).join('')}
+        ${Array.from({ length: 5 }, (_, r) => `<line x1="${228 + r * 9}" y1="20" x2="${228 + r * 9}" y2="64" stroke="#8a98aa" stroke-width="0.8"/>`).join('')}
+        <circle cx="238" cy="34" r="4" fill="#ffffff" opacity="0.9"/></g>
+        <path d="M246,58 L40,420 L100,420 Z M246,58 L180,420 L230,420 Z" fill="#ffffff" opacity="0.07"/>` : flags}
+      ${balloon(34, 120, '#e0558f', 0)}${balloon(64, 150, '#f2c94c', -0.8)}${balloon(24, 178, '#5cc4e0', -1.6)}
+      ${balloon(266, 112, '#8c5ce0', -0.4)}${balloon(238, 146, '#43b581', -1.2)}${balloon(276, 176, '#ff9a5c', -2)}
+      ${gift(14, '#5cc4e0', '#e0558f')}${gift(246, '#f2c94c', '#8c5ce0')}
     </svg>`;
   } else if (decor === 'pool') {
     const tiles = Array.from({ length: 16 }, (_, i) => `<line x1="${i * 20}" y1="16" x2="${i * 20}" y2="22" stroke="#ffffff" stroke-width="1"/>`).join('');
@@ -2257,6 +2353,17 @@ const BAT_SVG = `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
 const BIRD_SVG = `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
   <path d="M4,10 Q16,4 30,16 Q44,4 56,10 Q44,8 30,20 Q16,8 4,10 Z" fill="#3a3550" opacity="0.75"/>
 </svg>`;
+
+function spawnConfetti() {
+  const bit = document.createElement('div');
+  bit.className = 'ambient-confetti';
+  bit.style.left = `${Math.random() * 98}%`;
+  bit.style.background = ['#e0558f', '#8c5ce0', '#5cc4e0', '#f2c94c', '#43b581'][Math.floor(Math.random() * 5)];
+  bit.style.setProperty('--drift', `${(Math.random() - 0.5) * 50}px`);
+  bit.style.animationDuration = `${3.5 + Math.random() * 2.5}s`;
+  ambientLayer.appendChild(bit);
+  setTimeout(() => bit.remove(), 6500);
+}
 
 function spawnBubble() {
   const bubble = document.createElement('div');
