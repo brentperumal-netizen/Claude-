@@ -1217,3 +1217,14 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .cape-flutter, .searchlight { animation: none; }
 }
+
+/* ---------- Light-up sneakers ---------- */
+.light-sole { animation: sole-glow 1.2s linear infinite; }
+.light-sole-b { animation-delay: -0.6s; }
+@keyframes sole-glow {
+  0%   { fill: #ff6fb0; }
+  33%  { fill: #5cc4e0; }
+  66%  { fill: #f2c94c; }
+  100% { fill: #ff6fb0; }
+}
+@media (prefers-reduced-motion: reduce) { .light-sole { animation: none; } }
