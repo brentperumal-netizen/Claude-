@@ -3081,6 +3081,7 @@ function shopItems() {
     ...OUTFIT_STYLES.filter((i) => i.price).map((item) => ({ item, kind: 'outfit' })),
     ...ACCESSORIES.filter((i) => i.price).map((item) => ({ item, kind: 'accessory' })),
     ...SHOE_STYLES.filter((i) => i.price).map((item) => ({ item, kind: 'shoes' })),
+    ...WALK_STYLES.filter((i) => i.price).map((item) => ({ item, kind: 'walk' })),
     ...BACKGROUNDS.filter((i) => i.price).map((item) => ({ item, kind: 'background' })),
   ];
 }
@@ -3112,6 +3113,11 @@ function tryOn(item, kind) {
   if (kind === 'accessory') state.accessories[item.id] = true;
   if (kind === 'shoes') state.shoes.style = item.id;
   if (kind === 'background') state.background = item.id;
+  if (kind === 'walk') {
+    selectedWalk = item.id;
+    try { localStorage.setItem('runwayReady.walk', item.id); } catch (e) {}
+    refreshWalkPickers();
+  }
   rebuildThemedLists();
   render();
 }
@@ -3123,7 +3129,9 @@ function buyItem(item, kind) {
   saveShop();
   renderCash();
   tryOn(item, kind);
-  renderShop(`🎉 You bought the ${item.label}! It's on now.`);
+  renderShop(kind === 'walk'
+    ? `🎉 You bought the ${item.label}! It's picked for the Catwalk Show and Runway Run.`
+    : `🎉 You bought the ${item.label}! It's on now.`);
 }
 
 function renderShop(message) {
@@ -3136,10 +3144,10 @@ function renderShop(message) {
     const card = document.createElement('div');
     card.className = 'shop-card' + (owned.has(item.id) ? ' owned' : '');
     const bg = kind === 'background' ? item.gradient : (currentBg ? currentBg.gradient : '#f7eefb');
-    const kindLabel = kind === 'outfit' ? (item.shopLabel || (item.id === 'jester-suit' ? 'Costume' : /Dress/.test(item.label) ? 'Dress' : 'Gown')) : { accessory: 'Accessory', shoes: 'Shoes', background: 'Backdrop' }[kind];
+    const kindLabel = kind === 'outfit' ? (item.shopLabel || (item.id === 'jester-suit' ? 'Costume' : /Dress/.test(item.label) ? 'Dress' : 'Gown')) : { accessory: 'Accessory', shoes: 'Shoes', walk: 'Walk', background: 'Backdrop' }[kind];
     card.innerHTML = `
       <div class="thumb" style="background:${bg}">
-        <svg viewBox="0 0 300 520">${buildDollSVG(previewLook(item, kind), `shop-${item.id}`)}</svg>
+        <svg viewBox="0 0 300 520">${buildDollSVG(previewLook(item, kind), `shop-${item.id}`, { posed: kind === 'walk' })}</svg>
       </div>
       <span class="label">${item.emoji} ${item.label}</span>
       <span class="theme-tag">${kindLabel}</span>
@@ -3147,7 +3155,7 @@ function renderShop(message) {
     const btn = document.createElement('button');
     btn.className = 'btn shop-buy';
     if (owned.has(item.id)) {
-      btn.textContent = '✓ Owned — Wear it';
+      btn.textContent = kind === 'walk' ? '✓ Owned — Use it' : '✓ Owned — Wear it';
       btn.classList.add('btn-ghost');
       btn.addEventListener('click', () => { tryOn(item, kind); renderShop(`✨ Wearing the ${item.label}.`); });
     } else if (cash >= item.price) {
@@ -3161,6 +3169,8 @@ function renderShop(message) {
     }
     card.appendChild(btn);
     shopGrid.appendChild(card);
+    // Walk cards show the model striking that walk's final pose.
+    if (kind === 'walk') poseLimbs(card.querySelector('.thumb'), item, 0, 1, false);
   });
 }
 
@@ -3219,6 +3229,20 @@ const WALK_STYLES = [
     walkArms: 'sides', finalArms: 'tada', comment: 'So much joy! The crowd is bouncing with you.' },
   { id: 'ballet', label: 'Ballet Twirl', emoji: '🩰', duration: 5.5, cycle: 0.7, bob: 6, sway: 1, lift: 12, swing: 0, spin: true,
     walkArms: 'second', finalArms: 'arch', comment: 'Twirls, tiptoes and perfect arms. Bravo, ballerina!' },
+  { id: 'glide', label: 'Moon Glide', emoji: '🌙', price: 40, duration: 5.5, cycle: 0.6, bob: 0, sway: 0, lift: 4, swing: 3,
+    walkArms: 'sides', finalArms: 'model', comment: 'So smooth! You glided like you were on the moon.' },
+  { id: 'robot', label: 'Robot Walk', emoji: '🤖', price: 35, robot: true, duration: 5, cycle: 0.9, bob: 2, sway: 0, lift: 8, swing: 12,
+    walkArms: 'robot', finalArms: 'robot', comment: 'Beep boop! Precision strutting, 100% robot power.' },
+  { id: 'hop', label: 'Bunny Hop', emoji: '🐰', price: 25, bothLegs: true, duration: 4.5, cycle: 1.1, bob: 18, sway: 0, lift: 10, swing: 0,
+    walkArms: 'paws', finalArms: 'tada', comment: 'Hop, hop, hooray! The cutest walk on the runway.' },
+  { id: 'power', label: 'Power Strut', emoji: '💪', price: 45, duration: 5, cycle: 0.95, bob: 6, sway: 1.5, lift: 13, swing: 10,
+    walkArms: 'pump', finalArms: 'flex', comment: 'Strong and fierce! Total power move.' },
+  { id: 'kiss', label: 'Blow a Kiss', emoji: '😘', price: 30, duration: 5, cycle: 0.85, bob: 4, sway: 2.5, lift: 9, swing: 6,
+    walkArms: 'sides', finalArms: 'kiss', comment: 'Mwah! The crowd is blowing kisses back.' },
+  { id: 'disco', label: 'Disco Strut', emoji: '🪩', price: 60, duration: 5.5, cycle: 1, bob: 6, sway: 4, lift: 11, swing: 0,
+    walkArms: 'point', finalArms: 'disco', comment: 'Groovy! You turned the catwalk into a dance floor.' },
+  { id: 'spin-pose', label: 'Spin & Pose', emoji: '🌀', price: 50, spin: true, duration: 5.5, cycle: 0.9, bob: 4, sway: 2, lift: 10, swing: 0,
+    walkArms: 'hips', finalArms: 'model', comment: 'A spin, a pose, a superstar moment!' },
   { id: 'wave', label: 'Royal Wave', emoji: '👋', duration: 5.5, cycle: 0.8, bob: 3, sway: 2, lift: 8, swing: 4,
     walkArms: 'wave', finalArms: 'wave', comment: 'Graceful and regal. Everyone waved back!' },
 ];
@@ -3245,6 +3269,29 @@ function armPose(kind, side, bt, s, t, swing) {
   if (kind === 'v') {
     return { e: [mx(98), 138], h: [mx(76), 98] };
   }
+  if (kind === 'robot') {
+    const up = s > 0 === (side === 'L') ? -14 : 14;
+    return { e: [mx(106), 224], h: [mx(82), 214 + up * Math.min(1, Math.abs(s))] };
+  }
+  if (kind === 'paws') {
+    return { e: [mx(116), 212], h: [mx(136), 194] };
+  }
+  if (kind === 'pump') {
+    return { e: [mx(104), 214 + swingY * 0.4], h: [mx(118), 190 + swingY * 1.2] };
+  }
+  if (kind === 'flex') {
+    return { e: [mx(82), 172], h: [mx(94), 128] };
+  }
+  if (kind === 'kiss') {
+    return { e: [mx(98), 172], h: [mx(138), 116] };
+  }
+  if (kind === 'point') {
+    const upNow = (s > 0) === (side === 'L');
+    return upNow ? { e: [mx(94), 132], h: [mx(64), 90] } : { e: [mx(112 - spread * 0.5), 220], h: [mx(93 - spread), 268] };
+  }
+  if (kind === 'pointUp') {
+    return { e: [mx(94), 132], h: [mx(64), 90] };
+  }
   if (kind === 'out') {
     return { e: [mx(96), 180 + Math.sin(t * 3) * 3], h: [mx(56), 186 + Math.sin(t * 3) * 6] };
   }
@@ -3266,6 +3313,13 @@ function walkArmKinds(kind) {
     case 'model': return { L: 'hips', R: 'up' };
     case 'tada': return { L: 'v', R: 'v' };
     case 'second': return { L: 'out', R: 'out' };
+    case 'robot': return { L: 'robot', R: 'robot' };
+    case 'paws': return { L: 'paws', R: 'paws' };
+    case 'pump': return { L: 'pump', R: 'pump' };
+    case 'flex': return { L: 'flex', R: 'flex' };
+    case 'kiss': return { L: 'hips', R: 'kiss' };
+    case 'point': return { L: 'point', R: 'point' };
+    case 'disco': return { L: 'hips', R: 'pointUp' };
     case 'arch': return { L: 'arch', R: 'arch' };
     default: return { L: 'sides', R: 'sides' };
   }
@@ -3297,17 +3351,13 @@ const cwFlashes = document.getElementById('cw-flashes');
 const cwWalkBtn = document.getElementById('cw-walk-btn');
 
 let selectedWalk = 'slay';
+try { selectedWalk = localStorage.getItem('runwayReady.walk') || 'slay'; } catch (e) {}
 let cwRaf = null;
 let cwStart = 0;
 let cwFlashTimer = null;
 
 function buildWalkPicker() {
-  buildOptionButtons(document.getElementById('walk-styles'), WALK_STYLES, (id) => {
-    selectedWalk = id;
-    highlightSelection('#walk-styles', selectedWalk, 'id');
-    resetCatwalk();
-  });
-  highlightSelection('#walk-styles', selectedWalk, 'id');
+  buildWalkPickerIn('walk-styles', resetCatwalk);
 }
 
 function buildCrowd() {
@@ -3340,8 +3390,7 @@ function poseFrame(walk, u, t, finalK) {
   const bt = BODY_TYPES.find((b) => b.id === state.bodyType);
   const walking = finalK < 1;
   const phase = t * walk.cycle * Math.PI * 2;
-  const s = walking ? Math.sin(phase) * (1 - finalK) : 0;
-  const bob = Math.abs(Math.sin(phase)) * walk.bob * (1 - finalK);
+  const bob = Math.abs(Math.sin(phase)) * walk.bob * (1 - finalK) * (walking ? 1 : 0);
   const sway = Math.sin(phase) * walk.sway * (1 - finalK) + (walk.id === 'diva' ? finalK * 4 : 0) + (walk.id === 'slay' ? finalK * -3 : 0);
   const scale = 0.42 + 0.58 * u;
   const bottom = lerp(58, 3, u);
@@ -3350,20 +3399,57 @@ function poseFrame(walk, u, t, finalK) {
   const spin = walk.spin ? lerp(Math.cos(t * Math.PI * 1.2), 1, finalK) : 1;
   cwModel.style.transform = `translateX(-50%) translateY(${(-bob * scale).toFixed(1)}px) scale(${scale.toFixed(3)}) scaleX(${spin.toFixed(3)}) rotate(${sway.toFixed(2)}deg)`;
 
-  const liftL = Math.max(0, s) * walk.lift;
-  const liftR = Math.max(0, -s) * walk.lift;
-  cwModel.querySelectorAll('.pl-left').forEach((g) => g.setAttribute('transform', `translate(0,${(-liftL).toFixed(1)})`));
-  cwModel.querySelectorAll('.pl-right').forEach((g) => g.setAttribute('transform', `translate(0,${(-liftR).toFixed(1)})`));
+  poseLimbs(cwModel, walk, t, finalK, true);
+}
 
+// The step swing (-1..1) of a walk at time t. Robot walks snap between steps.
+function walkSwing(walk, t) {
+  const v = Math.sin(t * walk.cycle * Math.PI * 2);
+  return walk.robot ? Math.sign(v) : v;
+}
+
+// Poses the arms and legs of a posed doll (inside root) for a walk at time t.
+// finalK blends toward the walk's final pose; active=false holds a standing pose.
+function poseLimbs(root, walk, t, finalK, active) {
+  const svg = root.querySelector('svg');
+  if (!svg || !svg.querySelector('.posed-arms')) return;
+  const bt = BODY_TYPES.find((b) => b.id === state.bodyType);
+  const s = active ? walkSwing(walk, t) * (1 - finalK) : 0;
+  const liftL = (walk.bothLegs ? Math.abs(s) : Math.max(0, s)) * walk.lift;
+  const liftR = (walk.bothLegs ? Math.abs(s) : Math.max(0, -s)) * walk.lift;
+  root.querySelectorAll('.pl-left').forEach((g) => g.setAttribute('transform', `translate(0,${(-liftL).toFixed(1)})`));
+  root.querySelectorAll('.pl-right').forEach((g) => g.setAttribute('transform', `translate(0,${(-liftR).toFixed(1)})`));
   const walkK = walkArmKinds(walk.walkArms);
   const finK = walkArmKinds(walk.finalArms);
-  const svg = cwModel.querySelector('svg');
   ['L', 'R'].forEach((side) => {
     const a = armPose(walkK[side], side, bt, s, t, walk.swing);
     const b = armPose(finK[side], side, bt, 0, t, 0);
     const shoulder = side === 'L' ? [125, 168] : [175, 168];
     setArm(svg, side, shoulder, lerpPt(a.e, b.e, finalK), lerpPt(a.h, b.h, finalK), bt);
   });
+}
+
+function currentWalk() {
+  const w = WALK_STYLES.find((x) => x.id === selectedWalk);
+  return w && isOwned(w) ? w : WALK_STYLES[0];
+}
+
+// Walk pickers appear in both shows; locked walks show their price and open the shop.
+function buildWalkPickerIn(containerId, onChange) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  buildOptionButtons(el, WALK_STYLES, (id) => {
+    selectedWalk = id;
+    try { localStorage.setItem('runwayReady.walk', id); } catch (e) {}
+    refreshWalkPickers();
+    if (onChange) onChange();
+  });
+  highlightSelection(`#${containerId}`, selectedWalk, 'id');
+}
+
+function refreshWalkPickers() {
+  if (!catwalkOverlay.hidden) buildWalkPickerIn('walk-styles', resetCatwalk);
+  if (!gameOverlay.hidden) buildWalkPickerIn('game-walk-styles', updateGameWalkBadge);
 }
 
 function spawnCwFlash() {
@@ -3383,7 +3469,7 @@ function resetCatwalk() {
   cwFlashes.innerHTML = '';
   cwResult.hidden = true;
   cwWalkBtn.disabled = false;
-  const walk = WALK_STYLES.find((w) => w.id === selectedWalk);
+  const walk = currentWalk();
   cwCaption.textContent = `${walk.emoji} ${walk.label}`;
   const bgDef = BACKGROUNDS.find((b) => b.id === state.background);
   document.getElementById('cw-backdrop').style.background = bgDef.gradient;
@@ -3394,7 +3480,7 @@ function resetCatwalk() {
 function catwalkLoop(ts) {
   if (!cwStart) cwStart = ts;
   const t = (ts - cwStart) / 1000;
-  const walk = WALK_STYLES.find((w) => w.id === selectedWalk);
+  const walk = currentWalk();
   const u = Math.min(1, t / walk.duration);
   const ease = u < 1 ? u * (2 - u) * 0.15 + u * 0.85 : 1;
   const finalK = Math.min(1, Math.max(0, (t - walk.duration) / 0.45));
@@ -3535,6 +3621,12 @@ let jumpV = 0;
 let starsCollected = 0;
 let rafId = null;
 let lastTs = 0;
+let gameWalkT = 0;
+
+function updateGameWalkBadge() {
+  const walk = currentWalk();
+  document.getElementById('game-walk-badge').textContent = `${walk.emoji} ${walk.label}`;
+}
 
 function buildStars() {
   gameWorld.querySelectorAll('.game-star').forEach((s) => s.remove());
@@ -3585,7 +3677,9 @@ function resetGameState() {
   gameWorld.querySelectorAll('.game-character, .game-mount, .game-companion').forEach((c) => c.remove());
   gameCharacterEl = document.createElement('div');
   gameCharacterEl.className = 'game-character' + (gameMode === 'ride' ? ' riding' : '') + (gameMode === 'fly' ? ' flying' : '') + (gameMode === 'swim' ? ' swimming' : '');
-  gameCharacterEl.innerHTML = `<svg viewBox="0 -10 300 480" preserveAspectRatio="xMidYMax meet">${buildDollSVG(state, 'game')}</svg>`;
+  gameCharacterEl.innerHTML = `<svg viewBox="0 -10 300 480" preserveAspectRatio="xMidYMax meet">${buildDollSVG(state, 'game', { posed: true })}</svg>`;
+  gameWalkT = 0;
+  poseLimbs(gameCharacterEl, currentWalk(), 0, 0, false);
   gameWorld.appendChild(gameCharacterEl);
 
   mountEl = null;
@@ -3672,6 +3766,9 @@ function gameLoop(ts) {
     gameCharacterEl.style.top = `${GROUND_Y - CHAR_H - elevation}px`;
   }
   gameCharacterEl.classList.toggle('moving', vx !== 0);
+  // Walk with the chosen walk style: arms and steps animate while moving.
+  if (vx !== 0) gameWalkT += dt;
+  poseLimbs(gameCharacterEl, currentWalk(), gameWalkT, 0, vx !== 0 && elevation === 0);
 
   if (companionEl) {
     const compLeft = Math.max(0, charX - COMPANION_LAG);
@@ -3770,6 +3867,8 @@ function onGameKeyUp(e) {
 function openGame() {
   resetGameState();
   gameOverlay.hidden = false;
+  buildWalkPickerIn('game-walk-styles', updateGameWalkBadge);
+  updateGameWalkBadge();
   document.addEventListener('keydown', onGameKeyDown);
   document.addEventListener('keyup', onGameKeyUp);
   rafId = requestAnimationFrame(gameLoop);

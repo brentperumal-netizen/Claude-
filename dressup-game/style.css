@@ -1228,3 +1228,17 @@ body {
   100% { fill: #ff6fb0; }
 }
 @media (prefers-reduced-motion: reduce) { .light-sole { animation: none; } }
+
+/* ---------- Walk pickers & shop stacking ---------- */
+#shop-overlay { z-index: 110; }
+.walk-picker { gap: 6px; }
+.walk-picker .option-btn {
+  min-width: 0;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  border-radius: 999px;
+}
+.walk-picker .option-btn .emoji { display: inline; font-size: 1rem; margin: 0 4px 0 0; }
+.walk-picker .lock-badge { display: inline; margin: 0 0 0 4px; }
+.game-walk-badge { background: linear-gradient(135deg, #8c5ce0, #5cc4e0); }
+#game-walk-styles { margin-bottom: 10px; }
