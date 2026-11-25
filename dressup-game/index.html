@@ -132,6 +132,7 @@
               <rect x="-2.4" y="5" width="3.2" height="11" rx="1.6"></rect>
               <rect x="1.2" y="5" width="3.2" height="10" rx="1.6"></rect>
               <rect x="5.2" y="5" width="2.8" height="7.5" rx="1.4"></rect>
+              <g id="nails-left"></g>
             </g>
             <g id="hand-right" transform="translate(207,272)" stroke="rgba(40,28,20,0.28)" stroke-width="1.2">
               <ellipse cx="-7" cy="-4" rx="4.4" ry="3" transform="rotate(-35 -7 -4)"></ellipse>
@@ -140,6 +141,7 @@
               <rect x="-0.8" y="5" width="3.2" height="11" rx="1.6"></rect>
               <rect x="-4.4" y="5" width="3.2" height="10" rx="1.6"></rect>
               <rect x="-8" y="5" width="2.8" height="7.5" rx="1.4"></rect>
+              <g id="nails-right"></g>
             </g>
             <g id="hand-left-detail" transform="translate(93,272)" opacity="0.3">
               <line x1="-3.4" y1="6" x2="-3.4" y2="13" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"></line>
@@ -261,6 +263,7 @@
         <button id="minigames-btn" class="btn btn-ghost">🎮 Mini Games</button>
         <button id="hair-salon-btn" class="btn btn-ghost">💇 Hair Salon</button>
         <button id="salon-btn" class="btn btn-ghost">💄 Makeup Salon</button>
+        <button id="nail-salon-btn" class="btn btn-ghost">💅 Nail Salon</button>
         <button id="show-btn" class="btn btn-primary">🎬 Runway Run</button>
         <button id="catwalk-btn" class="btn btn-primary">💃 Catwalk Show</button>
       </div>
@@ -317,6 +320,38 @@
     </div>
     <p class="modal-subtitle">Pick a complete look and try it on all at once.</p>
     <div class="wardrobe-grid" id="wardrobe-grid"></div>
+  </div>
+</div>
+
+<!-- NAIL SALON MODAL -->
+<div class="modal-overlay" id="nail-salon-overlay" hidden>
+  <div class="modal salon-modal" role="dialog" aria-modal="true" aria-labelledby="ns-title">
+    <div class="modal-header">
+      <h2 id="ns-title">💅 Nail Salon</h2>
+      <button class="modal-close" id="ns-close" aria-label="Close nail salon">✕</button>
+    </div>
+    <p class="modal-subtitle" id="nail-hint"></p>
+    <div class="salon-layout">
+      <div class="salon-mirror-wrap">
+        <div class="nail-hand" id="nail-hand"></div>
+        <div class="salon-mirror-actions">
+          <button class="btn btn-ghost" id="ns-topcoat">✨ Top Coat</button>
+          <button class="btn btn-ghost" id="ns-clear">🗑️ Remove All</button>
+          <button class="btn btn-primary" id="ns-done">✅ Done</button>
+        </div>
+      </div>
+      <div class="salon-tools">
+        <h3>Tool</h3><div class="option-row walk-picker" id="nail-tools"></div>
+        <div id="nail-color-row">
+          <h3>Polish</h3><div class="swatch-row" id="nail-colors"></div>
+          <div class="option-row walk-picker nail-extras" id="nail-glitter"></div>
+          <button class="btn btn-ghost nail-all" id="ns-all">💅 Paint All Nails</button>
+        </div>
+        <div id="nail-sticker-row" hidden>
+          <h3>Stickers</h3><div class="option-row walk-picker" id="nail-stickers"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

@@ -2700,6 +2700,9 @@ const state = {
   accessories: Object.fromEntries(ACCESSORIES.map((a) => [a.id, false])),
   pet: { species: 'none', color: '#c68642', accessory: 'none' },
   background: 'pink',
+  nails: [null, null, null, null, null],
+  nailArt: [[], [], [], [], []],
+  nailTopCoat: false,
 };
 
 // ---------- Helpers ----------
@@ -3026,6 +3029,10 @@ function render() {
       layer.style.display = 'none';
     }
   });
+
+  // painted nails on the main stage hands
+  document.getElementById('nails-left').innerHTML = dollNailsSVG('L', state.nails);
+  document.getElementById('nails-right').innerHTML = dollNailsSVG('R', state.nails);
 
   // pet
   const petDisplay = document.getElementById('pet-display');
@@ -3571,6 +3578,7 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
         <rect x="-2.4" y="5" width="3.2" height="11" rx="1.6"/>
         <rect x="1.2" y="5" width="3.2" height="10" rx="1.6"/>
         <rect x="5.2" y="5" width="2.8" height="7.5" rx="1.4"/>
+        ${dollNailsSVG('L', look.nails)}
       </g>
       <g transform="translate(${rxHand},272)" stroke="rgba(40,28,20,0.28)" stroke-width="1.2">
         <ellipse cx="-7" cy="-4" rx="4.4" ry="3" transform="rotate(-35 -7 -4)"/>
@@ -3579,6 +3587,7 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
         <rect x="-0.8" y="5" width="3.2" height="11" rx="1.6"/>
         <rect x="-4.4" y="5" width="3.2" height="10" rx="1.6"/>
         <rect x="-8" y="5" width="2.8" height="7.5" rx="1.4"/>
+        ${dollNailsSVG('R', look.nails)}
       </g>
       <g transform="translate(${lx},272)" opacity="0.3">
         <line x1="-3.4" y1="6" x2="-3.4" y2="13" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"/>
@@ -3619,7 +3628,7 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
       <g class="pl-right"><g clip-path="url(#shoeClipR${idSuffix})" fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g></g>`
       : `<g fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g>`}
     <g fill="${outfitFill}">${typeof outfitDef.svg === 'function' ? outfitDef.svg(bt) : outfitDef.svg}</g>
-    ${posed ? posedArmsSVG(skinGrad) : ''}
+    ${posed ? posedArmsSVG(skinGrad, look.nails) : ''}
     ${accSvg}
   `;
 }
@@ -3684,6 +3693,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !mgOverlay.hidden) closeMiniGames();
   if (e.key === 'Escape' && !salonOverlay.hidden) closeSalon();
   if (e.key === 'Escape' && !hairSalonOverlay.hidden) closeHairSalon();
+  if (e.key === 'Escape' && !nailSalonOverlay.hidden) closeNailSalon();
   if (e.key === 'Escape' && !catwalkOverlay.hidden) closeCatwalk();
 });
 
@@ -3923,6 +3933,237 @@ document.getElementById('passes-btn').addEventListener('click', openPasses);
 document.getElementById('passes-close').addEventListener('click', closePasses);
 passesOverlay.addEventListener('click', (e) => {
   if (e.target === passesOverlay) closePasses();
+});
+
+// ---------- Nail Salon ----------
+// A big hand you paint yourself: pick a polish, then rub your finger over a nail.
+// Every dab is remembered, and each nail's latest colour shows on the model's fingertips.
+
+const nailSalonOverlay = document.getElementById('nail-salon-overlay');
+const nailHand = document.getElementById('nail-hand');
+
+const POLISH_COLORS = ['#e0245e', '#ff6fb0', '#ffb3d6', '#c0293b', '#ff9a5c', '#f2c94c', '#43b581', '#5cc4e0', '#5c7ce0', '#9b6be0', '#2b2b2b', '#ffffff'];
+const NAIL_STICKERS = [
+  { id: 'heart', label: 'Heart', emoji: '💗' },
+  { id: 'star', label: 'Star', emoji: '⭐' },
+  { id: 'flower', label: 'Flower', emoji: '🌸' },
+  { id: 'dot', label: 'Dots', emoji: '⚪' },
+  { id: 'gem', label: 'Gem', emoji: '💎' },
+];
+const NAIL_ART_LIMIT = 500;
+
+// Finger geometry in the big hand's 300x340 space; nail i sits at the fingertip.
+const NAIL_FINGERS = [
+  { x1: 92, y1: 236, x2: 44, y2: 156, r: 19 },   // thumb
+  { x1: 112, y1: 190, x2: 108, y2: 62, r: 18 },  // index
+  { x1: 152, y1: 190, x2: 152, y2: 42, r: 19 },  // middle
+  { x1: 192, y1: 190, x2: 196, y2: 58, r: 18 },  // ring
+  { x1: 228, y1: 196, x2: 238, y2: 100, r: 15 }, // pinky
+];
+
+let nailTool = 'brush';
+let nailColor = POLISH_COLORS[0];
+let nailGlitter = false;
+let nailSticker = 'heart';
+let nailPainting = false;
+
+function nailGeom(i) {
+  const f = NAIL_FINGERS[i];
+  const ang = Math.atan2(f.y2 - f.y1, f.x2 - f.x1);
+  const len = f.r * 1.15;
+  const cx = f.x2 - Math.cos(ang) * (f.r * 0.15);
+  const cy = f.y2 - Math.sin(ang) * (f.r * 0.15);
+  return { cx, cy, rx: f.r * 0.72, ry: len, rot: ang * 180 / Math.PI + 90 };
+}
+
+function insideNail(i, x, y) {
+  const g = nailGeom(i);
+  const a = -g.rot * Math.PI / 180;
+  const dx = x - g.cx, dy = y - g.cy;
+  const lx = dx * Math.cos(a) - dy * Math.sin(a);
+  const ly = dx * Math.sin(a) + dy * Math.cos(a);
+  return (lx * lx) / (g.rx * g.rx) + (ly * ly) / (g.ry * g.ry) <= 1.15;
+}
+
+function stickerSVG(type, x, y) {
+  if (type === 'heart') return `<path d="M${x},${y + 4} C${x - 6},${y} ${x - 5},${y - 4} ${x - 2},${y - 3.6} C${x - 1},${y - 3.4} ${x},${y - 2.4} ${x},${y - 1.6} C${x},${y - 2.4} ${x + 1},${y - 3.4} ${x + 2},${y - 3.6} C${x + 5},${y - 4} ${x + 6},${y} ${x},${y + 4} Z" fill="#ff3b7a" stroke="#ffffff" stroke-width="0.8"/>`;
+  if (type === 'star') return `<path d="M${x},${y - 5} L${x + 1.5},${y - 1.6} L${x + 5},${y - 1.4} L${x + 2.3},${y + 1} L${x + 3.1},${y + 4.6} L${x},${y + 2.6} L${x - 3.1},${y + 4.6} L${x - 2.3},${y + 1} L${x - 5},${y - 1.4} L${x - 1.5},${y - 1.6} Z" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.6"/>`;
+  if (type === 'flower') return `<g>${[0, 72, 144, 216, 288].map((a) => `<circle cx="${(x + Math.cos(a * Math.PI / 180) * 3).toFixed(1)}" cy="${(y + Math.sin(a * Math.PI / 180) * 3).toFixed(1)}" r="2.4" fill="#ffffff"/>`).join('')}<circle cx="${x}" cy="${y}" r="1.8" fill="#f2c94c"/></g>`;
+  if (type === 'dot') return `<circle cx="${x}" cy="${y}" r="2.6" fill="#ffffff"/>`;
+  if (type === 'gem') return `<path d="M${x},${y - 4} L${x + 3.4},${y} L${x},${y + 4} L${x - 3.4},${y} Z" fill="#bfe9ff" stroke="#ffffff" stroke-width="0.8"/>`;
+  return '';
+}
+
+function dabSVG(d) {
+  if (d.k === 'sticker') return stickerSVG(d.s, d.x, d.y);
+  let out = `<circle cx="${d.x}" cy="${d.y}" r="7.5" fill="${d.c}"/>`;
+  if (d.g) {
+    out += `<circle cx="${d.x - 3}" cy="${d.y - 2}" r="1" fill="#ffffff" opacity="0.9"/><circle cx="${d.x + 2.5}" cy="${d.y + 2}" r="0.8" fill="#fff7d6" opacity="0.9"/><circle cx="${d.x + 1}" cy="${d.y - 4}" r="0.7" fill="#ffffff" opacity="0.8"/>`;
+  }
+  return out;
+}
+
+function drawNailHand() {
+  const skin = state.skin;
+  const dark = darken(skin, 0.25);
+  const fingers = NAIL_FINGERS.map((f) => `<path d="${capsulePath(f.x1, f.y1, f.r, f.x2, f.y2, f.r * 0.92)}" fill="${skin}" stroke="${dark}" stroke-width="2"/>`).join('');
+  const clips = NAIL_FINGERS.map((_, i) => {
+    const g = nailGeom(i);
+    return `<clipPath id="nail-clip-${i}"><ellipse cx="${g.cx}" cy="${g.cy}" rx="${g.rx}" ry="${g.ry}" transform="rotate(${g.rot} ${g.cx} ${g.cy})"/></clipPath>`;
+  }).join('');
+  const nails = NAIL_FINGERS.map((_, i) => {
+    const g = nailGeom(i);
+    const shine = state.nailTopCoat
+      ? `<ellipse cx="${g.cx}" cy="${g.cy}" rx="${g.rx * 0.28}" ry="${g.ry * 0.6}" transform="rotate(${g.rot} ${g.cx} ${g.cy}) translate(${-g.rx * 0.35},${-g.ry * 0.1})" fill="#ffffff" opacity="0.55"/>`
+      : '';
+    return `<g class="nail" data-nail="${i}">
+        <ellipse cx="${g.cx}" cy="${g.cy}" rx="${g.rx}" ry="${g.ry}" transform="rotate(${g.rot} ${g.cx} ${g.cy})" fill="#f7ddd5" stroke="#e3b9ab" stroke-width="1.5"/>
+        <g clip-path="url(#nail-clip-${i})" class="nail-paint" id="nail-paint-${i}">${(state.nailArt[i] || []).map(dabSVG).join('')}</g>
+        ${shine}
+        <ellipse cx="${g.cx}" cy="${g.cy}" rx="${g.rx}" ry="${g.ry}" transform="rotate(${g.rot} ${g.cx} ${g.cy})" fill="none" stroke="#d9a99a" stroke-width="1.2" opacity="0.8"/>
+      </g>`;
+  }).join('');
+  nailHand.innerHTML = `<svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg" id="nail-hand-svg">
+      <defs>${clips}</defs>
+      <ellipse cx="160" cy="330" rx="120" ry="14" fill="#000000" opacity="0.08"/>
+      ${fingers}
+      <path d="M78,340 L76,214 Q78,184 112,178 L240,180 Q250,186 250,212 L248,340 Z" fill="${skin}"/>
+      <path d="M78,340 L76,214 Q78,190 96,182 M250,206 Q250,220 249,240 L248,340" fill="none" stroke="${dark}" stroke-width="2"/>
+      <path d="M126,196 Q132,200 138,196 M166,194 Q172,198 178,194 M204,196 Q210,200 216,196" fill="none" stroke="${dark}" stroke-width="1.4" opacity="0.5"/>
+      ${nails}
+    </svg>`;
+}
+
+function svgPoint(evt) {
+  const svg = document.getElementById('nail-hand-svg');
+  const pt = svg.createSVGPoint();
+  pt.x = evt.clientX;
+  pt.y = evt.clientY;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+function nailAt(x, y) {
+  for (let i = 0; i < NAIL_FINGERS.length; i++) if (insideNail(i, x, y)) return i;
+  return -1;
+}
+
+function addDab(i, dab) {
+  const art = state.nailArt[i];
+  art.push(dab);
+  if (art.length > NAIL_ART_LIMIT) art.splice(0, art.length - NAIL_ART_LIMIT);
+  const g = document.getElementById(`nail-paint-${i}`);
+  if (g) g.insertAdjacentHTML('beforeend', dabSVG(dab));
+  if (dab.k !== 'sticker') state.nails[i] = dab.c;
+}
+
+function nailAction(evt, first) {
+  const { x, y } = svgPoint(evt);
+  const i = nailAt(x, y);
+  if (i < 0) return;
+  const rx = Math.round(x * 10) / 10, ry = Math.round(y * 10) / 10;
+  if (nailTool === 'brush') {
+    addDab(i, { k: 'paint', x: rx, y: ry, c: nailColor, g: nailGlitter });
+  } else if (nailTool === 'sticker' && first) {
+    addDab(i, { k: 'sticker', x: rx, y: ry, s: nailSticker });
+  } else if (nailTool === 'remover' && first) {
+    state.nailArt[i] = [];
+    state.nails[i] = null;
+    drawNailHand();
+  }
+}
+
+nailHand.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  nailPainting = true;
+  try { nailHand.setPointerCapture(e.pointerId); } catch (err) {}
+  nailAction(e, true);
+});
+nailHand.addEventListener('pointermove', (e) => {
+  if (!nailPainting) return;
+  e.preventDefault();
+  nailAction(e, false);
+});
+['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => nailHand.addEventListener(ev, () => { nailPainting = false; render(); }));
+nailHand.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+nailHand.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+nailHand.addEventListener('contextmenu', (e) => e.preventDefault());
+
+function setNailTool(tool) {
+  nailTool = tool;
+  highlightSelection('#nail-tools', nailTool, 'id');
+  document.getElementById('nail-sticker-row').hidden = tool !== 'sticker';
+  document.getElementById('nail-color-row').hidden = tool !== 'brush';
+  document.getElementById('nail-hint').textContent = {
+    brush: '🖌️ Rub your finger across a nail to paint it.',
+    sticker: '⭐ Tap a nail to add a sticker.',
+    remover: '🧽 Tap a nail to wipe it clean.',
+  }[tool];
+}
+
+function buildNailSalon() {
+  buildOptionButtons(document.getElementById('nail-tools'), [
+    { id: 'brush', label: 'Brush', emoji: '🖌️' },
+    { id: 'sticker', label: 'Stickers', emoji: '⭐' },
+    { id: 'remover', label: 'Remover', emoji: '🧽' },
+  ], setNailTool);
+  buildSwatches(document.getElementById('nail-colors'), POLISH_COLORS, (c) => { nailColor = c; highlightSelection('#nail-colors', nailColor, 'color'); });
+  buildOptionButtons(document.getElementById('nail-glitter'), [{ id: 'glitter', label: 'Glitter Polish', emoji: '✨' }], () => {
+    nailGlitter = !nailGlitter;
+    document.querySelector('#nail-glitter .option-btn').classList.toggle('selected', nailGlitter);
+  });
+  buildOptionButtons(document.getElementById('nail-stickers'), NAIL_STICKERS, (id) => { nailSticker = id; highlightSelection('#nail-stickers', nailSticker, 'id'); });
+  highlightSelection('#nail-colors', nailColor, 'color');
+  highlightSelection('#nail-stickers', nailSticker, 'id');
+  document.querySelector('#nail-glitter .option-btn').classList.toggle('selected', nailGlitter);
+  setNailTool(nailTool);
+}
+
+function paintAllNails() {
+  NAIL_FINGERS.forEach((_, i) => {
+    const g = nailGeom(i);
+    state.nailArt[i] = [];
+    const a = g.rot * Math.PI / 180;
+    for (let k = -2; k <= 2; k++) for (let j = -1; j <= 1; j++) {
+      const lx = j * g.rx * 0.6, ly = k * g.ry * 0.42;
+      const x = g.cx + lx * Math.cos(a) - ly * Math.sin(a);
+      const y = g.cy + lx * Math.sin(a) + ly * Math.cos(a);
+      state.nailArt[i].push({ k: 'paint', x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10, c: nailColor, g: nailGlitter });
+    }
+    state.nails[i] = nailColor;
+  });
+  drawNailHand();
+  render();
+}
+
+function removeAllNails() {
+  state.nailArt = [[], [], [], [], []];
+  state.nails = [null, null, null, null, null];
+  state.nailTopCoat = false;
+  drawNailHand();
+  render();
+}
+
+function openNailSalon() {
+  if (!Array.isArray(state.nailArt) || state.nailArt.length !== 5) state.nailArt = [[], [], [], [], []];
+  if (!Array.isArray(state.nails) || state.nails.length !== 5) state.nails = [null, null, null, null, null];
+  buildNailSalon();
+  drawNailHand();
+  nailSalonOverlay.hidden = false;
+}
+
+function closeNailSalon() {
+  nailSalonOverlay.hidden = true;
+  render();
+}
+
+document.getElementById('nail-salon-btn').addEventListener('click', openNailSalon);
+document.getElementById('ns-close').addEventListener('click', closeNailSalon);
+document.getElementById('ns-done').addEventListener('click', closeNailSalon);
+document.getElementById('ns-all').addEventListener('click', paintAllNails);
+document.getElementById('ns-clear').addEventListener('click', removeAllNails);
+document.getElementById('ns-topcoat').addEventListener('click', () => { state.nailTopCoat = !state.nailTopCoat; drawNailHand(); });
+nailSalonOverlay.addEventListener('click', (e) => {
+  if (e.target === nailSalonOverlay) closeNailSalon();
 });
 
 // ---------- Hair Salon ----------
@@ -4393,6 +4634,17 @@ mgOverlay.addEventListener('click', (e) => {
 // A second show mode: pick a walk, and the model struts toward the camera down a
 // catwalk with arms, steps and sway animated per frame, then strikes a final pose.
 
+// Painted nail tips on the small doll hands (fingers 1-4; the thumb is hidden).
+const DOLL_NAIL_SPOTS = { L: [[-4.8, 12.4], [-0.8, 14.4], [2.8, 13.4], [6.6, 10.9]], R: [[4.8, 12.4], [0.8, 14.4], [-2.8, 13.4], [-6.6, 10.9]] };
+
+function dollNailsSVG(side, nails) {
+  if (!nails) return '';
+  return DOLL_NAIL_SPOTS[side].map(([x, y], i) => {
+    const c = nails[i + 1];
+    return c ? `<ellipse class="doll-nail" cx="${x}" cy="${y}" rx="1.35" ry="1.8" fill="${c}" stroke="none"/>` : '';
+  }).join('');
+}
+
 const HAND_SHAPES = {
   L: `<ellipse cx="7" cy="-4" rx="4.4" ry="3" transform="rotate(35 7 -4)"/>
       <ellipse cx="0" cy="-1" rx="9" ry="9"/>
@@ -4408,13 +4660,13 @@ const HAND_SHAPES = {
       <rect x="-8" y="5" width="2.8" height="7.5" rx="1.4"/>`,
 };
 
-function posedArmsSVG(skinGrad) {
+function posedArmsSVG(skinGrad, nails) {
   const side = (k) => `
     <path class="pa-${k}-uo" fill="rgba(40,28,20,0.28)"/>
     <path class="pa-${k}-fo" fill="rgba(40,28,20,0.28)"/>
     <path class="pa-${k}-u"/>
     <path class="pa-${k}-f"/>
-    <g class="pa-${k}-hand" stroke="rgba(40,28,20,0.28)" stroke-width="1.2">${HAND_SHAPES[k]}</g>`;
+    <g class="pa-${k}-hand" stroke="rgba(40,28,20,0.28)" stroke-width="1.2">${HAND_SHAPES[k]}${dollNailsSVG(k, nails)}</g>`;
   return `<g class="posed-arms" fill="url(#${skinGrad})">${side('L')}${side('R')}</g>`;
 }
 
