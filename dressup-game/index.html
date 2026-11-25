@@ -207,7 +207,8 @@
         <button id="randomize-btn" class="btn btn-ghost">🎲 Surprise Me</button>
         <button id="wardrobe-btn" class="btn btn-ghost">👗 Wardrobe</button>
         <button id="shop-btn" class="btn btn-ghost">🛍️ Shop</button>
-        <button id="show-btn" class="btn btn-primary">🎬 Start Fashion Show</button>
+        <button id="show-btn" class="btn btn-primary">🎬 Runway Run</button>
+        <button id="catwalk-btn" class="btn btn-primary">💃 Catwalk Show</button>
       </div>
     </section>
 
@@ -276,6 +277,37 @@
     <p class="modal-subtitle">Spend your cash on gowns, flowers and more for the Met Gala. Earn cash on the runway: every star is $5, finishing is $10, and grabbing all 8 stars adds a $20 bonus.</p>
     <p class="shop-toast" id="shop-toast" hidden></p>
     <div class="wardrobe-grid" id="shop-grid"></div>
+  </div>
+</div>
+
+<!-- CATWALK SHOW MODAL -->
+<div class="modal-overlay" id="catwalk-overlay" hidden>
+  <div class="modal game-modal" role="dialog" aria-modal="true" aria-labelledby="cw-title">
+    <div class="modal-header">
+      <h2 id="cw-title">💃 Catwalk Show</h2>
+      <button class="modal-close" id="cw-close" aria-label="Close catwalk show">✕</button>
+    </div>
+    <p class="modal-subtitle">Pick a walk, then strut down the catwalk for the judges. Every show earns $15.</p>
+    <div class="option-row walk-picker" id="walk-styles"></div>
+    <div class="cw-stage" id="cw-stage">
+      <div class="cw-backdrop" id="cw-backdrop"></div>
+      <div class="cw-runway"></div>
+      <div class="cw-crowd" id="cw-crowd"></div>
+      <div class="cw-flashes" id="cw-flashes"></div>
+      <div class="cw-model" id="cw-model"></div>
+      <div class="cw-caption" id="cw-caption"></div>
+      <div class="game-result" id="cw-result" hidden>
+        <div class="score" id="cw-score"></div>
+        <p class="comment" id="cw-comment"></p>
+        <p class="stars-summary" id="cw-cash"></p>
+        <div class="game-result-actions">
+          <button class="btn btn-ghost" id="cw-again-btn">🔁 Walk Again</button>
+          <button class="btn btn-primary" id="cw-done-btn">✅ Done</button>
+        </div>
+        <div class="confetti-layer" id="cw-confetti"></div>
+      </div>
+    </div>
+    <div class="cw-actions"><button class="btn btn-primary" id="cw-walk-btn">💃 Walk!</button></div>
   </div>
 </div>
 

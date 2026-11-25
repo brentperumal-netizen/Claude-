@@ -1930,7 +1930,11 @@ function launchConfetti(layer) {
 
 // ---------- Wardrobe ----------
 
-function buildDollSVG(look, idSuffix = '') {
+// opts.posed: draw the arms as bendable two-part limbs (on top of the outfit, so
+// hands can rest on hips) and split each leg + shoe into its own group, so the
+// Catwalk Show can animate arms and steps every frame.
+function buildDollSVG(look, idSuffix = '', opts = {}) {
+  const posed = !!opts.posed;
   const bt = BODY_TYPES.find((b) => b.id === look.bodyType);
   const hairDef = HAIR_STYLES.find((h) => h.id === look.hair.style);
   const outfitDef = OUTFIT_STYLES.find((o) => o.id === look.outfit.style);
@@ -1988,6 +1992,7 @@ function buildDollSVG(look, idSuffix = '') {
       </linearGradient>
     </defs>
     <g fill="url(#${skinGrad})">
+      ${posed ? '' : `
       <path d="${capsulePath(125, 168, rUpper + outlineGrow, lx, 272, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
       <path d="${capsulePath(175, 168, rUpper + outlineGrow, rxHand, 272, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
       <path d="${capsulePath(125, 168, rUpper, lx, 272, rLower)}"/>
@@ -2020,13 +2025,18 @@ function buildDollSVG(look, idSuffix = '') {
         <line x1="-0.4" y1="6" x2="-0.4" y2="14" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"/>
         <line x1="-4.4" y1="6" x2="-4.4" y2="12" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"/>
       </g>
+      `}
       ${outfitDef.hidesLegs ? '' : `
+      <g class="pl-left">
       <path d="${capsulePath(133, 248, rUpper + outlineGrow, 127, 445, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
-      <path d="${capsulePath(167, 248, rUpper + outlineGrow, 173, 445, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
       <path d="${capsulePath(133, 248, rUpper, 127, 445, rLower)}"/>
-      <path d="${capsulePath(167, 248, rUpper, 173, 445, rLower)}"/>
       <line x1="133" y1="248" x2="127" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
+      </g>
+      <g class="pl-right">
+      <path d="${capsulePath(167, 248, rUpper + outlineGrow, 173, 445, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${capsulePath(167, 248, rUpper, 173, 445, rLower)}"/>
       <line x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
+      </g>
       `}
       <path d="${bodyTorsoPath(bt)}" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
       <rect x="137" y="132" width="26" height="26" rx="8" stroke="rgba(40,28,20,0.18)" stroke-width="1.5"/>
@@ -2037,8 +2047,14 @@ function buildDollSVG(look, idSuffix = '') {
     </g>
     <g fill="url(#${hairGrad})" stroke="${hairDark}">${hairDef.svg}</g>
     <g>${buildFaceSVG(face, look.hair.color)}</g>
-    ${outfitDef.hidesLegs ? '' : `<g fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g>`}
+    ${outfitDef.hidesLegs ? '' : posed ? `
+      <clipPath id="shoeClipL${idSuffix}"><rect x="0" y="0" width="150" height="520"/></clipPath>
+      <clipPath id="shoeClipR${idSuffix}"><rect x="150" y="0" width="150" height="520"/></clipPath>
+      <g class="pl-left"><g clip-path="url(#shoeClipL${idSuffix})" fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g></g>
+      <g class="pl-right"><g clip-path="url(#shoeClipR${idSuffix})" fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g></g>`
+      : `<g fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g>`}
     <g fill="${outfitFill}">${typeof outfitDef.svg === 'function' ? outfitDef.svg(bt) : outfitDef.svg}</g>
+    ${posed ? posedArmsSVG(skinGrad) : ''}
     ${accSvg}
   `;
 }
@@ -2099,6 +2115,7 @@ wardrobeOverlay.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !wardrobeOverlay.hidden) closeWardrobe();
   if (e.key === 'Escape' && !shopOverlay.hidden) closeShop();
+  if (e.key === 'Escape' && !catwalkOverlay.hidden) closeCatwalk();
 });
 
 // ---------- Met Gala Boutique (shop) ----------
@@ -2205,6 +2222,270 @@ document.getElementById('shop-btn').addEventListener('click', openShop);
 document.getElementById('shop-close').addEventListener('click', closeShop);
 shopOverlay.addEventListener('click', (e) => {
   if (e.target === shopOverlay) closeShop();
+});
+
+// ---------- Catwalk Show (walk styles) ----------
+// A second show mode: pick a walk, and the model struts toward the camera down a
+// catwalk with arms, steps and sway animated per frame, then strikes a final pose.
+
+const HAND_SHAPES = {
+  L: `<ellipse cx="7" cy="-4" rx="4.4" ry="3" transform="rotate(35 7 -4)"/>
+      <ellipse cx="0" cy="-1" rx="9" ry="9"/>
+      <rect x="-6.4" y="5" width="3.2" height="9" rx="1.6"/>
+      <rect x="-2.4" y="5" width="3.2" height="11" rx="1.6"/>
+      <rect x="1.2" y="5" width="3.2" height="10" rx="1.6"/>
+      <rect x="5.2" y="5" width="2.8" height="7.5" rx="1.4"/>`,
+  R: `<ellipse cx="-7" cy="-4" rx="4.4" ry="3" transform="rotate(-35 -7 -4)"/>
+      <ellipse cx="0" cy="-1" rx="9" ry="9"/>
+      <rect x="3.2" y="5" width="3.2" height="9" rx="1.6"/>
+      <rect x="-0.8" y="5" width="3.2" height="11" rx="1.6"/>
+      <rect x="-4.4" y="5" width="3.2" height="10" rx="1.6"/>
+      <rect x="-8" y="5" width="2.8" height="7.5" rx="1.4"/>`,
+};
+
+function posedArmsSVG(skinGrad) {
+  const side = (k) => `
+    <path class="pa-${k}-uo" fill="rgba(40,28,20,0.28)"/>
+    <path class="pa-${k}-fo" fill="rgba(40,28,20,0.28)"/>
+    <path class="pa-${k}-u"/>
+    <path class="pa-${k}-f"/>
+    <g class="pa-${k}-hand" stroke="rgba(40,28,20,0.28)" stroke-width="1.2">${HAND_SHAPES[k]}</g>`;
+  return `<g class="posed-arms" fill="url(#${skinGrad})">${side('L')}${side('R')}</g>`;
+}
+
+const WALK_STYLES = [
+  { id: 'slay', label: 'Slay Walk', emoji: '💅', duration: 5, cycle: 0.95, bob: 5, sway: 1.2, lift: 12, swing: 7,
+    walkArms: 'sides', finalArms: 'slay', comment: 'Strong steps, arms locked in. That walk SLAYED!' },
+  { id: 'diva', label: 'Diva Walk', emoji: '👑', duration: 6, cycle: 0.8, bob: 3, sway: 6, lift: 8, swing: 0,
+    walkArms: 'hips', finalArms: 'hips', comment: 'Hands on hips, hips on point. Total diva!' },
+  { id: 'strut', label: 'Model Strut', emoji: '🕶️', duration: 5, cycle: 0.9, bob: 4, sway: 3.5, lift: 10, swing: 7,
+    walkArms: 'oneHip', finalArms: 'model', comment: 'Effortless strut, and that final pose? Iconic.' },
+  { id: 'skip', label: 'Happy Skip', emoji: '🎈', duration: 4.5, cycle: 1.3, bob: 14, sway: 2, lift: 15, swing: 14,
+    walkArms: 'sides', finalArms: 'tada', comment: 'So much joy! The crowd is bouncing with you.' },
+  { id: 'wave', label: 'Royal Wave', emoji: '👋', duration: 5.5, cycle: 0.8, bob: 3, sway: 2, lift: 8, swing: 4,
+    walkArms: 'wave', finalArms: 'wave', comment: 'Graceful and regal. Everyone waved back!' },
+];
+
+const CATWALK_CASH = 15;
+
+// Arm poses in the 300x520 doll space. Each side: elbow e and hand h.
+// s is the step swing (-1..1), t is time in seconds (for waving).
+function armPose(kind, side, bt, s, t, swing) {
+  const dir = side === 'L' ? -1 : 1;
+  const mx = (x) => (side === 'L' ? x : 300 - x);
+  const spread = bt.armSpread;
+  const w = bt.waistHalf;
+  const swingY = s * swing * (side === 'L' ? 1 : -1);
+  if (kind === 'sides') {
+    return { e: [mx(112 - spread * 0.5), 220 + swingY * 0.3], h: [mx(93 - spread), 272 + swingY] };
+  }
+  if (kind === 'hips') {
+    return { e: [150 + dir * (w + 40), 200], h: [150 + dir * (w + 2), 214] };
+  }
+  if (kind === 'up') {
+    return { e: [150 + dir * 66, 142], h: [150 + dir * 46, 96] };
+  }
+  if (kind === 'v') {
+    return { e: [mx(98), 138], h: [mx(76), 98] };
+  }
+  if (kind === 'waving') {
+    return { e: [mx(88), 150], h: [mx(72) + Math.sin(t * 9) * 9, 100] };
+  }
+  return armPose('sides', side, bt, s, t, swing);
+}
+
+function walkArmKinds(kind) {
+  switch (kind) {
+    case 'hips': return { L: 'hips', R: 'hips' };
+    case 'oneHip': return { L: 'hips', R: 'sides' };
+    case 'wave': return { L: 'sides', R: 'waving' };
+    case 'slay': return { L: 'hips', R: 'sides' };
+    case 'model': return { L: 'hips', R: 'up' };
+    case 'tada': return { L: 'v', R: 'v' };
+    default: return { L: 'sides', R: 'sides' };
+  }
+}
+
+function lerp(a, b, k) { return a + (b - a) * k; }
+function lerpPt(p, q, k) { return [lerp(p[0], q[0], k), lerp(p[1], q[1], k)]; }
+
+function setArm(root, side, shoulder, elbow, hand, bt) {
+  const rU = bt.limbWidth / 2 * 1.15;
+  const rL = bt.limbWidth / 2 * 0.68;
+  const rE = (rU + rL) / 2;
+  const g = 2;
+  const q = (c) => root.querySelector(`.pa-${side}-${c}`);
+  q('uo').setAttribute('d', capsulePath(shoulder[0], shoulder[1], rU + g, elbow[0], elbow[1], rE + g));
+  q('fo').setAttribute('d', capsulePath(elbow[0], elbow[1], rE + g, hand[0], hand[1], rL + g));
+  q('u').setAttribute('d', capsulePath(shoulder[0], shoulder[1], rU, elbow[0], elbow[1], rE));
+  q('f').setAttribute('d', capsulePath(elbow[0], elbow[1], rE, hand[0], hand[1], rL));
+  const ang = Math.atan2(hand[1] - elbow[1], hand[0] - elbow[0]) * 180 / Math.PI - 90;
+  q('hand').setAttribute('transform', `translate(${hand[0].toFixed(1)},${hand[1].toFixed(1)}) rotate(${ang.toFixed(1)})`);
+}
+
+const catwalkOverlay = document.getElementById('catwalk-overlay');
+const cwStage = document.getElementById('cw-stage');
+const cwModel = document.getElementById('cw-model');
+const cwCaption = document.getElementById('cw-caption');
+const cwResult = document.getElementById('cw-result');
+const cwFlashes = document.getElementById('cw-flashes');
+const cwWalkBtn = document.getElementById('cw-walk-btn');
+
+let selectedWalk = 'slay';
+let cwRaf = null;
+let cwStart = 0;
+let cwFlashTimer = null;
+
+function buildWalkPicker() {
+  buildOptionButtons(document.getElementById('walk-styles'), WALK_STYLES, (id) => {
+    selectedWalk = id;
+    highlightSelection('#walk-styles', selectedWalk, 'id');
+    resetCatwalk();
+  });
+  highlightSelection('#walk-styles', selectedWalk, 'id');
+}
+
+function buildCrowd() {
+  const crowd = document.getElementById('cw-crowd');
+  if (crowd.childElementCount) return;
+  const colors = ['#3b2a5c', '#5a3a7a', '#2b2b4a', '#6a4a8a', '#463466'];
+  // Fans sit in rows on both sides, kept outside the catwalk's slanted edge.
+  let n = 0;
+  [44, 33, 22, 11, 1].forEach((bottom) => {
+    const y = 100 - bottom - 8;
+    const edge = 41 - 29 * Math.max(0, y - 52) / 48;
+    for (let x = 1 + (bottom % 2) * 2; x + 6 <= edge - 2; x += 6.5) {
+      [x, 100 - x - 5.5].forEach((left) => {
+        const head = document.createElement('span');
+        head.className = 'cw-fan';
+        head.style.left = `${left}%`;
+        head.style.bottom = `${bottom}%`;
+        head.style.background = colors[n++ % colors.length];
+        crowd.appendChild(head);
+      });
+    }
+  });
+}
+
+function mountCatwalkModel() {
+  cwModel.innerHTML = `<svg viewBox="0 -10 300 520" preserveAspectRatio="xMidYMax meet">${buildDollSVG(state, 'cw', { posed: true })}</svg>`;
+}
+
+function poseFrame(walk, u, t, finalK) {
+  const bt = BODY_TYPES.find((b) => b.id === state.bodyType);
+  const walking = finalK < 1;
+  const phase = t * walk.cycle * Math.PI * 2;
+  const s = walking ? Math.sin(phase) * (1 - finalK) : 0;
+  const bob = Math.abs(Math.sin(phase)) * walk.bob * (1 - finalK);
+  const sway = Math.sin(phase) * walk.sway * (1 - finalK) + (walk.id === 'diva' ? finalK * 4 : 0) + (walk.id === 'slay' ? finalK * -3 : 0);
+  const scale = 0.42 + 0.58 * u;
+  const bottom = lerp(58, 3, u);
+  cwModel.style.bottom = `${bottom}%`;
+  cwModel.style.transform = `translateX(-50%) translateY(${(-bob * scale).toFixed(1)}px) scale(${scale.toFixed(3)}) rotate(${sway.toFixed(2)}deg)`;
+
+  const liftL = Math.max(0, s) * walk.lift;
+  const liftR = Math.max(0, -s) * walk.lift;
+  cwModel.querySelectorAll('.pl-left').forEach((g) => g.setAttribute('transform', `translate(0,${(-liftL).toFixed(1)})`));
+  cwModel.querySelectorAll('.pl-right').forEach((g) => g.setAttribute('transform', `translate(0,${(-liftR).toFixed(1)})`));
+
+  const walkK = walkArmKinds(walk.walkArms);
+  const finK = walkArmKinds(walk.finalArms);
+  const svg = cwModel.querySelector('svg');
+  ['L', 'R'].forEach((side) => {
+    const a = armPose(walkK[side], side, bt, s, t, walk.swing);
+    const b = armPose(finK[side], side, bt, 0, t, 0);
+    const shoulder = side === 'L' ? [125, 168] : [175, 168];
+    setArm(svg, side, shoulder, lerpPt(a.e, b.e, finalK), lerpPt(a.h, b.h, finalK), bt);
+  });
+}
+
+function spawnCwFlash() {
+  const f = document.createElement('div');
+  f.className = 'ambient-flash';
+  f.style.left = `${Math.random() < 0.5 ? 4 + Math.random() * 22 : 74 + Math.random() * 22}%`;
+  f.style.top = `${40 + Math.random() * 45}%`;
+  cwFlashes.appendChild(f);
+  setTimeout(() => f.remove(), 700);
+}
+
+function resetCatwalk() {
+  if (cwRaf) cancelAnimationFrame(cwRaf);
+  cwRaf = null;
+  if (cwFlashTimer) clearInterval(cwFlashTimer);
+  cwFlashTimer = null;
+  cwFlashes.innerHTML = '';
+  cwResult.hidden = true;
+  cwWalkBtn.disabled = false;
+  const walk = WALK_STYLES.find((w) => w.id === selectedWalk);
+  cwCaption.textContent = `${walk.emoji} ${walk.label}`;
+  const bgDef = BACKGROUNDS.find((b) => b.id === state.background);
+  document.getElementById('cw-backdrop').style.background = bgDef.gradient;
+  mountCatwalkModel();
+  poseFrame(walk, 0, 0, 0);
+}
+
+function catwalkLoop(ts) {
+  if (!cwStart) cwStart = ts;
+  const t = (ts - cwStart) / 1000;
+  const walk = WALK_STYLES.find((w) => w.id === selectedWalk);
+  const u = Math.min(1, t / walk.duration);
+  const ease = u < 1 ? u * (2 - u) * 0.15 + u * 0.85 : 1;
+  const finalK = Math.min(1, Math.max(0, (t - walk.duration) / 0.45));
+  poseFrame(walk, ease, t, finalK);
+  if (t > walk.duration + 1.8) {
+    finishCatwalk(walk);
+    return;
+  }
+  cwRaf = requestAnimationFrame(catwalkLoop);
+}
+
+function finishCatwalk(walk) {
+  cwRaf = null;
+  if (cwFlashTimer) clearInterval(cwFlashTimer);
+  cwFlashTimer = null;
+  const score = Math.min(10, 8.4 + Math.random() * 1.6);
+  cash += CATWALK_CASH;
+  saveShop();
+  renderCash();
+  document.getElementById('cw-score').textContent = `${score.toFixed(1)} / 10`;
+  document.getElementById('cw-comment').textContent = walk.comment;
+  document.getElementById('cw-cash').textContent = `💵 +$${CATWALK_CASH} (now $${cash})`;
+  cwResult.hidden = false;
+  const confetti = document.getElementById('cw-confetti');
+  confetti.innerHTML = '';
+  if (score >= 9.3) launchConfetti(confetti);
+}
+
+function startCatwalk() {
+  resetCatwalk();
+  cwWalkBtn.disabled = true;
+  cwStart = 0;
+  cwFlashTimer = setInterval(() => { if (Math.random() < 0.6) spawnCwFlash(); }, 260);
+  cwRaf = requestAnimationFrame(catwalkLoop);
+}
+
+function openCatwalk() {
+  buildWalkPicker();
+  buildCrowd();
+  catwalkOverlay.hidden = false;
+  resetCatwalk();
+}
+
+function closeCatwalk() {
+  catwalkOverlay.hidden = true;
+  if (cwRaf) cancelAnimationFrame(cwRaf);
+  cwRaf = null;
+  if (cwFlashTimer) clearInterval(cwFlashTimer);
+  cwFlashTimer = null;
+}
+
+document.getElementById('catwalk-btn').addEventListener('click', openCatwalk);
+document.getElementById('cw-close').addEventListener('click', closeCatwalk);
+document.getElementById('cw-done-btn').addEventListener('click', closeCatwalk);
+document.getElementById('cw-again-btn').addEventListener('click', startCatwalk);
+cwWalkBtn.addEventListener('click', startCatwalk);
+catwalkOverlay.addEventListener('click', (e) => {
+  if (e.target === catwalkOverlay) closeCatwalk();
 });
 
 // ---------- Runway Run (mini side-scroller) ----------

@@ -1030,3 +1030,96 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .hair-sway, .tail-fin, .seaweed { animation: none; }
 }
+
+/* ---------- Catwalk Show ---------- */
+
+.walk-picker { margin-bottom: 12px; }
+
+.cw-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3.4;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #2b2140;
+}
+
+.cw-backdrop {
+  position: absolute;
+  inset: 0 0 45% 0;
+}
+.cw-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 12, 36, 0) 40%, rgba(20, 12, 36, 0.55) 100%);
+}
+
+.cw-runway {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(41% 52%, 59% 52%, 88% 100%, 12% 100%);
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0) 100%),
+    linear-gradient(180deg, #ffd6ec 52%, #ffffff 100%);
+}
+
+.cw-stage::before {
+  content: '';
+  position: absolute;
+  inset: 55% 0 0 0;
+  background: linear-gradient(180deg, #3a2a55, #22182f);
+}
+
+.cw-crowd { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+
+.cw-fan {
+  position: absolute;
+  width: 5.5%;
+  aspect-ratio: 1 / 1.5;
+  border-radius: 50% 50% 20% 20%;
+  opacity: 0.95;
+}
+.cw-fan::before {
+  content: '';
+  position: absolute;
+  left: 20%;
+  top: -42%;
+  width: 60%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.cw-flashes { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+
+.cw-model {
+  position: absolute;
+  left: 50%;
+  bottom: 58%;
+  width: 38%;
+  transform-origin: 50% 100%;
+  z-index: 3;
+}
+.cw-model svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+.cw-caption {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  z-index: 4;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+.cw-stage .game-result { z-index: 5; }
+
+.cw-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+.cw-actions .btn:disabled { opacity: 0.6; cursor: default; transform: none; }
