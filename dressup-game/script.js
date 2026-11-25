@@ -2709,6 +2709,8 @@ function renderCash() {
   document.getElementById('cash-badge').textContent = `💵 $${cash}`;
   const shopCash = document.getElementById('shop-cash');
   if (shopCash) shopCash.textContent = `💵 $${cash}`;
+  const olCash = document.getElementById('ol-cash');
+  if (olCash) olCash.textContent = `💵 $${cash}`;
   const mgCash = document.getElementById('mg-cash');
   if (mgCash) mgCash.textContent = `💵 $${cash}`;
   const passesCash = document.getElementById('passes-cash');
@@ -3731,6 +3733,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !salonOverlay.hidden) closeSalon();
   if (e.key === 'Escape' && !hairSalonOverlay.hidden) closeHairSalon();
   if (e.key === 'Escape' && !nailSalonOverlay.hidden) closeNailSalon();
+  if (e.key === 'Escape' && !onlineOverlay.hidden) closeOnline();
   if (e.key === 'Escape' && !catwalkOverlay.hidden) closeCatwalk();
 });
 
@@ -3970,6 +3973,298 @@ document.getElementById('passes-btn').addEventListener('click', openPasses);
 document.getElementById('passes-close').addEventListener('click', closePasses);
 passesOverlay.addEventListener('click', (e) => {
   if (e.target === passesOverlay) closePasses();
+});
+
+// ---------- Play Online (robot servers) ----------
+// Two pretend servers filled with friendly robot players (no real people, no internet):
+// Free Play is a hangout with emotes, Competition is a dress-to-the-theme contest.
+
+const onlineOverlay = document.getElementById('online-overlay');
+const onlineBody = document.getElementById('online-body');
+const compBanner = document.getElementById('comp-banner');
+
+const ROBOT_NAMES = ['RoboRuby', 'Bolt Bella', 'Pixel Pip', 'Sparkle-9', 'Chip Chic', 'Glitterbot', 'Nova Nuts', 'Beep Bijou', 'Zappy Zoe', 'Circuit Coco'];
+const ROBOT_LINES = ['Cute outfit! 😍', 'Love your shoes!', 'Slay! 💅', 'Want to compete? 🏆', 'Beep boop, so stylish!', 'Your hair is amazing!', 'Best friends! 💖', 'Let\'s go to the runway!', 'Twirl time! 💃', 'Those colours! 🌈'];
+const EMOTES = [
+  { id: 'wave', label: 'Wave', emoji: '👋' },
+  { id: 'dance', label: 'Dance', emoji: '💃' },
+  { id: 'love', label: 'Love', emoji: '💖' },
+  { id: 'laugh', label: 'Laugh', emoji: '😂' },
+  { id: 'wow', label: 'Wow', emoji: '🤩' },
+  { id: 'compliment', label: 'Nice outfit!', emoji: '✨' },
+];
+
+const CHALLENGES = [
+  { id: 'beach', label: 'Beach Day', emoji: '☀️', theme: 'summer', items: ['ruffle-swimsuit', 'polka-swimsuit', 'board-shorts', 'flip-flops', 'sun-hat', 'flower-lei', 'pineapple-glasses'], colors: ['#5cc4e0', '#f2c94c'], bg: 'sunny-beach' },
+  { id: 'spooky', label: 'Spooky Night', emoji: '🎃', theme: 'halloween', items: ['pumpkin-costume', 'cat-costume', 'car-costume', 'witch-hat', 'candy-bag', 'spiderweb'], colors: ['#2b2b2b', '#8c5ce0'], bg: 'haunted-night' },
+  { id: 'hero', label: 'Superhero Squad', emoji: '🦸', theme: 'superhero', items: ['hero-suit', 'hero-dress', 'hero-cape', 'hero-mask', 'hero-sword', 'hero-shield'], colors: ['#d93b4a', '#5c7ce0'], bg: 'hero-city' },
+  { id: 'gala', label: 'Met Gala Glam', emoji: '🌹', theme: 'metgala', items: ['rose-gown', 'golden-goddess', 'garden-gown', 'crystal-tux', 'rose-bouquet', 'rose-headpiece', 'gold-clutch', 'pearl-necklace', 'galaxy-gown'], colors: ['#e0558f', '#f2c94c'], bg: 'met-steps' },
+  { id: 'winter', label: 'Winter Wonderland', emoji: '❄️', theme: 'christmas', items: ['santa-hat', 'christmas-dress', 'hot-cocoa', 'santa-dress', 'elf-costume', 'snowflake', 'candy-cane'], colors: ['#e05c5c', '#ffffff'], bg: 'winter-wonderland' },
+  { id: 'mermaid', label: 'Under the Sea', emoji: '🧜‍♀️', theme: 'mermaid', items: ['mermaid-tail', 'ocean-sparkle-tail', 'shell-top', 'pearl-shell-top', 'starfish-clip', 'mermaid-waves'], colors: ['#5cc4e0', '#8c5ce0'], bg: 'under-the-sea' },
+  { id: 'party', label: 'Birthday Party', emoji: '🎉', theme: 'party', items: ['polka-party-dress', 'party-hat', 'cake'], colors: ['#e0558f', '#f2c94c'], bg: 'party-room' },
+  { id: 'pink', label: 'Pink Everything', emoji: '💗', theme: null, items: ['ruffle-dress', 'kitty-dress', 'heart-sunglasses', 'glam-tracksuit', 'cat-ears'], colors: ['#e0558f', '#ff8fc7', '#ff6fb0', '#ffb3d6'], bg: 'pink' },
+  { id: 'sleepover', label: 'Cozy Sleepover', emoji: '😴', theme: 'sleepy', items: ['cozy-pajamas', 'nightgown', 'bunny-slippers', 'fluffy-slippers', 'unicorn-slippers', 'bear-slippers', 'heart-slippers', 'sleeping-mask'], colors: ['#8c5ce0', '#5cc4e0'], bg: 'cozy-bedroom' },
+  { id: 'ballet', label: 'Ballet Recital', emoji: '🩰', theme: 'ballet', items: ['ballet-tutu', 'swan-tutu', 'ballet-slippers', 'bun'], colors: ['#ff8fc7', '#ffffff'], bg: 'ballet-stage' },
+  { id: 'school', label: 'First Day of School', emoji: '🎒', theme: 'school', items: ['uniform-skirt', 'uniform-trousers', 'backpack', 'star-backpack', 'big-bow', 'twin-bows'], colors: ['#2b4a8a', '#e05c5c'], bg: 'classroom' },
+];
+
+const COMP_PRIZES = [
+  { cash: 60, points: 8, label: '🥇 1st place' },
+  { cash: 35, points: 5, label: '🥈 2nd place' },
+  { cash: 20, points: 3, label: '🥉 3rd place' },
+  { cash: 10, points: 1, label: '🎀 4th place' },
+  { cash: 10, points: 1, label: '🎀 5th place' },
+];
+const DRESS_SECONDS = 90;
+
+let onlineTimers = [];
+let compState = null;
+const onlineLater = (fn, ms) => { onlineTimers.push(setTimeout(fn, ms)); };
+const onlineEvery = (fn, ms) => { onlineTimers.push(setInterval(fn, ms)); };
+function clearOnlineTimers() {
+  onlineTimers.forEach((t) => { clearTimeout(t); clearInterval(t); });
+  onlineTimers = [];
+}
+
+function freeItems(list) {
+  return list.filter((i) => !i.price && !i.pass && !i.unlockLevel && i.id !== 'none');
+}
+
+// A robot's look: random everyday pieces, or mostly matching a challenge.
+function robotLook(challenge) {
+  const look = {
+    bodyType: pick(BODY_TYPES).id,
+    skin: pick(SKIN_TONES),
+    hair: { style: pick(freeItems(HAIR_STYLES)).id, color: pick(SALON_HAIR_COLORS), bangs: Math.random() < 0.3 ? pick(BANG_STYLES).id : 'none' },
+    outfit: { style: pick(freeItems(OUTFIT_STYLES).filter((o) => !o.theme)).id, color: pick(OUTFIT_COLORS) },
+    shoes: { style: pick(freeItems(SHOE_STYLES).filter((o) => !o.theme)).id, color: pick(SHOE_COLORS) },
+    accessories: {},
+    face: { ...DEFAULT_FACE, eyeShape: pick(EYE_SHAPES.filter((e) => e.id !== 'closed')).id, mouth: pick(MOUTH_SHAPES).id, lipColor: pick(LIP_COLORS), lashes: pick(LASH_STYLES).id, eyeColor: pick(EYE_COLORS) },
+  };
+  freeItems(ACCESSORIES).filter((a) => !a.theme && !a.behindSvg).sort(() => Math.random() - 0.5).slice(0, Math.floor(Math.random() * 2))
+    .forEach((a) => { look.accessories[a.id] = true; });
+  let matched = 0;
+  if (challenge) {
+    if (Math.random() < 0.8) look.outfit.color = pick(challenge.colors);
+    challenge.items.forEach((id) => {
+      if (Math.random() > 0.45) return;
+      const found = findAnyItem(id);
+      if (!found || found.item.price || found.item.pass) return;
+      matched += 1;
+      if (found.kind === 'outfit') look.outfit.style = id;
+      if (found.kind === 'shoes') look.shoes.style = id;
+      if (found.kind === 'hair') look.hair.style = id;
+      if (found.kind === 'accessory') look.accessories[id] = true;
+    });
+  }
+  return { look, matched };
+}
+
+function dollThumb(look, id, bgGradient) {
+  return `<div class="ol-thumb" style="background:${bgGradient || 'transparent'}"><svg viewBox="0 -10 300 530">${buildDollSVG(look, id)}</svg></div>`;
+}
+
+function currentLookCopy() {
+  return {
+    ...state,
+    hair: { ...state.hair },
+    outfit: { ...state.outfit },
+    shoes: { ...state.shoes },
+    accessories: { ...state.accessories },
+    face: { ...state.face },
+    nails: state.nails ? [...state.nails] : null,
+  };
+}
+
+// ---------- server picker ----------
+function showServerPicker() {
+  clearOnlineTimers();
+  compState = null;
+  compBanner.hidden = true;
+  onlineBody.innerHTML = `
+    <p class="ol-note">🤖 These servers are filled with friendly robot players, not real people, so it's always safe to play.</p>
+    <div class="ol-servers">
+      <button class="mg-card ol-server" id="ol-free"><span class="mg-emoji">🌐</span><span class="mg-name">Free Play Server</span>
+        <span class="mg-blurb">Hang out in the lounge with robot friends, send emotes and show off your look.</span><span class="mg-reward">🟢 5 robots online</span></button>
+      <button class="mg-card ol-server" id="ol-comp"><span class="mg-emoji">🏆</span><span class="mg-name">Competition Server</span>
+        <span class="mg-blurb">Get a theme, dress up before time runs out, then walk against 4 robots for the crown.</span><span class="mg-reward">🎁 Win up to $60 + 8 pass points</span></button>
+    </div>`;
+  document.getElementById('ol-free').addEventListener('click', startFreePlay);
+  document.getElementById('ol-comp').addEventListener('click', startCompetitionLobby);
+}
+
+// ---------- Free Play ----------
+function startFreePlay() {
+  clearOnlineTimers();
+  const robots = ROBOT_NAMES.slice().sort(() => Math.random() - 0.5).slice(0, 5).map((name, i) => ({ name, ...robotLook(null), id: `fp${i}` }));
+  const people = [{ name: 'You ⭐', look: currentLookCopy(), id: 'fpme', me: true }, ...robots];
+  onlineBody.innerHTML = `
+    <div class="ol-head"><button class="btn btn-ghost mg-back" id="ol-leave">← Servers</button><span class="ol-server-name">🌐 Free Play Server · 🟢 ${people.length} online</span></div>
+    <div class="fp-lounge" id="fp-lounge">
+      <div class="fp-sign">✨ Style Lounge ✨</div>
+      ${people.map((pp, i) => `<div class="fp-avatar${pp.me ? ' me' : ''}" id="fpa-${i}" style="left:${8 + i * 15}%; animation-duration:${6 + Math.random() * 5}s; animation-delay:${-Math.random() * 5}s">
+          <div class="fp-bubble" id="fpb-${i}" hidden></div>
+          ${dollThumb(pp.look, pp.id)}
+          <span class="fp-name">${pp.name.startsWith('You') ? pp.name : `🤖 ${pp.name}`}</span>
+        </div>`).join('')}
+    </div>
+    <div class="option-row walk-picker fp-emotes" id="fp-emotes"></div>
+    <button class="btn btn-primary fp-to-comp" id="fp-to-comp">🏆 Join a Competition</button>`;
+  document.getElementById('ol-leave').addEventListener('click', showServerPicker);
+  document.getElementById('fp-to-comp').addEventListener('click', startCompetitionLobby);
+  const say = (i, text) => {
+    const bub = document.getElementById(`fpb-${i}`);
+    if (!bub) return;
+    bub.textContent = text;
+    bub.hidden = false;
+    const av = document.getElementById(`fpa-${i}`);
+    if (text.includes('💃')) { av.classList.remove('dancing'); void av.offsetWidth; av.classList.add('dancing'); }
+    onlineLater(() => { bub.hidden = true; }, 2200);
+  };
+  buildOptionButtons(document.getElementById('fp-emotes'), EMOTES, (id) => {
+    const em = EMOTES.find((e) => e.id === id);
+    say(0, `${em.emoji} ${em.id === 'compliment' ? 'Nice outfit!' : em.label}`);
+    // a robot or two answers back
+    const answer = 1 + Math.floor(Math.random() * robots.length);
+    onlineLater(() => say(answer, id === 'compliment' ? 'Aww thank you! 💖' : pick(ROBOT_LINES)), 700 + Math.random() * 600);
+    if (id === 'dance') onlineLater(() => say(1 + Math.floor(Math.random() * robots.length), '💃 Dance party!'), 1100);
+  });
+  onlineEvery(() => {
+    const i = 1 + Math.floor(Math.random() * robots.length);
+    say(i, Math.random() < 0.3 ? `${pick(EMOTES).emoji}` : pick(ROBOT_LINES));
+  }, 2600);
+}
+
+// ---------- Competition ----------
+function startCompetitionLobby() {
+  clearOnlineTimers();
+  const challenge = pick(CHALLENGES);
+  const robots = ROBOT_NAMES.slice().sort(() => Math.random() - 0.5).slice(0, 4).map((name, i) => ({ name, ...robotLook(challenge), id: `cp${i}` }));
+  compState = { challenge, robots, timeLeft: DRESS_SECONDS };
+  const bg = BACKGROUNDS.find((b) => b.id === challenge.bg);
+  onlineBody.innerHTML = `
+    <div class="ol-head"><button class="btn btn-ghost mg-back" id="ol-leave">← Servers</button><span class="ol-server-name">🏆 Competition Server · Round starting</span></div>
+    <div class="comp-theme" style="background:${bg ? bg.gradient : '#f6f0ff'}">
+      <span class="comp-theme-label">This round's theme</span>
+      <span class="comp-theme-name">${challenge.emoji} ${challenge.label}</span>
+      <span class="comp-theme-tip">${challenge.theme ? `Tip: try the ${THEMES.find((t) => t.id === challenge.theme).emoji} ${THEMES.find((t) => t.id === challenge.theme).label} theme. ` : ''}Matching clothes and colours score the most!</span>
+    </div>
+    <h3 class="comp-sub">Your competitors</h3>
+    <div class="comp-lineup">${robots.map((r) => `<div class="comp-card">${dollThumb(r.look, r.id + 'l')}<span class="comp-name">🤖 ${r.name}</span><span class="comp-ready">✅ Ready</span></div>`).join('')}</div>
+    <button class="btn btn-primary comp-go" id="comp-go">👗 Start Dressing (${DRESS_SECONDS}s)</button>`;
+  document.getElementById('ol-leave').addEventListener('click', showServerPicker);
+  document.getElementById('comp-go').addEventListener('click', startDressing);
+}
+
+function startDressing() {
+  const { challenge } = compState;
+  if (challenge.theme && state.theme !== challenge.theme) {
+    state.theme = challenge.theme;
+    sanitizeStateForTheme();
+    rebuildThemedLists();
+  }
+  render();
+  onlineOverlay.hidden = true;
+  compBanner.hidden = false;
+  compState.timeLeft = DRESS_SECONDS;
+  const update = () => {
+    compBanner.querySelector('.cb-text').textContent = `🏆 ${challenge.emoji} ${challenge.label} · ⏱️ ${compState.timeLeft}s`;
+    compBanner.classList.toggle('hurry', compState.timeLeft <= 10);
+  };
+  update();
+  onlineEvery(() => {
+    compState.timeLeft -= 1;
+    update();
+    if (compState.timeLeft <= 0) finishDressing();
+  }, 1000);
+}
+
+function scorePlayer(challenge) {
+  let score = 6;
+  const reasons = [];
+  if (challenge.theme && state.theme === challenge.theme) { score += 1.2; reasons.push('on theme'); }
+  const worn = [state.outfit.style, state.shoes.style, state.hair.style, ...Object.keys(state.accessories).filter((k) => state.accessories[k])];
+  const hits = challenge.items.filter((id) => worn.includes(id)).length;
+  if (hits) { score += Math.min(2, hits * 0.7); reasons.push(`${hits} matching piece${hits === 1 ? '' : 's'}`); }
+  if (challenge.colors.includes(state.outfit.color)) { score += 0.7; reasons.push('great colours'); }
+  const accCount = Object.values(state.accessories).filter(Boolean).length;
+  score += Math.min(0.6, accCount * 0.2);
+  if (state.nails && state.nails.some(Boolean)) { score += 0.2; reasons.push('painted nails'); }
+  score += Math.random() * 0.6;
+  return { score: Math.min(10, score), reasons };
+}
+
+function finishDressing() {
+  clearOnlineTimers();
+  compBanner.hidden = true;
+  const { challenge, robots } = compState;
+  const me = scorePlayer(challenge);
+  const entries = [
+    { name: 'You ⭐', look: currentLookCopy(), id: 'cpme', me: true, score: me.score, reasons: me.reasons },
+    ...robots.map((r) => ({ ...r, score: Math.min(9.6, 6.2 + Math.random() * 2.4 + r.matched * 0.35) })),
+  ].sort(() => Math.random() - 0.5);
+  const bg = BACKGROUNDS.find((b) => b.id === challenge.bg);
+  onlineOverlay.hidden = false;
+  onlineBody.innerHTML = `
+    <div class="ol-head"><span class="ol-server-name">🏆 ${challenge.emoji} ${challenge.label} · The judges are scoring...</span></div>
+    <div class="comp-runway" style="background:${bg ? bg.gradient : '#f6f0ff'}">
+      ${entries.map((e, i) => `<div class="comp-card${e.me ? ' me' : ''}" id="cr-${i}">${dollThumb(e.look, e.id + 'r')}<span class="comp-name">${e.me ? e.name : `🤖 ${e.name}`}</span><span class="comp-score" id="cs-${i}">⭐ ...</span></div>`).join('')}
+    </div>
+    <div class="comp-results" id="comp-results"></div>`;
+  entries.forEach((e, i) => onlineLater(() => {
+    const el = document.getElementById(`cs-${i}`);
+    if (!el) return;
+    el.textContent = `⭐ ${e.score.toFixed(1)}`;
+    document.getElementById(`cr-${i}`).classList.add('scored');
+  }, 900 + i * 900));
+  onlineLater(() => showCompetitionResults(entries), 900 + entries.length * 900 + 600);
+}
+
+function showCompetitionResults(entries) {
+  const ranked = entries.slice().sort((a, b) => b.score - a.score);
+  const place = ranked.findIndex((e) => e.me);
+  const prize = COMP_PRIZES[place];
+  cash += prize.cash;
+  saveShop();
+  renderCash();
+  const hasPass = PASSES.some((x) => passOwned(x.id));
+  const unlocked = hasPass ? addPassPoints(prize.points) : [];
+  rebuildThemedLists();
+  render();
+  const me = ranked[place];
+  const box = document.getElementById('comp-results');
+  box.innerHTML = `
+    <div class="comp-podium">${ranked.map((e, i) => `<div class="podium-row${e.me ? ' me' : ''}"><span>${COMP_PRIZES[i].label.split(' ')[0]}</span><span class="podium-name">${e.me ? e.name : `🤖 ${e.name}`}</span><span>⭐ ${e.score.toFixed(1)}</span></div>`).join('')}</div>
+    <p class="comp-you">${place === 0 ? '👑 You won the round!' : `You came ${prize.label.split(' ').slice(1).join(' ')}!`}
+      ${me.reasons.length ? `The judges loved: ${me.reasons.join(', ')}.` : 'Tip: wear clothes and colours that match the theme to score higher.'}</p>
+    <p class="comp-prize">💵 +$${prize.cash} (now $${cash})${hasPass ? ` · 🎟️ +${prize.points} pass points` : ''}${unlocked.length ? ` · Unlocked ${unlocked.join(' & ')}!` : ''}</p>
+    <div class="game-result-actions"><button class="btn btn-ghost" id="comp-again">🔁 Next Round</button><button class="btn btn-primary" id="comp-leave">🌐 Back to Servers</button></div>
+    <div class="confetti-layer" id="comp-confetti"></div>`;
+  document.getElementById('comp-again').addEventListener('click', startCompetitionLobby);
+  document.getElementById('comp-leave').addEventListener('click', showServerPicker);
+  if (place === 0) launchConfetti(document.getElementById('comp-confetti'));
+  document.querySelector('#online-overlay .ol-server-name').textContent = `🏆 ${compState.challenge.emoji} ${compState.challenge.label} · Results`;
+}
+
+function openOnline() {
+  if (compState && !compBanner.hidden) return;
+  renderCash();
+  showServerPicker();
+  onlineOverlay.hidden = false;
+}
+
+function closeOnline() {
+  clearOnlineTimers();
+  compState = null;
+  compBanner.hidden = true;
+  onlineOverlay.hidden = true;
+}
+
+document.getElementById('online-btn').addEventListener('click', openOnline);
+document.getElementById('ol-close').addEventListener('click', closeOnline);
+document.getElementById('cb-ready').addEventListener('click', () => { if (compState) finishDressing(); });
+onlineOverlay.addEventListener('click', (e) => {
+  if (e.target === onlineOverlay) closeOnline();
 });
 
 // ---------- Nail Salon ----------

@@ -264,6 +264,7 @@
         <button id="hair-salon-btn" class="btn btn-ghost">💇 Hair Salon</button>
         <button id="salon-btn" class="btn btn-ghost">💄 Makeup Salon</button>
         <button id="nail-salon-btn" class="btn btn-ghost">💅 Nail Salon</button>
+        <button id="online-btn" class="btn btn-primary">🌐 Play Online</button>
         <button id="show-btn" class="btn btn-primary">🎬 Runway Run</button>
         <button id="catwalk-btn" class="btn btn-primary">💃 Catwalk Show</button>
       </div>
@@ -321,6 +322,23 @@
     <p class="modal-subtitle">Pick a complete look and try it on all at once.</p>
     <div class="wardrobe-grid" id="wardrobe-grid"></div>
   </div>
+</div>
+
+<!-- PLAY ONLINE (ROBOT SERVERS) MODAL -->
+<div class="modal-overlay" id="online-overlay" hidden>
+  <div class="modal game-modal online-modal" role="dialog" aria-modal="true" aria-labelledby="ol-title">
+    <div class="modal-header">
+      <h2 id="ol-title">🌐 Play Online</h2>
+      <span class="cash-badge shop-cash" id="ol-cash">💵 $100</span>
+      <button class="modal-close" id="ol-close" aria-label="Leave the server">✕</button>
+    </div>
+    <div id="online-body"></div>
+  </div>
+</div>
+
+<div class="comp-banner" id="comp-banner" hidden>
+  <span class="cb-text"></span>
+  <button class="btn btn-primary" id="cb-ready">✅ I'm Ready!</button>
 </div>
 
 <!-- NAIL SALON MODAL -->
