@@ -115,7 +115,14 @@ const HAIR_STYLES = [
           <path d="M110,64 Q127,52 146,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
           <path d="M100,110 Q103,160 98,200" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.18"/>` },
   { id: 'curly', label: 'Curly', emoji: '✨',
-    svg: `<circle cx="108" cy="72" r="17"/>
+    // Long curls: columns of ringlets fall past the shoulders (and gently sway).
+    svg: `${['left', 'right'].map((side) => {
+            const mx = (x) => (side === 'left' ? x : 300 - x);
+            const curls = [[96, 146, 15], [108, 160, 13], [92, 172, 14], [104, 190, 13], [90, 202, 13], [102, 220, 12], [92, 236, 12], [100, 252, 11], [94, 266, 10]];
+            return `<g class="hair-sway hair-sway-${side}">${curls.map(([x, y, r]) => `<circle cx="${mx(x)}" cy="${y}" r="${r}"/>`).join('')}
+              <circle cx="${mx(92)}" cy="${172 - 4}" r="2.6" fill="#ffffff" opacity="0.2"/><circle cx="${mx(102)}" cy="${220 - 4}" r="2.4" fill="#ffffff" opacity="0.2"/></g>`;
+          }).join('')}
+          <circle cx="108" cy="72" r="17"/>
           <circle cx="128" cy="50" r="20"/>
           <circle cx="150" cy="42" r="21"/>
           <circle cx="172" cy="50" r="20"/>
