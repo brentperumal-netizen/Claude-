@@ -1870,16 +1870,31 @@ gameOverlay.addEventListener('click', (e) => {
   if (e.target === gameOverlay) closeGame();
 });
 
-btnLeft.addEventListener('pointerdown', () => { keys.left = true; });
-btnRight.addEventListener('pointerdown', () => { keys.right = true; });
-['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => {
-  btnLeft.addEventListener(ev, () => { keys.left = false; });
-  btnRight.addEventListener(ev, () => { keys.right = false; });
-});
-btnJump.addEventListener('pointerdown', () => { keys.up = true; tryJump(); });
-['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => {
-  btnJump.addEventListener(ev, () => { keys.up = false; });
-});
+// Touch controls: holding a button keeps moving. On iPad/iPhone a long press
+// would otherwise start text selection, the copy/paste menu or the magnifier,
+// so the default touch behaviour is cancelled and the finger is "captured" by
+// the button until it lifts, even if it slides a little off the button.
+function wireHoldButton(btn, onPress, onRelease) {
+  btn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    if (btn.setPointerCapture) {
+      try { btn.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+    onPress();
+  });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => btn.addEventListener(ev, onRelease));
+  btn.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+  btn.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+
+wireHoldButton(btnLeft, () => { keys.left = true; }, () => { keys.left = false; });
+wireHoldButton(btnRight, () => { keys.right = true; }, () => { keys.right = false; });
+wireHoldButton(btnJump, () => { keys.up = true; tryJump(); }, () => { keys.up = false; });
+
+// Block long-press menus and double-tap zoom anywhere on the runway game.
+const gameModalEl = gameOverlay.querySelector('.game-modal');
+gameModalEl.addEventListener('contextmenu', (e) => e.preventDefault());
+gameViewport.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
 
 // ---------- Init ----------
 
