@@ -4496,23 +4496,48 @@ mapWrap.addEventListener('pointerdown', mapPointer);
 mapWrap.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
 mapWrap.addEventListener('contextmenu', (e) => e.preventDefault());
 
-function openExplore() {
+function startIsland() {
+  stopTown();
+  worldStage.hidden = true;
+  if (worldRaf) cancelAnimationFrame(worldRaf);
+  worldRaf = null;
+  mapStage.hidden = false;
+  document.getElementById('island-bar').hidden = false;
+  document.getElementById('map-progress').hidden = false;
+  document.getElementById('ex-title').textContent = '🏝️ Style Island';
   scatterGems();
   mapPos = { x: 500, y: 395 };
   mapTarget = null;
   mapLand = null;
   mapPanel.hidden = true;
-  renderCash();
   drawMap();
-  exploreOverlay.hidden = false;
   document.addEventListener('keydown', mapKeyDown);
   document.addEventListener('keyup', mapKeyUp);
   mapLast = 0;
   mapRaf = requestAnimationFrame(mapTick);
 }
 
+function stopIsland() {
+  if (mapRaf) cancelAnimationFrame(mapRaf);
+  mapRaf = null;
+  Object.keys(mapKeys).forEach((k) => { mapKeys[k] = false; });
+  document.removeEventListener('keydown', mapKeyDown);
+  document.removeEventListener('keyup', mapKeyUp);
+  mapStage.hidden = true;
+  document.getElementById('island-bar').hidden = true;
+}
+
+function openExplore() {
+  renderCash();
+  exploreOverlay.hidden = false;
+  showTown();
+}
+
 function closeExplore() {
+  stopTown();
   stopLand();
+  if (worldRaf) cancelAnimationFrame(worldRaf);
+  worldRaf = null;
   landStage.hidden = true;
   landStage.innerHTML = '';
   mapStage.hidden = false;
@@ -4568,6 +4593,8 @@ let landState = null;
 function enterLand(land) {
   if (mapRaf) cancelAnimationFrame(mapRaf);
   mapRaf = null;
+  if (worldRaf) cancelAnimationFrame(worldRaf);
+  worldRaf = null;
   const sc = LAND_SCENES[land.id];
   const bg = BACKGROUNDS.find((b) => b.id === land.bg);
   const rand = (a, b) => a + Math.random() * (b - a);
@@ -4589,7 +4616,7 @@ function enterLand(land) {
       <span class="land-title">${land.emoji} ${land.name}</span>
       <span class="land-count" id="land-count"></span>
     </div>
-    <div class="land-scene" id="land-scene" style="background:${bg ? bg.gradient : '#bfe9ff'}">
+    <div class="land-scene" id="land-scene" style="background:${land.gradient || (bg ? bg.gradient : '#bfe9ff')}">
       ${particles}
       <div class="land-world" id="land-world" style="width:${LAND_W}px; height:${VIEW_H}px">
         ${backProps}
@@ -4608,6 +4635,8 @@ function enterLand(land) {
     </div>
     <p class="game-hint">Tap where to walk, hold ◀ ▶, or use the arrow keys. Find every ${sc.collect.emoji} ${sc.collect.name}, then open the treasure chest at the end!</p>`;
   mapStage.hidden = true;
+  worldStage.hidden = true;
+  document.getElementById('island-bar').hidden = true;
   landStage.hidden = false;
   document.getElementById('map-progress').hidden = true;
 
@@ -4774,6 +4803,8 @@ function exitLand() {
   stopLand();
   landStage.hidden = true;
   landStage.innerHTML = '';
+  if (land && land.world) { showWorld(land); return; }
+  document.getElementById('island-bar').hidden = false;
   mapStage.hidden = false;
   document.getElementById('map-progress').hidden = false;
   drawMap();
@@ -4781,6 +4812,498 @@ function exitLand() {
   mapLast = 0;
   mapRaf = requestAnimationFrame(mapTick);
 }
+
+// ---------- Style Town (free-play map) ----------
+// A town to roam freely: walk around (tap, arrow keys or the d-pad), meet robot
+// shoppers, and walk up to a door to go inside a building. The airport flies you
+// to the World Map and the ferry dock goes to Style Island.
+
+const townStage = document.getElementById('town-stage');
+const townWrap = document.getElementById('town-wrap');
+const townPanel = document.getElementById('town-panel');
+const TOWN_W = 1600, TOWN_H = 1100, TVIEW_W = 800, TVIEW_H = 520;
+
+const TOWN_BUILDINGS = [
+  { id: 'dressing', name: 'Dressing Room', emoji: '👗', x: 160, y: 130, w: 260, h: 170, wall: '#ffe0ef', roof: '#e0558f', blurb: 'Try on whole looks from the wardrobe.' },
+  { id: 'hair', name: 'Hair Salon', emoji: '💇', x: 500, y: 130, w: 240, h: 170, wall: '#e6f4ff', roof: '#5c7ce0', blurb: 'New hairstyles, bangs and colours.' },
+  { id: 'makeup', name: 'Makeup Salon', emoji: '💄', x: 840, y: 130, w: 240, h: 170, wall: '#fff0f6', roof: '#c0293b', blurb: 'Eyeshadow, lashes, lipstick and face paint.' },
+  { id: 'nails', name: 'Nail Salon', emoji: '💅', x: 1180, y: 130, w: 240, h: 170, wall: '#fff6e0', roof: '#ff6fb0', blurb: 'Paint your nails yourself!' },
+  { id: 'shop', name: 'Boutique', emoji: '🛍️', x: 120, y: 450, w: 280, h: 180, wall: '#f6ecff', roof: '#8c5ce0', blurb: 'Spend your cash on cool clothes and walks.' },
+  { id: 'passes', name: 'Pass Station', emoji: '🎟️', x: 140, y: 740, w: 240, h: 160, wall: '#fff0e0', roof: '#f2994a', blurb: 'Baddie Pass, Sweetie Pass and their rewards.' },
+  { id: 'arcade', name: 'Arcade', emoji: '🎮', x: 1200, y: 450, w: 280, h: 180, wall: '#e8fff4', roof: '#43b581', blurb: 'Mini games for pass points and cash.' },
+  { id: 'comp', name: 'Competition Hall', emoji: '🏆', x: 1210, y: 740, w: 270, h: 170, wall: '#fff8d6', roof: '#c98f1f', blurb: 'Dress to the theme and beat the robots!' },
+  { id: 'runway', name: 'Runway Stage', emoji: '💃', x: 560, y: 840, w: 480, h: 150, wall: '#2b2140', roof: '#e0558f', blurb: 'Strut down the catwalk in the Catwalk Show.' },
+  { id: 'airport', name: 'Airport', emoji: '✈️', x: 140, y: 960, w: 250, h: 110, wall: '#eef3f8', roof: '#5cc4e0', blurb: 'Fly around the world to explore!' },
+  { id: 'ferry', name: 'Ferry Dock', emoji: '⛴️', x: 1230, y: 960, w: 240, h: 110, wall: '#f2e3b0', roof: '#2a8fc4', blurb: 'Sail to Style Island and its 13 lands.' },
+];
+const FOUNTAIN = { x: 800, y: 560, r: 70 };
+
+let townPos = { x: 800, y: 700 };
+let townTarget = null;
+let townRaf = null;
+let townLast = 0;
+let townDoor = null;
+let townT = 0;
+let townRobots = [];
+let townBubbleTimer = 0;
+const townKeys = { up: false, down: false, left: false, right: false };
+
+function townDoorSpot(b) {
+  return { x: b.x + b.w / 2, y: b.y + b.h + 22 };
+}
+
+function townBlocked(x, y) {
+  if (x < 30 || y < 70 || x > TOWN_W - 30 || y > TOWN_H - 20) return true;
+  if (Math.hypot(x - FOUNTAIN.x, y - FOUNTAIN.y) < FOUNTAIN.r + 14) return true;
+  return TOWN_BUILDINGS.some((b) => x > b.x - 12 && x < b.x + b.w + 12 && y > b.y - 30 && y < b.y + b.h + 6);
+}
+
+function townBuildingSVG(b) {
+  const door = { x: b.x + b.w / 2 - 22, y: b.y + b.h - 50 };
+  if (b.id === 'runway') {
+    const lights = Array.from({ length: 9 }, (_, i) => `<circle cx="${b.x + 30 + i * 52}" cy="${b.y + 14}" r="6" fill="#ffd76a"/>`).join('');
+    return `<g>
+      <rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="16" fill="${b.wall}"/>
+      <path d="M${b.x + b.w / 2 - 50},${b.y + 30} L${b.x + b.w / 2 + 50},${b.y + 30} L${b.x + b.w / 2 + 34},${b.y + b.h} L${b.x + b.w / 2 - 34},${b.y + b.h} Z" fill="#e0558f"/>
+      ${lights}
+      <rect x="${b.x + b.w / 2 - 90}" y="${b.y - 34}" width="180" height="34" rx="10" fill="#ffffff" stroke="${b.roof}" stroke-width="3"/>
+      <text x="${b.x + b.w / 2}" y="${b.y - 11}" font-size="18" font-weight="800" text-anchor="middle" fill="#2b2140" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">${b.emoji} ${b.name}</text>
+      <text x="${b.x + 50}" y="${b.y + 110}" font-size="34">🎤</text><text x="${b.x + b.w - 90}" y="${b.y + 110}" font-size="34">📸</text>
+    </g>`;
+  }
+  const windows = [0.2, 0.8].map((f) => `<rect x="${b.x + b.w * f - 26}" y="${b.y + 46}" width="52" height="42" rx="6" fill="#bfe9ff" stroke="#ffffff" stroke-width="4"/>`).join('');
+  return `<g>
+    <rect x="${b.x + 6}" y="${b.y + b.h - 6}" width="${b.w - 12}" height="12" rx="6" fill="#000000" opacity="0.12"/>
+    <rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="12" fill="${b.wall}" stroke="#d9cbd9" stroke-width="2"/>
+    <path d="M${b.x - 14},${b.y + 14} L${b.x + 18},${b.y - 36} L${b.x + b.w - 18},${b.y - 36} L${b.x + b.w + 14},${b.y + 14} Z" fill="${b.roof}"/>
+    <path d="M${b.x - 14},${b.y + 14} L${b.x + b.w + 14},${b.y + 14}" stroke="#ffffff" stroke-width="3" opacity="0.5"/>
+    ${windows}
+    <rect x="${door.x}" y="${door.y}" width="44" height="50" rx="6" fill="#8a5a2b"/>
+    <circle cx="${door.x + 34}" cy="${door.y + 27}" r="3" fill="#f2c94c"/>
+    <rect x="${b.x + b.w / 2 - 82}" y="${b.y - 30}" width="164" height="30" rx="10" fill="#ffffff" opacity="0.95"/>
+    <text x="${b.x + b.w / 2}" y="${b.y - 9}" font-size="16" font-weight="800" text-anchor="middle" fill="#2b2140" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">${b.emoji} ${b.name}</text>
+    <rect x="${door.x - 8}" y="${b.y + b.h}" width="60" height="10" rx="4" fill="#d9a0b8" opacity="0.8"/>
+  </g>`;
+}
+
+function townActorSVG(look, id, name, me) {
+  return `<g class="town-actor" id="${id}">
+      <ellipse cx="0" cy="0" rx="18" ry="6" fill="#000000" opacity="0.18"/>
+      <svg x="-24" y="-82" width="48" height="84" viewBox="0 -10 300 530" overflow="visible"><g class="town-bob">${buildDollSVG(look, id)}</g></svg>
+      <rect x="-40" y="-104" width="80" height="18" rx="9" fill="${me ? '#e0558f' : '#ffffff'}" opacity="0.92"/>
+      <text x="0" y="-91" font-size="11" font-weight="800" text-anchor="middle" fill="${me ? '#ffffff' : '#2b2140'}" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">${name}</text>
+      <g class="town-bubble" id="${id}-bubble" style="display:none">
+        <rect x="-70" y="-140" width="140" height="28" rx="12" fill="#ffffff" stroke="#e0d6ea" stroke-width="1.5"/>
+        <text x="0" y="-121" font-size="12" font-weight="700" text-anchor="middle" fill="#2b2140" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif"></text>
+      </g>
+    </g>`;
+}
+
+function drawTown() {
+  const paths = TOWN_BUILDINGS.map((b) => {
+    const d = townDoorSpot(b);
+    return `<path d="M${FOUNTAIN.x},${FOUNTAIN.y} Q${(FOUNTAIN.x + d.x) / 2},${d.y} ${d.x},${d.y}" fill="none" stroke="#f4e3d0" stroke-width="46" stroke-linecap="round"/>`;
+  }).join('');
+  const decoSpots = [[470, 420], [1120, 420], [460, 700], [1130, 700], [80, 360], [1520, 360], [80, 690], [1530, 680], [470, 1040], [1120, 1040], [800, 80], [440, 80], [1160, 80]];
+  const deco = decoSpots.map(([x, y], i) => `<text x="${x}" y="${y}" font-size="${i % 3 ? 34 : 42}" text-anchor="middle">${['🌳', '🌷', '🌸', '🌳', '🌼', '🪴'][i % 6]}</text>`).join('')
+    + [[650, 470], [950, 470], [650, 660], [950, 660]].map(([x, y]) => `<text x="${x}" y="${y}" font-size="26" text-anchor="middle">🪑</text>`).join('');
+  townWrap.innerHTML = `<svg id="town-svg" viewBox="0 0 ${TVIEW_W} ${TVIEW_H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <rect width="${TOWN_W}" height="${TOWN_H}" fill="#bfe7a8"/>
+      ${Array.from({ length: 40 }, (_, i) => `<path d="M${(i * 137) % TOWN_W},${(i * 251) % TOWN_H} l4,-8 l4,8" fill="none" stroke="#9fd38a" stroke-width="2"/>`).join('')}
+      <circle cx="${FOUNTAIN.x}" cy="${FOUNTAIN.y}" r="230" fill="#f4e3d0"/>
+      ${paths}
+      <circle cx="${FOUNTAIN.x}" cy="${FOUNTAIN.y}" r="230" fill="none" stroke="#e8d2bc" stroke-width="4" stroke-dasharray="14 10"/>
+      <circle cx="${FOUNTAIN.x}" cy="${FOUNTAIN.y}" r="${FOUNTAIN.r}" fill="#9fdcf0" stroke="#ffffff" stroke-width="10"/>
+      <circle cx="${FOUNTAIN.x}" cy="${FOUNTAIN.y}" r="24" fill="#ffffff"/>
+      <text class="town-fountain" x="${FOUNTAIN.x}" y="${FOUNTAIN.y + 12}" font-size="34" text-anchor="middle">⛲</text>
+      ${TOWN_BUILDINGS.map(townBuildingSVG).join('')}
+      ${deco}
+      <g id="town-actors">
+        ${townRobots.map((r) => townActorSVG(r.look, r.id, `🤖 ${r.name}`, false)).join('')}
+        ${townActorSVG(currentLookCopy(), 'town-me', 'You ⭐', true)}
+      </g>
+    </svg>`;
+  placeTownActors();
+}
+
+function placeTownActors() {
+  const me = document.getElementById('town-me');
+  if (me) me.setAttribute('transform', `translate(${townPos.x.toFixed(1)},${townPos.y.toFixed(1)})`);
+  townRobots.forEach((r) => {
+    const el = document.getElementById(r.id);
+    if (el) el.setAttribute('transform', `translate(${r.x.toFixed(1)},${r.y.toFixed(1)})`);
+  });
+  const camX = Math.min(Math.max(townPos.x - TVIEW_W / 2, 0), TOWN_W - TVIEW_W);
+  const camY = Math.min(Math.max(townPos.y - TVIEW_H / 2 - 30, 0), TOWN_H - TVIEW_H);
+  const svg = document.getElementById('town-svg');
+  if (svg) svg.setAttribute('viewBox', `${camX.toFixed(1)} ${camY.toFixed(1)} ${TVIEW_W} ${TVIEW_H}`);
+}
+
+function townSay(id, text) {
+  const g = document.getElementById(`${id}-bubble`);
+  if (!g) return;
+  g.querySelector('text').textContent = text;
+  g.style.display = '';
+  setTimeout(() => { g.style.display = 'none'; }, 2600);
+}
+
+function newRobotTarget(r) {
+  for (let k = 0; k < 20; k++) {
+    const x = 60 + Math.random() * (TOWN_W - 120), y = 120 + Math.random() * (TOWN_H - 180);
+    if (!townBlocked(x, y)) { r.tx = x; r.ty = y; return; }
+  }
+}
+
+function townTick(ts) {
+  if (!townLast) townLast = ts;
+  const dt = Math.min(0.05, (ts - townLast) / 1000);
+  townLast = ts;
+  const speed = 250;
+  let vx = (townKeys.right ? 1 : 0) - (townKeys.left ? 1 : 0);
+  let vy = (townKeys.down ? 1 : 0) - (townKeys.up ? 1 : 0);
+  if (vx || vy) townTarget = null;
+  else if (townTarget) {
+    const dx = townTarget.x - townPos.x, dy = townTarget.y - townPos.y, d = Math.hypot(dx, dy);
+    if (d < 6) townTarget = null;
+    else { vx = dx / d; vy = dy / d; }
+  }
+  if (vx || vy) {
+    const n = Math.hypot(vx, vy);
+    const nx = townPos.x + (vx / n) * speed * dt, ny = townPos.y + (vy / n) * speed * dt;
+    let moved = false;
+    if (!townBlocked(nx, townPos.y)) { townPos.x = nx; moved = true; }
+    if (!townBlocked(townPos.x, ny)) { townPos.y = ny; moved = true; }
+    if (!moved) townTarget = null;
+    townT += dt;
+  }
+  const me = document.getElementById('town-me');
+  if (me) me.classList.toggle('walking', !!(vx || vy));
+
+  townRobots.forEach((r) => {
+    const dx = r.tx - r.x, dy = r.ty - r.y, d = Math.hypot(dx, dy);
+    if (r.wait > 0) { r.wait -= dt; return; }
+    if (d < 6) { r.wait = 1 + Math.random() * 3; newRobotTarget(r); return; }
+    const nx = r.x + (dx / d) * 90 * dt, ny = r.y + (dy / d) * 90 * dt;
+    if (townBlocked(nx, ny)) { newRobotTarget(r); return; }
+    r.x = nx; r.y = ny;
+  });
+  townBubbleTimer -= dt;
+  if (townBubbleTimer <= 0 && townRobots.length) {
+    townBubbleTimer = 2.5 + Math.random() * 2;
+    const r = pick(townRobots);
+    townSay(r.id, Math.hypot(r.x - townPos.x, r.y - townPos.y) < 220 ? pick(['Hi! 👋', 'Cute outfit! 😍', 'Love your look!', 'Slay! 💅']) : pick(ROBOT_LINES));
+  }
+  placeTownActors();
+
+  const near = TOWN_BUILDINGS.find((b) => { const d = townDoorSpot(b); return Math.hypot(d.x - townPos.x, d.y - townPos.y) < 60; });
+  if (near !== townDoor) {
+    townDoor = near || null;
+    if (townDoor) showTownPanel(townDoor);
+    else townPanel.hidden = true;
+  }
+  townRaf = requestAnimationFrame(townTick);
+}
+
+function showTownPanel(b) {
+  townPanel.innerHTML = `
+    <div class="map-panel-head"><span class="map-panel-emoji">${b.emoji}</span>
+      <div><strong>${b.name}</strong><span>${b.blurb}</span></div></div>
+    <div class="map-panel-actions"><button class="btn btn-primary" id="town-enter">🚪 Go Inside</button></div>`;
+  townPanel.hidden = false;
+  document.getElementById('town-enter').addEventListener('click', () => enterBuilding(b));
+}
+
+// Opens a feature from a building, then brings you back to town when it closes.
+function returnToTownWhenClosed(overlay) {
+  const obs = new MutationObserver(() => {
+    if (!overlay.hidden) return;
+    if (compState && !compBanner.hidden) return;
+    obs.disconnect();
+    renderCash();
+    exploreOverlay.hidden = false;
+    showTown(true);
+  });
+  obs.observe(overlay, { attributes: true, attributeFilter: ['hidden'] });
+}
+
+function enterBuilding(b) {
+  if (b.id === 'airport') { showWorld(null); return; }
+  if (b.id === 'ferry') { startIsland(); return; }
+  const open = {
+    dressing: [openWardrobe, wardrobeOverlay],
+    hair: [openHairSalon, hairSalonOverlay],
+    makeup: [openSalon, salonOverlay],
+    nails: [openNailSalon, nailSalonOverlay],
+    shop: [openShop, shopOverlay],
+    passes: [openPasses, passesOverlay],
+    arcade: [openMiniGames, mgOverlay],
+    runway: [openCatwalk, catwalkOverlay],
+    comp: [() => { openOnline(); startCompetitionLobby(); }, onlineOverlay],
+  }[b.id];
+  if (!open) return;
+  townDoor = null;
+  closeExplore();
+  open[0]();
+  returnToTownWhenClosed(open[1]);
+}
+
+function townKey(down) {
+  return (e) => {
+    const k = { ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down', ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right' }[e.key];
+    if (!k) return;
+    townKeys[k] = down;
+    e.preventDefault();
+  };
+}
+const townKeyDown = townKey(true), townKeyUp = townKey(false);
+
+function showTown(keepPos) {
+  stopTown();
+  stopIsland();
+  if (worldRaf) cancelAnimationFrame(worldRaf);
+  worldRaf = null;
+  stopLand();
+  landStage.hidden = true;
+  worldStage.hidden = true;
+  document.getElementById('map-progress').hidden = true;
+  townStage.hidden = false;
+  document.getElementById('ex-title').textContent = '🏙️ Style Town';
+  if (!keepPos) townPos = { x: 800, y: 700 };
+  townTarget = null;
+  townDoor = null;
+  townPanel.hidden = true;
+  if (!townRobots.length) {
+    townRobots = ROBOT_NAMES.slice().sort(() => Math.random() - 0.5).slice(0, 6).map((name, i) => {
+      const r = { name, id: `tr${i}`, look: robotLook(null).look, x: 0, y: 0, tx: 0, ty: 0, wait: 0 };
+      newRobotTarget(r); r.x = r.tx; r.y = r.ty; newRobotTarget(r);
+      return r;
+    });
+  }
+  drawTown();
+  document.addEventListener('keydown', townKeyDown);
+  document.addEventListener('keyup', townKeyUp);
+  townLast = 0;
+  townRaf = requestAnimationFrame(townTick);
+}
+
+function stopTown() {
+  if (townRaf) cancelAnimationFrame(townRaf);
+  townRaf = null;
+  Object.keys(townKeys).forEach((k) => { townKeys[k] = false; });
+  document.removeEventListener('keydown', townKeyDown);
+  document.removeEventListener('keyup', townKeyUp);
+  if (townStage) townStage.hidden = true;
+}
+
+townWrap.addEventListener('pointerdown', (e) => {
+  const svg = document.getElementById('town-svg');
+  if (!svg) return;
+  e.preventDefault();
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX;
+  pt.y = e.clientY;
+  const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  // tapping a building walks you to its door
+  const b = TOWN_BUILDINGS.find((bb) => p.x > bb.x - 14 && p.x < bb.x + bb.w + 14 && p.y > bb.y - 40 && p.y < bb.y + bb.h + 6);
+  if (b) {
+    const d = townDoorSpot(b);
+    if (townDoor === b) { enterBuilding(b); return; }
+    townTarget = d;
+    return;
+  }
+  townTarget = { x: p.x, y: p.y };
+});
+townWrap.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+townWrap.addEventListener('contextmenu', (e) => e.preventDefault());
+[['town-up', 'up'], ['town-down', 'down'], ['town-left', 'left'], ['town-right', 'right']].forEach(([id, k]) => {
+  const btn = document.getElementById(id);
+  btn.addEventListener('pointerdown', (e) => { e.preventDefault(); townKeys[k] = true; });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => btn.addEventListener(ev, () => { townKeys[k] = false; }));
+  btn.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+});
+document.getElementById('world-to-town').addEventListener('click', () => showTown(true));
+
+// ---------- World Map ----------
+// The whole world to explore: fly your plane to real places, read a fun fact,
+// and go inside each one. Style Island is one of the stops.
+
+const worldStage = document.getElementById('world-stage');
+const worldWrap = document.getElementById('world-wrap');
+const worldPanel = document.getElementById('world-panel');
+const WORLD_W = 1000, WORLD_H = 560;
+
+const WORLD_PLACES = [
+  { id: 'w-newyork', name: 'New York', emoji: '🗽', x: 300, y: 150, theme: 'classic', gradient: 'linear-gradient(180deg, #8fd3ff 0%, #c4ecff 60%, #9aa6b8 60%, #8a95a8 100%)', fact: 'The Statue of Liberty was a gift from France to the United States!' },
+  { id: 'w-canada', name: 'Canadian Rockies', emoji: '🍁', x: 215, y: 92, theme: 'christmas', gradient: 'linear-gradient(180deg, #a8dcff 0%, #e6f6ff 62%, #ffffff 62%, #e8f0f8 100%)', fact: 'Canada has more lakes than any other country in the world!' },
+  { id: 'w-hawaii', name: 'Hawaii', emoji: '🌺', x: 75, y: 255, theme: 'summer', gradient: 'linear-gradient(180deg, #ffb38a 0%, #ffd9a0 35%, #8fd3ff 36%, #4cb8e0 62%, #f2dfb0 62%)', fact: 'The Hawaiian islands were made by volcanoes in the Pacific Ocean!' },
+  { id: 'w-mexico', name: 'Mexico', emoji: '🌵', x: 215, y: 238, theme: 'party', gradient: 'linear-gradient(180deg, #ffd27a 0%, #ffe9b8 60%, #e8b07a 60%, #d89a62 100%)', fact: 'Colourful piñatas are a favourite at Mexican parties!' },
+  { id: 'w-rio', name: 'Rio de Janeiro', emoji: '🎭', x: 350, y: 388, theme: 'party', gradient: 'linear-gradient(180deg, #ff9f6a 0%, #ffd27a 40%, #5cc4e0 41%, #3fa9d6 62%, #f2dfb0 62%)', fact: 'Rio\'s Carnival is one of the biggest parties on Earth!' },
+  { id: 'w-london', name: 'London', emoji: '💂', x: 455, y: 92, theme: 'school', gradient: 'linear-gradient(180deg, #b8c4d6 0%, #dde4ee 60%, #8a95a8 60%, #7a8598 100%)', fact: 'Big Ben is the name of the giant bell inside the famous clock tower!' },
+  { id: 'w-paris', name: 'Paris', emoji: '🗼', x: 505, y: 135, theme: 'metgala', gradient: 'linear-gradient(180deg, #ffc6dc 0%, #ffe6f2 60%, #d9c7b0 60%, #c9b59a 100%)', fact: 'The Eiffel Tower gets a fresh coat of paint about every 7 years!' },
+  { id: 'w-rome', name: 'Rome', emoji: '🏛️', x: 552, y: 178, theme: 'classic', gradient: 'linear-gradient(180deg, #ffd9a0 0%, #fff0d6 60%, #d9b48a 60%, #c99f74 100%)', fact: 'The Colosseum in Rome is almost 2,000 years old!' },
+  { id: 'w-egypt', name: 'Egypt', emoji: '🐪', x: 585, y: 240, theme: 'summer', gradient: 'linear-gradient(180deg, #ffc46a 0%, #ffe6a8 60%, #e8c98a 60%, #d8b26a 100%)', fact: 'The Great Pyramid was the tallest building in the world for thousands of years!' },
+  { id: 'w-kenya', name: 'Kenya Safari', emoji: '🦁', x: 600, y: 335, theme: 'birds', gradient: 'linear-gradient(180deg, #ff9f5a 0%, #ffd27a 55%, #c9b26a 55%, #b89f58 100%)', fact: 'Giraffes, lions and elephants roam the grassy savanna!' },
+  { id: 'w-india', name: 'India', emoji: '🕌', x: 705, y: 238, theme: 'metgala', gradient: 'linear-gradient(180deg, #ffb3c6 0%, #ffe0c6 60%, #f2dfc0 60%, #e6ceaa 100%)', fact: 'The Taj Mahal is made of white marble that seems to change colour in the sunlight!' },
+  { id: 'w-china', name: 'China', emoji: '🐼', x: 775, y: 168, theme: 'fairy', gradient: 'linear-gradient(180deg, #c8f2c0 0%, #eaffe6 60%, #9fd88a 60%, #86c470 100%)', fact: 'Giant pandas spend about half of their day eating bamboo!' },
+  { id: 'w-tokyo', name: 'Tokyo', emoji: '🗻', x: 868, y: 178, theme: 'ballet', gradient: 'linear-gradient(180deg, #ffd6ec 0%, #fff0f6 60%, #c9b6d6 60%, #b8a2c8 100%)', fact: 'In spring, people in Japan have picnics under the cherry blossoms!' },
+  { id: 'w-sydney', name: 'Sydney', emoji: '🦘', x: 872, y: 420, theme: 'summer', gradient: 'linear-gradient(180deg, #8fd3ff 0%, #c4ecff 45%, #3fa9d6 46%, #2a8fc4 60%, #f2dfb0 60%)', fact: 'Baby kangaroos are called joeys and ride in their mum\'s pouch!' },
+  { id: 'w-antarctica', name: 'Antarctica', emoji: '🐧', x: 500, y: 528, theme: 'christmas', gradient: 'linear-gradient(180deg, #2a3f7a 0%, #6a8fd0 40%, #cfe6ff 62%, #ffffff 62%, #e8f4ff 100%)', fact: 'Antarctica is the coldest place on Earth, and penguins love it!' },
+  { id: 'style-island', name: 'Style Island', emoji: '🏝️', x: 412, y: 282, island: true, fact: 'Our very own island, with a land for every style!' },
+];
+WORLD_PLACES.forEach((pl) => { pl.world = true; });
+
+// Inside-scene settings for each real-world place (used by the land explorer).
+Object.assign(LAND_SCENES, {
+  'w-newyork': { ground: '#8a95a8', back: ['🏙️', '🗽', '🏢', '🏙️', '🌉'], front: ['🚕', '🌭', '🥨', '🚖', '🌳', '🛍️'], collect: { emoji: '🍎', name: 'big apple', plural: 'big apples' }, particle: null, lines: ['Welcome to the Big Apple!', 'Want a pretzel? 🥨', 'Taxi! 🚕'] },
+  'w-canada': { ground: '#ffffff', back: ['🏔️', '🌲', '🏔️', '🌲', '🏔️'], front: ['🦫', '🌲', '🍁', '🦌', '🛶', '🐻'], collect: { emoji: '🍁', name: 'maple leaf', plural: 'maple leaves' }, particle: { emoji: '🍁', dir: 'down' }, lines: ['Hello, eh! 🍁', 'Watch out for the moose!', 'Maple syrup pancakes, anyone?'] },
+  'w-hawaii': { ground: '#f2dfb0', back: ['🌋', '🌴', '🌴', '🏄', '🌴'], front: ['🌺', '🐢', '🍍', '🌺', '🥥', '🐠'], collect: { emoji: '🌺', name: 'hibiscus flower', plural: 'hibiscus flowers' }, particle: null, lines: ['Aloha! 🌺', 'Surf\'s up!', 'Look at that volcano! 🌋'] },
+  'w-mexico': { ground: '#d89a62', back: ['🌵', '⛰️', '🌵', '🏜️', '🌵'], front: ['🪅', '🌮', '🎺', '🌵', '🌽', '🪅'], collect: { emoji: '🪅', name: 'piñata', plural: 'piñatas' }, particle: { emoji: '🎊', dir: 'down' }, lines: ['¡Hola! 👋', 'Fiesta time! 🎉', 'Tacos for everyone! 🌮'] },
+  'w-rio': { ground: '#f2dfb0', back: ['⛰️', '🌴', '🏖️', '🌴', '⛰️'], front: ['🦜', '🥁', '🎭', '⚽', '🦜', '🥥'], collect: { emoji: '🦜', name: 'parrot', plural: 'parrots' }, particle: { emoji: '🎊', dir: 'down' }, lines: ['Olá! Welcome to Carnival!', 'Dance to the drums! 🥁', 'The parrots are so colourful!'] },
+  'w-london': { ground: '#7a8598', back: ['🏰', '🕰️', '🎡', '🏰', '🌉'], front: ['💂', '🚌', '☂️', '🫖', '🌳', '🚇'], collect: { emoji: '☂️', name: 'umbrella', plural: 'umbrellas' }, particle: { emoji: '💧', dir: 'down' }, lines: ['Cheerio! 👋', 'Fancy a cup of tea? 🫖', 'It might rain, grab an umbrella!'] },
+  'w-paris': { ground: '#c9b59a', back: ['🗼', '🏛️', '🗼', '🏰', '🌳'], front: ['🥐', '🎨', '🌹', '🥖', '☕', '🛍️'], collect: { emoji: '🥐', name: 'croissant', plural: 'croissants' }, particle: { emoji: '🌸', dir: 'down' }, lines: ['Bonjour! 🥐', 'Paris is the city of fashion!', 'Ooh la la, magnifique!'] },
+  'w-rome': { ground: '#c99f74', back: ['🏟️', '🏛️', '⛲', '🏛️', '🏟️'], front: ['🍕', '🍝', '🛵', '🍦', '🏺', '🌿'], collect: { emoji: '🍦', name: 'gelato', plural: 'gelatos' }, particle: null, lines: ['Ciao! 👋', 'Toss a coin in the fountain! ⛲', 'Pizza time! 🍕'] },
+  'w-egypt': { ground: '#d8b26a', back: ['🏜️', '🐪', '🌴', '🏜️', '🐪'], front: ['🏺', '🌴', '🐫', '🦂', '🏺', '🌞'], collect: { emoji: '🏺', name: 'ancient vase', plural: 'ancient vases' }, particle: null, lines: ['Welcome to the land of the pyramids!', 'Camels can go days without water! 🐪', 'Ancient treasures are buried here!'] },
+  'w-kenya': { ground: '#b89f58', back: ['🌳', '🦒', '🌳', '🐘', '🌳'], front: ['🦁', '🦓', '🦒', '🐘', '🦛', '🌾'], collect: { emoji: '🐾', name: 'paw print', plural: 'paw prints' }, particle: null, lines: ['Jambo! Welcome to the safari!', 'Shh... the lions are napping 🦁', 'Look at that tall giraffe! 🦒'] },
+  'w-india': { ground: '#e6ceaa', back: ['🕌', '🐘', '🕌', '🌴', '🕌'], front: ['🪷', '🦚', '🪔', '🌺', '🐅', '🪷'], collect: { emoji: '🪷', name: 'lotus flower', plural: 'lotus flowers' }, particle: { emoji: '🌸', dir: 'down' }, lines: ['Namaste! 🙏', 'The peacock is India\'s national bird! 🦚', 'So many beautiful colours!'] },
+  'w-china': { ground: '#86c470', back: ['🏯', '🎋', '⛰️', '🎋', '🏯'], front: ['🐼', '🎋', '🏮', '🥟', '🐼', '🐉'], collect: { emoji: '🏮', name: 'lantern', plural: 'lanterns' }, particle: { emoji: '🌸', dir: 'down' }, lines: ['Nǐ hǎo! 👋', 'The pandas are munching bamboo 🐼', 'Dumplings are delicious! 🥟'] },
+  'w-tokyo': { ground: '#b8a2c8', back: ['🗻', '🏯', '🌸', '🗼', '🌸'], front: ['🍣', '🌸', '🎎', '🍡', '🚄', '🐱'], collect: { emoji: '🍡', name: 'dango', plural: 'dango' }, particle: { emoji: '🌸', dir: 'down' }, lines: ['Konnichiwa! 👋', 'The cherry blossoms are so pretty 🌸', 'Ride the bullet train! 🚄'] },
+  'w-sydney': { ground: '#f2dfb0', back: ['🌉', '🏖️', '🌳', '🌉', '🌳'], front: ['🦘', '🐨', '🏄', '🦘', '🐚', '🌊'], collect: { emoji: '🪃', name: 'boomerang', plural: 'boomerangs' }, particle: null, lines: ['G\'day mate! 👋', 'Koalas sleep most of the day 🐨', 'Hop like a kangaroo! 🦘'] },
+  'w-antarctica': { ground: '#ffffff', back: ['🏔️', '🧊', '🏔️', '🐋', '🏔️'], front: ['🐧', '🧊', '🦭', '🐧', '❄️', '🐧'], collect: { emoji: '🐟', name: 'fish for the penguins', plural: 'fish for the penguins' }, particle: { emoji: '❄️', dir: 'down' }, lines: ['Brrrr! Welcome to Antarctica!', 'The penguins are hungry, find them some fish! 🐟', 'Slide on your tummy like a penguin! 🐧'] },
+});
+
+let worldPos = { x: 412, y: 282 };
+let worldRaf = null;
+let worldPlace = null;
+
+function continentPaths() {
+  return [
+    'M120,70 C180,40 300,50 340,90 C360,120 330,150 300,170 C290,200 260,230 235,258 C220,280 205,300 192,290 C170,262 150,222 132,202 C102,172 82,122 120,70 Z',
+    'M360,48 C392,38 422,55 412,80 C402,100 372,95 360,80 Z',
+    'M290,300 C330,290 372,320 382,360 C388,402 362,452 332,492 C316,506 300,480 300,450 C296,410 280,360 290,300 Z',
+    'M462,88 C502,68 562,78 582,108 C592,140 562,170 534,178 C502,182 472,166 462,142 C456,122 452,104 462,88 Z',
+    'M446,84 C454,78 460,92 454,106 C448,110 442,98 446,84 Z',
+    'M472,200 C522,190 592,200 612,240 C632,290 612,330 592,370 C572,410 552,442 532,432 C512,412 502,362 492,322 C472,292 457,242 472,200 Z',
+    'M592,80 C682,50 822,60 902,100 C942,130 902,170 872,200 C842,240 802,252 762,262 C722,272 692,272 662,252 C632,232 612,202 602,172 C592,142 582,110 592,80 Z',
+    'M858,160 C868,154 874,172 866,194 C860,200 852,184 858,160 Z',
+    'M792,380 C832,360 892,370 907,400 C917,432 892,456 852,456 C817,456 792,442 787,416 C784,400 785,388 792,380 Z',
+    'M300,518 C400,498 600,498 700,518 C722,538 702,556 600,558 L400,558 C320,557 280,540 300,518 Z',
+  ];
+}
+
+function drawWorld() {
+  const explored = WORLD_PLACES.filter((pl) => !pl.island && landQuests.has(pl.id)).length;
+  const total = WORLD_PLACES.filter((pl) => !pl.island).length;
+  document.getElementById('world-progress').textContent = `🌍 ${explored} / ${total} places explored`;
+  const routes = WORLD_PLACES.filter((pl) => !pl.island).map((pl) => `<path d="M412,282 Q${(412 + pl.x) / 2},${Math.min(282, pl.y) - 60} ${pl.x},${pl.y}" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-dasharray="4 7" opacity="0.55"/>`).join('');
+  const lands = continentPaths().map((d) => `<path d="${d}" fill="#a8dc8f" stroke="#86c470" stroke-width="2.5"/>`).join('');
+  const places = WORLD_PLACES.map((pl) => {
+    const done = pl.island ? false : landQuests.has(pl.id);
+    return `<g class="world-place" data-place="${pl.id}">
+        ${pl.island ? `<ellipse cx="${pl.x}" cy="${pl.y + 4}" rx="34" ry="18" fill="#f2e3b0" stroke="#e6cf8a" stroke-width="2"/>` : ''}
+        <circle cx="${pl.x}" cy="${pl.y}" r="21" fill="#ffffff" stroke="${pl.island ? '#8c5ce0' : done ? '#43b581' : '#e0558f'}" stroke-width="3"/>
+        <text x="${pl.x}" y="${pl.y + 8}" font-size="22" text-anchor="middle">${pl.emoji}</text>
+        <text x="${pl.x}" y="${pl.y + 37}" font-size="12" font-weight="800" text-anchor="middle" fill="#2b2140" stroke="#ffffff" stroke-width="3" paint-order="stroke" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">${pl.name}${done ? ' ✅' : ''}</text>
+      </g>`;
+  }).join('');
+  worldWrap.innerHTML = `<svg id="world-svg" viewBox="0 0 ${WORLD_W} ${WORLD_H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <rect width="${WORLD_W}" height="${WORLD_H}" fill="#5cb8e6"/>
+      ${Array.from({ length: 18 }, (_, i) => `<path d="M${(i * 97) % 1000},${(i * 151) % 560} q8,-5 16,0 t16,0" fill="none" stroke="#ffffff" stroke-width="1.6" opacity="0.45"/>`).join('')}
+      ${lands}${routes}${places}
+      <g id="world-me" transform="translate(${worldPos.x},${worldPos.y})">
+        <circle cx="0" cy="-30" r="17" fill="#ffffff" stroke="#8c5ce0" stroke-width="3"/>
+        <svg x="-16" y="-47" width="32" height="34" viewBox="88 26 124 124">${buildDollSVG(currentLookCopy(), 'world')}</svg>
+        <text x="16" y="-16" font-size="20" text-anchor="middle">✈️</text>
+      </g>
+    </svg>`;
+}
+
+function placeWorldMe() {
+  const me = document.getElementById('world-me');
+  if (me) me.setAttribute('transform', `translate(${worldPos.x.toFixed(1)},${worldPos.y.toFixed(1)})`);
+}
+
+function flyTo(place) {
+  if (worldRaf) cancelAnimationFrame(worldRaf);
+  worldPanel.hidden = true;
+  const from = { ...worldPos };
+  const to = { x: place.x, y: place.y };
+  const dist = Math.hypot(to.x - from.x, to.y - from.y);
+  const dur = Math.max(400, dist * 2.4);
+  const lift = Math.min(90, dist * 0.25);
+  let start = 0;
+  const step = (ts) => {
+    if (!start) start = ts;
+    const k = Math.min(1, (ts - start) / dur);
+    const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    worldPos = { x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e - Math.sin(Math.PI * e) * lift };
+    placeWorldMe();
+    if (k < 1) worldRaf = requestAnimationFrame(step);
+    else { worldRaf = null; showWorldPanel(place); }
+  };
+  worldRaf = requestAnimationFrame(step);
+}
+
+function showWorldPanel(place) {
+  worldPlace = place;
+  const done = !place.island && landQuests.has(place.id);
+  worldPanel.innerHTML = `
+    <div class="map-panel-head"><span class="map-panel-emoji">${place.emoji}</span>
+      <div><strong>${place.name}${done ? ' ✅' : ''}</strong><span>🌍 Fun fact: ${place.fact}</span></div></div>
+    <div class="map-panel-actions">
+      ${place.island
+        ? '<button class="btn btn-primary" id="world-island">🏝️ Visit Style Island</button>'
+        : `<button class="btn btn-primary" id="world-enter">🚪 Explore ${place.name}</button>
+           <button class="btn btn-ghost" id="world-style">${THEMES.find((t) => t.id === place.theme).emoji} Wear the Look</button>`}
+    </div>
+    <p class="map-panel-note" id="world-note"></p>`;
+  worldPanel.hidden = false;
+  if (place.island) {
+    document.getElementById('world-island').addEventListener('click', () => { worldPanel.hidden = true; startIsland(); });
+  } else {
+    document.getElementById('world-enter').addEventListener('click', () => enterLand(place));
+    document.getElementById('world-style').addEventListener('click', () => {
+      if (state.theme !== place.theme) { state.theme = place.theme; sanitizeStateForTheme(); }
+      rebuildThemedLists();
+      render();
+      document.getElementById('world-note').textContent = `✨ Switched to the ${THEMES.find((t) => t.id === place.theme).label} theme to match ${place.name}!`;
+    });
+  }
+}
+
+function showWorld(fromPlace) {
+  stopTown();
+  stopIsland();
+  if (worldRaf) cancelAnimationFrame(worldRaf);
+  worldRaf = null;
+  landStage.hidden = true;
+  worldStage.hidden = false;
+  document.getElementById('map-progress').hidden = true;
+  document.getElementById('ex-title').textContent = '🌍 World Explorer';
+  if (fromPlace) worldPos = { x: fromPlace.x, y: fromPlace.y };
+  drawWorld();
+  if (fromPlace) showWorldPanel(fromPlace);
+  else worldPanel.hidden = true;
+}
+
+worldWrap.addEventListener('pointerdown', (e) => {
+  const svg = document.getElementById('world-svg');
+  if (!svg) return;
+  e.preventDefault();
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX;
+  pt.y = e.clientY;
+  const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  const place = WORLD_PLACES.slice().sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
+  if (Math.hypot(place.x - p.x, place.y - p.y) > 45) return;
+  if (worldPlace === place && Math.hypot(worldPos.x - place.x, worldPos.y - place.y) < 2) {
+    if (place.island) startIsland(); else enterLand(place);
+    return;
+  }
+  flyTo(place);
+});
+worldWrap.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+worldWrap.addEventListener('contextmenu', (e) => e.preventDefault());
+document.getElementById('to-world').addEventListener('click', () => showWorld(WORLD_PLACES.find((pl) => pl.island)));
 
 // ---------- Nail Salon ----------
 // A big hand you paint yourself: pick a polish, then rub your finger over a nail.

@@ -1765,3 +1765,26 @@ body {
 
 .land-chest { z-index: 6; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25)); }
 .land-chest .land-bubble { bottom: 150%; }
+
+/* ---------- World map ---------- */
+.world-stage[hidden], .island-bar[hidden] { display: none; }
+.world-wrap { aspect-ratio: 1000 / 560; }
+.world-place { cursor: pointer; }
+.island-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 8px; color: var(--muted); font-size: 0.85rem; }
+
+/* ---------- Style Town ---------- */
+.town-stage[hidden] { display: none; }
+.town-wrap { aspect-ratio: 800 / 520; cursor: pointer; }
+.town-actor.walking .town-bob { animation: town-step 0.32s ease-in-out infinite alternate; }
+@keyframes town-step { from { transform: translateY(0); } to { transform: translateY(-14px); } }
+.town-fountain { animation: map-bob 1.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+.town-pad {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.town-pad-mid { display: grid; gap: 6px; }
+.town-pad .game-btn { padding: 10px 18px; }
+@media (prefers-reduced-motion: reduce) { .town-actor.walking .town-bob, .town-fountain { animation: none; } }

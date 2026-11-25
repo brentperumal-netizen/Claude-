@@ -329,13 +329,40 @@
 <div class="modal-overlay" id="explore-overlay" hidden>
   <div class="modal explore-modal" role="dialog" aria-modal="true" aria-labelledby="ex-title">
     <div class="modal-header">
-      <h2 id="ex-title">🗺️ Style Island</h2>
+      <h2 id="ex-title">🏙️ Style Town</h2>
       <span class="cash-badge shop-cash" id="ex-cash">💵 $100</span>
       <button class="modal-close" id="ex-close" aria-label="Close the map">✕</button>
     </div>
-    <p class="modal-subtitle">Tap anywhere to walk there (or use the arrow keys). Walk to a land and tap 🚪 Go Inside to explore it! Open every 🎁 treasure and pick up 💎 gems on the way.</p>
-    <p class="map-progress" id="map-progress"></p>
-    <div class="map-stage" id="map-stage">
+    <div class="town-stage" id="town-stage" hidden>
+      <p class="modal-subtitle">Walk anywhere: tap the ground, use the arrow keys or the buttons. Walk up to a door (or tap a building) to go inside!</p>
+      <div class="map-stage">
+        <div class="map-wrap town-wrap" id="town-wrap"></div>
+        <div class="map-panel" id="town-panel" hidden></div>
+      </div>
+      <div class="town-pad">
+        <button class="game-btn" id="town-left" aria-label="Walk left">◀</button>
+        <div class="town-pad-mid">
+          <button class="game-btn" id="town-up" aria-label="Walk up">▲</button>
+          <button class="game-btn" id="town-down" aria-label="Walk down">▼</button>
+        </div>
+        <button class="game-btn" id="town-right" aria-label="Walk right">▶</button>
+      </div>
+    </div>
+    <div class="world-stage" id="world-stage" hidden>
+      <div class="island-bar"><button class="btn btn-ghost mg-back" id="world-to-town">🏙️ Back to Town</button></div>
+      <p class="modal-subtitle">Tap a place to fly there ✈️, then tap 🚪 Explore to go inside. Find every hidden treasure around the world!</p>
+      <p class="map-progress" id="world-progress"></p>
+      <div class="map-stage">
+        <div class="map-wrap world-wrap" id="world-wrap"></div>
+        <div class="map-panel" id="world-panel" hidden></div>
+      </div>
+    </div>
+    <div class="island-bar" id="island-bar" hidden>
+      <button class="btn btn-ghost mg-back" id="to-world">🌍 World Map</button>
+      <span>Tap anywhere to walk (or use the arrow keys). Walk to a land and tap 🚪 Go Inside!</span>
+    </div>
+    <p class="map-progress" id="map-progress" hidden></p>
+    <div class="map-stage" id="map-stage" hidden>
       <div class="map-wrap" id="map-wrap"></div>
       <div class="map-panel" id="map-panel" hidden></div>
     </div>
