@@ -83,6 +83,7 @@ const THEMES = [
   { id: 'superhero', label: 'Superhero', emoji: '🦸' },
   { id: 'ballet', label: 'Ballet', emoji: '🩰' },
   { id: 'sleepy', label: 'Sleepover', emoji: '😴' },
+  { id: 'y2k', label: 'Y2K', emoji: '💿' },
 ];
 
 const SKIN_TONES = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5a3825'];
@@ -258,6 +259,12 @@ const HAIR_STYLES = [
           <path d="M98,82 A58,58 0 0 1 202,82 Z"/>
           <rect x="188" y="80" width="14" height="26" rx="7"/>
           <circle cx="106" cy="72" r="6" fill="#8c5ce0" stroke="#5a3aa8" stroke-width="1"/>
+          <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
+  { id: 'flippy-bob', label: 'Flippy Bob', emoji: '💁‍♀️', theme: 'y2k',
+    svg: `<path d="M98,80 A58,58 0 0 1 202,80 Z"/>
+          <path d="M98,78 L112,78 L112,128 Q104,140 84,138 Q96,130 98,118 Z"/>
+          <path d="M202,78 L188,78 L188,128 Q196,140 216,138 Q204,130 202,118 Z"/>
+          <path d="M140,40 L150,52 L160,40" fill="none" stroke="#000000" stroke-width="1.4" opacity="0.25"/>
           <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
   { id: 'crop', label: 'Short Crop', emoji: '💈',
     svg: `<path d="M100,78 A52,52 0 0 1 200,78 L198,96 A50,42 0 0 0 102,96 Z"/>
@@ -1268,6 +1275,53 @@ const OUTFIT_STYLES = [
               <path d="M${cx},${sY + 14} l-6,-4 l0,8 Z M${cx},${sY + 14} l6,-4 l0,8 Z" fill="#ffffff"/>
               <path d="M${cx - w + 6},${wY + 8} L${cx - hemHalf + 20},${hemY - 10}" fill="none" stroke="#ffffff" stroke-width="5" opacity="0.15" stroke-linecap="round"/>`;
     } },
+  { id: 'butterfly-flares', label: 'Butterfly Top & Flares', emoji: '🦋', theme: 'y2k',
+    svg: (bt) => {
+      const cx = 150, h = bt.hipHalf + 6;
+      const leg = (d) => {
+        const outer = cx + d * h, inner = cx + d * 2;
+        return `<path d="M${outer},230 L${inner},230 L${inner},262 L${cx + d * 4},360 L${cx + d * 2},446 L${cx + d * (h + 22)},446 L${cx + d * (h + 4)},360 Z" fill="#7aa3d9" stroke="#4f78b0" stroke-width="1.4"/>
+          <path d="M${cx + d * (h - 2)},250 L${cx + d * (h + 14)},440" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 4" opacity="0.8"/>
+          ${[300, 330, 360].map((y, i) => `<circle cx="${cx + d * (h - 6 + i * 3)}" cy="${y}" r="1.8" fill="#ffffff"/>`).join('')}`;
+      };
+      const tw = torsoHalfAt(bt, 186) + 3, bw = torsoHalfAt(bt, 226) + 3;
+      return `${leg(-1)}${leg(1)}
+              <rect x="${cx - h}" y="224" width="${h * 2}" height="9" fill="#5a85c0"/>
+              <path d="M${cx - h + 4},228 L${cx + h - 4},228" stroke="#d6dbe2" stroke-width="2" stroke-dasharray="3 2"/>
+              <path d="M${cx - 10},150 L${cx - tw},186 L${cx - bw},226 L${cx + bw},226 L${cx + tw},186 L${cx + 10},150 Z"/>
+              <path d="M${cx - 10},150 L${cx - 22},146 M${cx + 10},150 L${cx + 22},146" stroke="#ffffff" stroke-width="2"/>
+              <g transform="translate(${cx},200)">
+                <path d="M0,0 C-14,-16 -22,-6 -14,2 C-22,8 -14,18 0,6 Z M0,0 C14,-16 22,-6 14,2 C22,8 14,18 0,6 Z" fill="#ffffff" opacity="0.9"/>
+                <rect x="-1.2" y="-6" width="2.4" height="14" rx="1.2" fill="#2b2b2b"/>
+                <circle cx="-10" cy="-4" r="1.8" fill="#ff6fb0"/><circle cx="10" cy="-4" r="1.8" fill="#ff6fb0"/>
+              </g>`;
+    } },
+  { id: 'chrome-dress', label: 'Chrome Mini Dress', emoji: '🪩', theme: 'y2k', fixedColor: true,
+    svg: (bt) => {
+      const cx = 150, sY = TORSO_Y.shoulder, wY = TORSO_Y.waist;
+      const w = bt.waistHalf + 4, hemY = 300, hemHalf = bt.hipHalf + 24;
+      const top = `M${cx - torsoHalfAt(bt, sY + 18) - 3},${sY + 18} L${cx + torsoHalfAt(bt, sY + 18) + 3},${sY + 18} L${cx + w},${wY} L${cx + hemHalf},${hemY} Q${cx},${hemY + 8} ${cx - hemHalf},${hemY} L${cx - w},${wY} Z`;
+      const bands = ['#e8eef6', '#c9d4e2', '#f6f9ff', '#b6c2d4', '#eef3fa'];
+      return `<path d="${top}" fill="#dfe6ee"/>
+              ${bands.map((c, i) => `<path d="M${cx - hemHalf + i * 2},${180 + i * 24} Q${cx},${170 + i * 24} ${cx + hemHalf - i * 2},${186 + i * 24}" fill="none" stroke="${c}" stroke-width="10" opacity="0.8"/>`).join('')}
+              <path d="${top}" fill="none" stroke="#9aa6b8" stroke-width="1.5"/>
+              <path d="M${cx - w + 6},${wY - 30} L${cx - hemHalf + 14},${hemY - 10}" stroke="#ffffff" stroke-width="6" opacity="0.6" stroke-linecap="round"/>
+              <path d="M${cx - torsoHalfAt(bt, sY + 18) + 4},${sY + 18} L${cx - 20},${sY - 2} M${cx + torsoHalfAt(bt, sY + 18) - 4},${sY + 18} L${cx + 20},${sY - 2}" stroke="#c9d4e2" stroke-width="3"/>
+              ${[[-18, 200], [16, 230], [-8, 262], [22, 280], [-26, 282]].map(([x, y]) => `<path d="M${cx + x},${y - 4} L${cx + x + 1.2},${y - 1.2} L${cx + x + 4},${y} L${cx + x + 1.2},${y + 1.2} L${cx + x},${y + 4} L${cx + x - 1.2},${y + 1.2} L${cx + x - 4},${y} L${cx + x - 1.2},${y - 1.2} Z" fill="#ffffff"/>`).join('')}`;
+    } },
+  { id: 'denim-skirt-tee', label: 'Baby Tee & Denim Skirt', emoji: '👚', theme: 'y2k',
+    svg: (bt) => {
+      const cx = 150, wY = TORSO_Y.waist;
+      const tw = bt.waistHalf + 6, hw = bt.hipHalf + 20, hemY = 296;
+      return `<path d="M${cx - tw},${wY + 6} L${cx + tw},${wY + 6} L${cx + hw},${hemY} L${cx - hw},${hemY} Z" fill="#6b93cf" stroke="#4f78b0" stroke-width="1.4"/>
+              <path d="M${cx - hw + 3},${hemY - 4} L${cx + hw - 3},${hemY - 4}" stroke="#ffffff" stroke-width="1" stroke-dasharray="3 3" opacity="0.8"/>
+              <path d="M${cx},${wY + 8} L${cx},${hemY - 6}" stroke="#4f78b0" stroke-width="1.2"/>
+              <path d="M${cx - 30},${wY + 50} l6,-6 l6,6 l-6,6 Z" fill="#ff6fb0"/>
+              <path d="M${cx + 24},${wY + 64} l2.4,5 l5.4,0.6 l-4,3.6 l1.2,5.4 l-5,-2.8 l-5,2.8 l1.2,-5.4 l-4,-3.6 l5.4,-0.6 Z" fill="#f2c94c"/>
+              ${fittedTopSVG(bt, wY + 10, null)}
+              <path d="M${cx - 12},${TORSO_Y.shoulder} Q${cx},${TORSO_Y.shoulder + 12} ${cx + 12},${TORSO_Y.shoulder}" fill="none" stroke="#ffffff" stroke-width="3"/>
+              <text x="${cx}" y="${TORSO_Y.chest + 8}" font-size="13" font-weight="800" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif">✿ cutie ✿</text>`;
+    } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -1440,6 +1494,13 @@ SHOE_STYLES.push({ id: 'sprinkle-sneakers', label: 'Sprinkle Sneakers', emoji: '
         <path d="M${106 + dx},444 Q${106 + dx},428 ${124 + dx},425 Q${144 + dx},423 ${150 + dx},438 Q${152 + dx},444 ${148 + dx},446 L${106 + dx},446 Z"/>
         ${[[114, 438, '#e05c5c', 20], [124, 432, '#5cc4e0', -30], [134, 438, '#f2c94c', 50], [142, 434, '#43b581', -10], [128, 441, '#9b6be0', 70]].map(([x, y, c, r]) =>
           `<rect x="${x + dx - 2.5}" y="${y - 0.9}" width="5" height="1.8" rx="0.9" fill="${c}" stroke="none" transform="rotate(${r} ${x + dx} ${y})"/>`).join('')}`).join('') });
+SHOE_STYLES.push({ id: 'chunky-platforms', label: 'Chunky Platforms', emoji: '👟', theme: 'y2k',
+  svg: [0, 46].map((dx) => `
+        <rect x="${103 + dx}" y="444" width="48" height="18" rx="6" fill="#ffffff" stroke="#d6d6d6" stroke-width="1"/>
+        <path d="M${103 + dx},452 L${151 + dx},452" stroke="#ff8fc7" stroke-width="2"/>
+        <path d="M${106 + dx},444 Q${106 + dx},426 ${124 + dx},423 Q${144 + dx},421 ${150 + dx},436 Q${152 + dx},442 ${148 + dx},444 Z"/>
+        <path d="M${126 + dx},430 L${142 + dx},427 M${126 + dx},435 L${144 + dx},432" stroke="#ffffff" stroke-width="1.6"/>
+        <path d="M${112 + dx},436 l2,-4 l2,4 l4,1 l-4,1 l-2,4 l-2,-4 l-4,-1 Z" fill="#ffffff" stroke="none"/>`).join('') });
 SHOE_STYLES.push({ id: 'fluffy-slippers', label: 'Fluffy Slippers', emoji: '☁️', theme: 'sleepy',
   svg: [127, 173].map((x) => `
         <ellipse cx="${x}" cy="458" rx="18" ry="5" fill="#000000" opacity="0.15" stroke="none"/>
@@ -1894,6 +1955,27 @@ const ACCESSORIES = [
             M120,90 Q132,79 144,90 Q132,100 120,90 Z M156,90 Q168,79 180,90 Q168,100 156,90 Z
             M136,112 Q150,103 164,112 Q150,122 136,112 Z" fill="#a8d8a0" fill-opacity="0.92" stroke="#86bf7d" stroke-width="1"/>
           <g fill="#86bf7d" stroke="none" opacity="0.7"><circle cx="126" cy="72" r="1.2"/><circle cx="170" cy="70" r="1.2"/><circle cx="118" cy="108" r="1.2"/><circle cx="182" cy="110" r="1.2"/><circle cx="150" cy="126" r="1.2"/></g>` },
+  { id: 'tinted-shades', label: 'Tinted Shades', emoji: '🕶️', theme: 'y2k', color: '#ff9a5c',
+    svg: [132, 168].map((x) => `<ellipse cx="${x}" cy="90" rx="13" ry="8" fill="#ff9a5c" fill-opacity="0.55" stroke="#c9d4e2" stroke-width="1.6"/>
+          <path d="M${x - 7},87 Q${x - 3},85 ${x + 1},86" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.7" stroke-linecap="round"/>`).join('') +
+      `<path d="M145,89 L155,89" stroke="#c9d4e2" stroke-width="1.6"/>
+       <line x1="119" y1="89" x2="105" y2="84" stroke="#c9d4e2" stroke-width="1.6"/><line x1="181" y1="89" x2="195" y2="84" stroke="#c9d4e2" stroke-width="1.6"/>` },
+  { id: 'flip-phone', label: 'Flip Phone', emoji: '📱', theme: 'y2k', color: '#ff8fc7',
+    svg: `<rect x="206" y="246" width="18" height="24" rx="4" stroke="#e0458f" stroke-width="1.2"/>
+          <rect x="209" y="249" width="12" height="10" rx="2" fill="#bfe9ff" stroke="none"/>
+          <rect x="206" y="270" width="18" height="24" rx="4" stroke="#e0458f" stroke-width="1.2"/>
+          ${[0, 1, 2].map((r) => [0, 1, 2].map((c) => `<rect x="${209 + c * 4.4}" y="${274 + r * 5}" width="3" height="3" rx="1" fill="#ffffff" stroke="none"/>`).join('')).join('')}
+          <path d="M224,256 q8,-2 6,8 q-2,8 4,10" fill="none" stroke="#c9a6ff" stroke-width="1.6"/>
+          <circle cx="234" cy="276" r="3" fill="#f2c94c" stroke="none"/>
+          <path d="M213,252 l1.5,1.5 l3,-3" fill="none" stroke="#e0458f" stroke-width="1"/>` },
+  { id: 'bucket-hat', label: 'Fuzzy Bucket Hat', emoji: '👒', theme: 'y2k', color: '#c9a6ff',
+    svg: `<path d="M102,60 Q100,70 92,74 Q150,86 208,74 Q200,70 198,60 Z" stroke="#9b6be0" stroke-width="1.4"/>
+          <path d="M112,62 Q112,22 150,20 Q188,22 188,62 Z" stroke="#9b6be0" stroke-width="1.4"/>
+          ${Array.from({ length: 14 }, (_, i) => `<circle cx="${(116 + (i % 7) * 11).toFixed(1)}" cy="${i < 7 ? 34 : 50}" r="1.6" fill="#ffffff" opacity="0.6" stroke="none"/>`).join('')}
+          <path d="M146,44 l2.4,5 l5.4,0.6 l-4,3.6 l1.2,5.4 l-5,-2.8 l-5,2.8 l1.2,-5.4 l-4,-3.6 l5.4,-0.6 Z" fill="#ff8fc7" stroke="none"/>` },
+  { id: 'star-clips', label: 'Star Clips', emoji: '⭐', theme: 'y2k', color: '#f2c94c',
+    svg: [[116, 60, '#f2c94c'], [126, 52, '#ff8fc7'], [180, 58, '#5cc4e0'], [188, 66, '#c9a6ff']].map(([x, y, c]) =>
+      `<path d="M${x},${y - 6} L${x + 1.8},${y - 1.8} L${x + 6},${y - 1.6} L${x + 2.8},${y + 1.4} L${x + 3.8},${y + 5.6} L${x},${y + 3.2} L${x - 3.8},${y + 5.6} L${x - 2.8},${y + 1.4} L${x - 6},${y - 1.6} L${x - 1.8},${y - 1.8} Z" fill="${c}" stroke="#ffffff" stroke-width="0.8"/>`).join('') },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 C110,26 136,8 160,10 C186,12 206,36 214,72 C202,58 192,46 180,40 C186,46 190,52 192,58 Z" stroke="#8e1b20" stroke-width="1.2"/>
           <path d="M124,46 C128,30 142,20 158,18" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
@@ -2395,6 +2477,10 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #e6dcff 0%, #f3e8ff 62%, #c9a27a 62%, #b88f68 100%)' },
   { id: 'dreamland', label: 'Dreamland', emoji: '🌙', theme: 'sleepy', ambient: 'sparkle', decor: 'dreamland',
     gradient: 'linear-gradient(180deg, #1a1f4a 0%, #3a2f7a 55%, #7a5ab0 100%)' },
+  { id: 'cyber-dream', label: 'Cyber Dream', emoji: '💿', theme: 'y2k', ambient: 'sparkle', decor: 'y2k',
+    gradient: 'linear-gradient(180deg, #a8e6ff 0%, #d6c8ff 45%, #ffc6e8 100%)' },
+  { id: 'bubblegum-chrome', label: 'Bubblegum Chrome', emoji: '🫧', theme: 'y2k', ambient: 'bubbles',
+    gradient: 'linear-gradient(135deg, #ff9fd6 0%, #ffd6ef 30%, #e8eef6 50%, #c8f0ff 70%, #b49fff 100%)' },
   { id: 'met-steps', label: 'Met Gala Steps', emoji: '📸', theme: 'metgala', price: 50, ambient: 'flash', decor: 'carpet',
     gradient: 'linear-gradient(180deg, #1e1a2e 0%, #3b2f4f 60%, #5a4a6a 100%)' },
   { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
@@ -2421,6 +2507,7 @@ const JUDGE_COMMENTS = [
   "Super style! Saving the day, one runway at a time.",
   "Bravo! Graceful as a swan.",
   "Sweet dreams! Cozy and cute.",
+  "Totally Y2K! That look is so iconic! 💿",
 ];
 
 const WARDROBE_PRESETS = [
@@ -2503,6 +2590,19 @@ const WARDROBE_PRESETS = [
     look: { bodyType: 'masculine', skin: SKIN_TONES[1], hair: { style: 'crop', color: '#8a5a2b' },
       outfit: { style: 'cozy-pajamas', color: '#43b581' }, shoes: { style: 'bear-slippers', color: '#a8763f' },
       accessories: { 'clay-mask': true }, background: 'cozy-bedroom', face: { eyeShape: 'closed' } } },
+  { id: 'y2k-icon', label: 'Y2K Icon', theme: 'y2k',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[2], hair: { style: 'flippy-bob', color: '#d9b45a' },
+      outfit: { style: 'butterfly-flares', color: '#ff6fb0' }, shoes: { style: 'chunky-platforms', color: '#ff8fc7' },
+      accessories: { 'tinted-shades': true, 'flip-phone': true, 'star-clips': true }, background: 'cyber-dream',
+      face: { lipColor: '#e0558f', lashes: 'long' } } },
+  { id: 'chrome-cutie', label: 'Chrome Cutie', theme: 'y2k',
+    look: { bodyType: 'neutral', skin: SKIN_TONES[4], hair: { style: 'space-buns', color: '#8c5ce0' },
+      outfit: { style: 'chrome-dress', color: '#dfe6ee' }, shoes: { style: 'chunky-platforms', color: '#ffffff' },
+      accessories: { 'bucket-hat': false, 'flip-phone': true }, background: 'bubblegum-chrome', face: { mouth: 'grin' } } },
+  { id: 'y2k-chill', label: 'Y2K Chill', theme: 'y2k',
+    look: { bodyType: 'masculine', skin: SKIN_TONES[1], hair: { style: 'crop', color: '#2b2b2b' },
+      outfit: { style: 'denim-skirt-tee', color: '#5cc4e0' }, shoes: { style: 'chunky-platforms', color: '#5cc4e0' },
+      accessories: { 'bucket-hat': true, 'tinted-shades': true }, background: 'cyber-dream' } },
   { id: 'santas-helper', label: "Santa's Helper", theme: 'christmas',
     look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'ponytail', color: '#8a5a2b' },
       outfit: { style: 'elf-costume', color: '#1e7a46' }, shoes: { style: 'boots', color: '#8a5a2b' },
@@ -3240,6 +3340,21 @@ function addDecor(decor) {
       <rect x="0" y="196" width="300" height="5" rx="2" fill="#c9935a"/>
       ${[20, 110, 190, 280].map((x) => `<rect x="${x - 2}" y="196" width="4" height="48" fill="#a8763f"/>`).join('')}
       ${Array.from({ length: 8 }, (_, i) => `<line x1="${i * 40}" y1="244" x2="${i * 40 - 30}" y2="420" stroke="#b88a5a" stroke-width="1" opacity="0.5"/>`).join('')}
+    </svg>`;
+  } else if (decor === 'y2k') {
+    const star = (x, y, r, c) => `<path d="M${x},${y - r} L${x + r * 0.3},${y - r * 0.3} L${x + r},${y} L${x + r * 0.3},${y + r * 0.3} L${x},${y + r} L${x - r * 0.3},${y + r * 0.3} L${x - r},${y} L${x - r * 0.3},${y - r * 0.3} Z" fill="${c}"/>`;
+    const cd = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#e8eef6" stroke="#c9d4e2" stroke-width="2"/>
+        <circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="#ff9fd6" stroke-width="${r * 0.5}" opacity="0.35"/>
+        <circle cx="${x}" cy="${y}" r="${r * 0.22}" fill="#ffffff" stroke="#c9d4e2"/>`;
+    const heart = (x, y, s2, c) => `<path transform="translate(${x},${y}) scale(${s2})" d="M0,8 C-12,0 -10,-8 -4,-7.2 C-2,-7 0,-5 0,-3.4 C0,-5 2,-7 4,-7.2 C10,-8 12,0 0,8 Z" fill="${c}"/>`;
+    const fly = (x, y, c) => `<g transform="translate(${x},${y})"><path d="M0,0 C-10,-12 -16,-4 -10,2 C-16,6 -10,14 0,4 Z M0,0 C10,-12 16,-4 10,2 C16,6 10,14 0,4 Z" fill="${c}"/><rect x="-1" y="-5" width="2" height="11" rx="1" fill="#2b2b2b"/></g>`;
+    el.classList.add('ambient-decor-full');
+    el.innerHTML = `<svg viewBox="0 0 300 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      ${cd(40, 60, 24)}${cd(262, 330, 30)}
+      ${star(250, 50, 14, '#ffffff')}${star(30, 300, 10, '#ffffff')}${star(270, 180, 8, '#fff7d6')}${star(60, 200, 7, '#fff7d6')}
+      ${heart(220, 110, 1.6, '#ff6fb0')}${heart(40, 380, 1.4, '#c9a6ff')}${heart(150, 30, 1, '#ff9fd6')}
+      ${fly(80, 130, '#5cc4e0')}${fly(240, 250, '#ff8fc7')}${fly(20, 240, '#c9a6ff')}
+      <text x="150" y="410" font-size="18" font-weight="900" text-anchor="middle" fill="#ffffff" opacity="0.8" font-family="Arial Black, Arial, sans-serif" letter-spacing="3">✧ Y2K ✧</text>
     </svg>`;
   } else if (decor === 'skyline') {
     const builds = [[0, 70, 40], [38, 40, 30], [66, 96, 34], [98, 56, 28], [124, 80, 30], [152, 44, 26], [176, 104, 36], [210, 62, 30], [238, 86, 34], [270, 52, 30]];
@@ -4008,6 +4123,7 @@ const CHALLENGES = [
   { id: 'pink', label: 'Pink Everything', emoji: '💗', theme: null, items: ['ruffle-dress', 'kitty-dress', 'heart-sunglasses', 'glam-tracksuit', 'cat-ears'], colors: ['#e0558f', '#ff8fc7', '#ff6fb0', '#ffb3d6'], bg: 'pink' },
   { id: 'sleepover', label: 'Cozy Sleepover', emoji: '😴', theme: 'sleepy', items: ['cozy-pajamas', 'nightgown', 'bunny-slippers', 'fluffy-slippers', 'unicorn-slippers', 'bear-slippers', 'heart-slippers', 'sleeping-mask'], colors: ['#8c5ce0', '#5cc4e0'], bg: 'cozy-bedroom' },
   { id: 'ballet', label: 'Ballet Recital', emoji: '🩰', theme: 'ballet', items: ['ballet-tutu', 'swan-tutu', 'ballet-slippers', 'bun'], colors: ['#ff8fc7', '#ffffff'], bg: 'ballet-stage' },
+  { id: 'y2k', label: 'Totally Y2K', emoji: '💿', theme: 'y2k', items: ['butterfly-flares', 'chrome-dress', 'denim-skirt-tee', 'chunky-platforms', 'tinted-shades', 'flip-phone', 'bucket-hat', 'star-clips', 'flippy-bob'], colors: ['#ff6fb0', '#c9a6ff', '#5cc4e0'], bg: 'cyber-dream' },
   { id: 'school', label: 'First Day of School', emoji: '🎒', theme: 'school', items: ['uniform-skirt', 'uniform-trousers', 'backpack', 'star-backpack', 'big-bow', 'twin-bows'], colors: ['#2b4a8a', '#e05c5c'], bg: 'classroom' },
 ];
 
