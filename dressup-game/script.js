@@ -4662,6 +4662,7 @@ const MINI_GAMES = [
   { id: 'memory', label: 'Outfit Memory', emoji: '👗', blurb: 'Flip cards and find the matching pairs. Fewer flips = more points!', reward: 'Up to 6 pass points + $10' },
   { id: 'catch', label: 'Fashion Catch', emoji: '🛍️', blurb: 'Move the bag to catch falling fashion. Dodge the stinky socks!', reward: 'Up to 8 pass points + $20' },
   { id: 'poses', label: 'Pose Party', emoji: '💃', blurb: 'Watch the poses light up, then copy the pattern. It gets longer!', reward: 'Up to 8 pass points + $16' },
+  { id: 'spot', label: 'Spot the Match', emoji: '🔍', blurb: 'Look at the model on top, then find her exact twin below. Watch the tiny details!', reward: 'Up to 8 pass points + $16' },
 ];
 
 let mgCurrent = null;
@@ -4699,6 +4700,7 @@ function startMiniGame(id) {
   if (id === 'memory') startMemory();
   if (id === 'catch') startCatch();
   if (id === 'poses') startPoses();
+  if (id === 'spot') startSpot();
 }
 
 function showMiniMenu() {
@@ -4780,6 +4782,85 @@ function startMemory() {
     });
     mgArea.appendChild(card);
   });
+}
+
+// --- Spot the Match ---
+// A target model, plus look-alikes that each differ by one detail. Find the exact twin.
+function cloneLook(look) {
+  return { ...look, hair: { ...look.hair }, outfit: { ...look.outfit }, shoes: { ...look.shoes }, accessories: { ...look.accessories }, face: { ...look.face } };
+}
+
+function tweakLook(base, used) {
+  const v = cloneLook(base);
+  const differentFrom = (list, current) => pick(list.filter((x) => x !== current));
+  const plainOutfits = freeItems(OUTFIT_STYLES).filter((o) => !o.theme && !o.fixedColor).map((o) => o.id);
+  const plainShoes = freeItems(SHOE_STYLES).filter((o) => !o.theme).map((o) => o.id);
+  const plainHair = freeItems(HAIR_STYLES).filter((o) => !o.theme).map((o) => o.id);
+  const plainAcc = freeItems(ACCESSORIES).filter((a) => !a.theme && !a.behindSvg).map((a) => a.id);
+  const changes = [
+    ['outfit colour', () => { v.outfit.color = differentFrom(OUTFIT_COLORS, base.outfit.color); }],
+    ['hair colour', () => { v.hair.color = differentFrom(SALON_HAIR_COLORS, base.hair.color); }],
+    ['hairstyle', () => { v.hair.style = differentFrom(plainHair, base.hair.style); }],
+    ['shoes', () => { v.shoes.style = differentFrom(plainShoes, base.shoes.style); }],
+    ['shoe colour', () => { v.shoes.color = differentFrom(SHOE_COLORS, base.shoes.color); }],
+    ['accessory', () => {
+      const on = Object.keys(v.accessories).filter((k) => v.accessories[k]);
+      if (on.length && Math.random() < 0.5) v.accessories[pick(on)] = false;
+      else v.accessories[pick(plainAcc.filter((a) => !v.accessories[a]))] = true;
+    }],
+    ['outfit', () => { v.outfit.style = differentFrom(plainOutfits, base.outfit.style); }],
+    ['skin', () => { v.skin = differentFrom(SKIN_TONES, base.skin); }],
+  ];
+  const options = changes.filter(([name]) => !used.has(name));
+  const [name, apply] = pick(options.length ? options : changes);
+  used.add(name);
+  apply();
+  return v;
+}
+
+function startSpot() {
+  const ROUNDS = 8;
+  let round = 0;
+  let firstTry = 0;
+  let missedThisRound = false;
+  const update = () => { mgHud.textContent = `🔍 Round ${round + 1} / ${ROUNDS} · ✅ ${firstTry} found first try`; };
+  const nextRound = () => {
+    if (round >= ROUNDS) {
+      finishMiniGame(firstTry === ROUNDS ? '🏆 Perfect eye for detail!' : `🔍 You found ${firstTry} on the first try!`, firstTry, firstTry * 2);
+      return;
+    }
+    missedThisRound = false;
+    update();
+    const base = robotLook(null).look;
+    base.outfit.style = pick(freeItems(OUTFIT_STYLES).filter((o) => !o.theme && !o.fixedColor)).id;
+    const count = round < 3 ? 4 : 6;
+    const used = new Set();
+    const cands = Array.from({ length: count - 1 }, () => ({ look: tweakLook(base, used), twin: false }));
+    cands.push({ look: cloneLook(base), twin: true });
+    cands.sort(() => Math.random() - 0.5);
+    mgArea.innerHTML = `
+      <div class="spot-target"><span class="spot-label">🎯 Find this model</span>${dollThumb(base, `spt${round}`)}</div>
+      <div class="spot-grid spot-grid-${count}">${cands.map((c, i) => `<button class="spot-card" data-i="${i}" aria-label="Model ${i + 1}">${dollThumb(c.look, `spc${round}_${i}`)}</button>`).join('')}</div>`;
+    mgArea.querySelectorAll('.spot-card').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const c = cands[Number(btn.dataset.i)];
+        if (btn.disabled) return;
+        if (c.twin) {
+          btn.classList.add('right');
+          if (!missedThisRound) firstTry += 1;
+          mgArea.querySelectorAll('.spot-card').forEach((b) => { b.disabled = true; });
+          round += 1;
+          update();
+          setTimeout(nextRound, 650);
+        } else {
+          missedThisRound = true;
+          btn.classList.add('wrong');
+          btn.disabled = true;
+        }
+      });
+    });
+  };
+  nextRound();
 }
 
 // --- Fashion Catch ---

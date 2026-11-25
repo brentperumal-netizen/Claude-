@@ -1622,3 +1622,43 @@ body {
 .comp-banner[hidden] { display: none; }
 .comp-banner.hurry { background: linear-gradient(90deg, #e05c5c, #f2994a); }
 .comp-banner .btn-primary { background: #ffffff; color: #8c5ce0; box-shadow: none; }
+
+/* Spot the Match */
+.mg-area-spot {
+  padding: 12px;
+  background: linear-gradient(160deg, #fff6e0, #ffe6f2);
+  display: grid;
+  grid-template-columns: minmax(90px, 0.6fr) 2fr;
+  gap: 12px;
+  align-items: start;
+}
+@media (max-width: 560px) { .mg-area-spot { grid-template-columns: 1fr; } }
+.spot-target {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: #ffffff; border: 3px dashed #e0558f; border-radius: 14px; padding: 8px;
+}
+.spot-target .ol-thumb { max-width: 150px; }
+.spot-label { font-weight: 800; color: var(--accent-dark); font-size: 0.85rem; }
+.spot-grid { display: grid; gap: 8px; grid-template-columns: repeat(2, 1fr); }
+.spot-grid-6 { grid-template-columns: repeat(3, 1fr); }
+.spot-card {
+  position: relative; border: 3px solid transparent; border-radius: 14px; padding: 4px;
+  background: #ffffff; cursor: pointer; touch-action: manipulation;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+.spot-card:hover { transform: translateY(-2px); }
+.spot-card:focus-visible { outline: 3px solid #8c5ce0; outline-offset: 2px; }
+.spot-card .ol-thumb { max-height: 190px; }
+.spot-card.right { border-color: #43b581; box-shadow: 0 0 0 4px #c9efd6; }
+.spot-card.right::after, .spot-card.wrong::after {
+  position: absolute; top: 6px; right: 8px; font-size: 1.4rem;
+}
+.spot-card.right::after { content: '✅'; }
+.spot-card.wrong { border-color: #e05c5c; opacity: 0.55; animation: spot-shake 0.3s ease; }
+.spot-card.wrong::after { content: '❌'; }
+@keyframes spot-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+@media (prefers-reduced-motion: reduce) { .spot-card.wrong { animation: none; } }
