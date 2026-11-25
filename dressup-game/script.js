@@ -133,6 +133,18 @@ const HAIR_STYLES = [
           <circle cx="196" cy="122" r="13"/>
           <path d="M138,36 Q150,29 162,36" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
           <circle cx="118" cy="58" r="3" fill="#ffffff" opacity="0.22"/>` },
+  { id: 'short-curly', label: 'Short Curls', emoji: '🌀',
+    svg: `<circle cx="108" cy="72" r="17"/>
+          <circle cx="128" cy="50" r="20"/>
+          <circle cx="150" cy="42" r="21"/>
+          <circle cx="172" cy="50" r="20"/>
+          <circle cx="192" cy="72" r="17"/>
+          <circle cx="98" cy="98" r="15"/>
+          <circle cx="202" cy="98" r="15"/>
+          <circle cx="104" cy="122" r="13"/>
+          <circle cx="196" cy="122" r="13"/>
+          <path d="M138,36 Q150,29 162,36" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
+          <circle cx="118" cy="58" r="3" fill="#ffffff" opacity="0.22"/>` },
   { id: 'ponytail', label: 'Ponytail', emoji: '🎀',
     svg: `<path d="M98,80 A58,58 0 0 1 202,80 Z"/>
           <rect x="98" y="80" width="18" height="40" rx="9"/>
