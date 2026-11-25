@@ -900,3 +900,78 @@ body {
   font-size: 0.8rem;
   margin: 10px 0 0;
 }
+
+/* ---------- Cash & Met Gala Boutique ---------- */
+
+.cash-badge {
+  font-weight: 700;
+  color: #1e7a46;
+  background: #e3f6e9;
+  border-radius: 999px;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+.modal-header .shop-cash { margin-left: auto; }
+
+.shop-toast {
+  margin: -8px 0 14px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fff0f6;
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.shop-card {
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  padding: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.shop-card.owned { border-color: #9fd8b0; }
+
+.shop-card .thumb {
+  width: 100%;
+  aspect-ratio: 3 / 4.6;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.shop-card .thumb svg { width: 100%; height: 100%; display: block; }
+.shop-card .label { font-size: 0.82rem; font-weight: 700; color: var(--ink); }
+.shop-card .theme-tag {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.shop-buy {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+}
+.shop-buy:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.option-btn.shop-locked { cursor: pointer; }
+
+.ambient-flash {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0) 70%);
+  animation: camera-flash 0.6s ease-out forwards;
+}
+
+@keyframes camera-flash {
+  0%   { opacity: 0; transform: scale(0.4); }
+  20%  { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0; transform: scale(1.6); }
+}

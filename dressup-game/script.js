@@ -75,6 +75,7 @@ const THEMES = [
   { id: 'fairy', label: 'Fairy Tale', emoji: '🧚' },
   { id: 'halloween', label: 'Halloween', emoji: '🎃' },
   { id: 'birds', label: 'Birds', emoji: '🐦' },
+  { id: 'metgala', label: 'Met Gala', emoji: '🌹' },
 ];
 
 const SKIN_TONES = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5a3825'];
@@ -378,6 +379,119 @@ const OUTFIT_STYLES = [
               <path d="M${cx + s},${sY + 2} Q${cx + s + 26},${sY + 56} ${rx + 6},282 L${rx - 4},270 L${rx - 10},284 L${rx - 16},268 Q${cx + s - 2},${sY + 60} ${cx + s - 8},${sY + 6} Z" fill="#6b4220"/>
               <path d="M110,58 L108,26 L132,48 Z" fill="#6b4220"/>
               <path d="M190,58 L192,26 L168,48 Z" fill="#6b4220"/>` } },
+  { id: 'rose-gown', label: 'Rose Petal Gown', emoji: '🌹', theme: 'metgala', price: 60, fixedColor: true,
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY, chest: bY, waist: wY, hip: hY } = TORSO_Y;
+      const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3, w = bt.waistHalf + 4, h = bt.hipHalf + 4;
+      const kneeY = 300, kneeHalf = h - 6, hemY = 410, hemHalf = h + 56;
+      const rose = (x, y, r) => `<circle cx="${cx + x}" cy="${y}" r="${r}" fill="#e0245e"/>
+          <path d="M${cx + x - r * 0.6},${y + r * 0.1} Q${cx + x},${y - r * 0.8} ${cx + x + r * 0.6},${y} Q${cx + x},${y + r * 0.7} ${cx + x - r * 0.3},${y - r * 0.15}" fill="none" stroke="#7a0b2a" stroke-width="1.2"/>
+          <circle cx="${cx + x}" cy="${y}" r="${r * 0.28}" fill="none" stroke="#7a0b2a" stroke-width="1"/>`;
+      const roses = [[0, 172, 8], [-18, 196, 7], [16, 212, 8], [-8, 236, 7], [20, 258, 7], [-22, 280, 8], [6, 296, 7],
+        [-30, 328, 9], [26, 336, 9], [0, 360, 10], [-50, 384, 10], [44, 388, 10], [-12, 396, 9], [70, 400, 8], [-74, 398, 8]];
+      return `<path d="M${cx - s},${sY + 8} L${cx + s},${sY + 8}
+                C${cx + s},${sY + 18} ${cx + c},${bY - 8} ${cx + c},${bY}
+                C${cx + c},${bY + 16} ${cx + w},${wY - 14} ${cx + w},${wY}
+                C${cx + w},${wY + 16} ${cx + h},${hY - 18} ${cx + h},${hY}
+                L${cx + kneeHalf},${kneeY} Q${cx + hemHalf},${kneeY + 30} ${cx + hemHalf},${hemY}
+                Q${cx},${hemY + 18} ${cx - hemHalf},${hemY} Q${cx - hemHalf},${kneeY + 30} ${cx - kneeHalf},${kneeY}
+                L${cx - h},${hY}
+                C${cx - h},${hY - 18} ${cx - w},${wY + 16} ${cx - w},${wY}
+                C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY}
+                C${cx - c},${bY - 8} ${cx - s},${sY + 18} ${cx - s},${sY + 8} Z" fill="#b0123f"/>
+              <path d="M${cx - s + 8},${sY + 14} L${cx - w + 2},${kneeY - 12}" fill="none" stroke="#ffffff" stroke-width="5" opacity="0.14" stroke-linecap="round"/>
+              ${roses.map(([x, y, r]) => rose(x, y, r)).join('')}` } },
+  { id: 'golden-goddess', label: 'Golden Goddess Gown', emoji: '🏆', theme: 'metgala', price: 90, fixedColor: true,
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY, chest: bY, waist: wY } = TORSO_Y;
+      const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3, w = bt.waistHalf + 4;
+      const hemY = 412, hemHalf = bt.hipHalf + 50;
+      const pleats = [-0.75, -0.45, -0.15, 0.15, 0.45, 0.75].map((f) =>
+        `<path d="M${cx + f * w},${wY + 6} Q${cx + f * (w + hemHalf) / 2},${(wY + hemY) / 2} ${cx + f * hemHalf},${hemY + 6}" fill="none" stroke="#b8862a" stroke-width="1.6" opacity="0.55"/>`).join('');
+      const sparkles = [[-30, 250], [24, 290], [-12, 330], [40, 360], [-48, 380], [10, 395], [18, 190], [-14, 172]]
+        .map(([x, y]) => `<path d="M${cx + x},${y - 4} L${cx + x + 1.2},${y - 1.2} L${cx + x + 4},${y} L${cx + x + 1.2},${y + 1.2} L${cx + x},${y + 4} L${cx + x - 1.2},${y + 1.2} L${cx + x - 4},${y} L${cx + x - 1.2},${y - 1.2} Z" fill="#fff7d6"/>`).join('');
+      return `<path d="M${cx - s},${sY} L${cx - s + 16},${sY}
+                L${cx + c},${bY}
+                C${cx + c},${bY + 16} ${cx + w},${wY - 14} ${cx + w},${wY}
+                L${cx + hemHalf + 26},${hemY} Q${cx},${hemY + 22} ${cx - hemHalf},${hemY}
+                L${cx - w},${wY}
+                C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY}
+                C${cx - c},${bY - 10} ${cx - s},${sY + 14} ${cx - s},${sY} Z" fill="#e8b84b"/>
+              <path d="M${cx - s + 8},${sY + 2} L${cx + c - 4},${bY + 2}" fill="none" stroke="#b8862a" stroke-width="2" opacity="0.6"/>
+              <path d="M${cx - s + 10},${sY + 14} L${cx + c - 10},${bY + 14}" fill="none" stroke="#b8862a" stroke-width="1.5" opacity="0.45"/>
+              ${pleats}
+              <rect x="${cx - w}" y="${wY - 3}" width="${w * 2}" height="7" rx="3" fill="#fff3c4"/>
+              <path d="M${cx - s + 6},${sY + 10} L${cx - w + 4},${wY + 120}" fill="none" stroke="#ffffff" stroke-width="6" opacity="0.2" stroke-linecap="round"/>
+              ${sparkles}` } },
+  { id: 'garden-gown', label: 'Garden Bloom Gown', emoji: '💐', theme: 'metgala', price: 120, fixedColor: true,
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY, chest: bY, waist: wY } = TORSO_Y;
+      const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3, w = bt.waistHalf + 4;
+      const hemY = 418, hemHalf = bt.hipHalf + 72;
+      const petals = ['#ff8fc7', '#b79cff', '#ffb38a', '#8fd3ff', '#ff6f91'];
+      const flower = (x, y, r, col) => {
+        let out = '';
+        for (let i = 0; i < 5; i++) {
+          const a = (Math.PI * 2 * i) / 5 - Math.PI / 2;
+          out += `<circle cx="${(x + Math.cos(a) * r).toFixed(1)}" cy="${(y + Math.sin(a) * r).toFixed(1)}" r="${(r * 0.8).toFixed(1)}" fill="${col}"/>`;
+        }
+        return out + `<circle cx="${x}" cy="${y}" r="${(r * 0.55).toFixed(1)}" fill="#ffd23f"/>`;
+      };
+      let blooms = '', k = 0;
+      for (let y = wY + 22; y <= hemY - 10; y += 30) {
+        const half = w + (hemHalf - w) * (y - wY) / (hemY - wY) - 10;
+        const count = Math.max(2, Math.round(half / 22));
+        for (let i = 0; i <= count; i++) {
+          const x = cx - half + (2 * half * i) / count + (k % 2 ? 8 : -8);
+          blooms += `<ellipse cx="${x + 7}" cy="${y + 5}" rx="5" ry="2.4" fill="#6fbf5e" transform="rotate(30 ${x + 7} ${y + 5})"/>`;
+          blooms += flower(x, y, 4.2, petals[(i + k) % petals.length]);
+        }
+        k++;
+      }
+      [[-14, 176], [12, 188], [-4, 204]].forEach(([x, y], i) => { blooms += flower(cx + x, y, 3.6, petals[i + 1]); });
+      return `<path d="M${cx - w},${wY} L${cx + w},${wY} L${cx + hemHalf},${hemY} Q${cx},${hemY + 26} ${cx - hemHalf},${hemY} Z" fill="#f3f7ef" stroke="#d6e4cc" stroke-width="1.5"/>
+              <path d="M${cx - w + 8},${wY} L${cx + w - 8},${wY} L${cx + hemHalf - 30},${hemY - 4} Q${cx},${hemY + 14} ${cx - hemHalf + 30},${hemY - 4} Z" fill="#e3f2dc" opacity="0.7"/>
+              <path d="M${cx - s},${sY + 6} L${cx + s},${sY + 6}
+                C${cx + s},${sY + 16} ${cx + c},${bY - 10} ${cx + c},${bY}
+                C${cx + c},${bY + 16} ${cx + w},${wY - 14} ${cx + w},${wY + 4}
+                L${cx - w},${wY + 4}
+                C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY}
+                C${cx - c},${bY - 10} ${cx - s},${sY + 16} ${cx - s},${sY + 6} Z" fill="#f3f7ef" stroke="#d6e4cc" stroke-width="1.5"/>
+              ${blooms}` } },
+  { id: 'crystal-tux', label: 'Crystal Tuxedo', emoji: '💎', theme: 'metgala', price: 80, fixedColor: true,
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY, chest: bY, waist: wY } = TORSO_Y;
+      const s = bt.shoulderHalf + 3, c = bt.chestHalf + 4, w = bt.waistHalf + 3;
+      const jacketHemY = 252;
+      const rUpper = bt.limbWidth / 2 * 1.15 + 4;
+      const rLower = bt.limbWidth / 2 * 0.68 * 0.9 + 3;
+      const legL = capsulePath(133, 248, rUpper, 127, 418, rLower);
+      const legR = capsulePath(167, 248, rUpper, 173, 418, rLower);
+      const gem = (x, y, r) => `<path d="M${x},${y - r} L${x + r * 0.8},${y} L${x},${y + r} L${x - r * 0.8},${y} Z" fill="#e8f6ff" stroke="#9fc6dd" stroke-width="0.5"/>`;
+      const gems = [];
+      for (let i = 0; i < 6; i++) {
+        const t = i / 5;
+        gems.push(gem(cx - s + 6 + (c - s + 18) * t * 0.6 + 6, sY + 4 + t * 24, 2.6));
+        gems.push(gem(cx + s - 6 - (c - s + 18) * t * 0.6 - 6, sY + 4 + t * 24, 2.6));
+      }
+      return `<path d="${legL}" fill="#141414"/>
+              <path d="${legR}" fill="#141414"/>
+              <path d="M${cx - s},${sY} L${cx + s},${sY}
+                C${cx + s},${sY + 14} ${cx + c},${bY - 10} ${cx + c},${bY}
+                C${cx + c},${bY + 16} ${cx + w},${wY - 10} ${cx + w - 4},${jacketHemY}
+                L${cx},${jacketHemY - 14}
+                L${cx - w + 4},${jacketHemY}
+                C${cx - w},${wY - 10} ${cx - c},${bY + 16} ${cx - c},${bY}
+                C${cx - c},${bY - 10} ${cx - s},${sY + 14} ${cx - s},${sY} Z" fill="#141414"/>
+              <path d="M${cx - s + 24},${sY} L${cx + s - 24},${sY} L${cx},${bY + 33} Z" fill="#fdfdfd"/>
+              <path d="M${cx - 11},${sY + 4} L${cx},${sY + 9} L${cx + 11},${sY + 4} L${cx + 11},${sY + 14} L${cx},${sY + 9} L${cx - 11},${sY + 14} Z" fill="#c0c8d0"/>
+              <path d="M${cx - s + 8},${sY + 10} L${cx - w + 8},${jacketHemY - 10}" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.12" stroke-linecap="round"/>
+              ${gems.join('')}
+              ${gem(cx - c + 12, bY + 30, 3.4)}${gem(cx + c - 14, bY + 44, 3)}${gem(cx - c + 18, wY + 20, 2.6)}` } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -593,6 +707,40 @@ const ACCESSORIES = [
           <path d="M175,16 L181,18 L175,20 Z" fill="#f28c28" stroke="none"/>
           <circle cx="171.5" cy="15.5" r="1.2" fill="#2b2b2b" stroke="none"/>
           <path d="M158,26 Q162,20 168,26 Q162,30 158,26 Z" fill="#e0b13a" stroke="none"/>` },
+  { id: 'rose-bouquet', label: 'Rose Bouquet', emoji: '💐', theme: 'metgala', price: 30, color: '#e0245e',
+    svg: `<path d="M72,262 Q76,258 82,264 M96,262 Q92,256 86,262" fill="none" stroke="#3f8f3a" stroke-width="2"/>
+          <ellipse cx="72" cy="258" rx="6" ry="3" fill="#4fae48" stroke="none" transform="rotate(-30 72 258)"/>
+          <ellipse cx="98" cy="258" rx="6" ry="3" fill="#4fae48" stroke="none" transform="rotate(30 98 258)"/>
+          <circle cx="78" cy="254" r="6.5" stroke="#9c0d3c" stroke-width="1"/>
+          <circle cx="90" cy="254" r="6.5" stroke="#9c0d3c" stroke-width="1"/>
+          <circle cx="84" cy="246" r="6.5" stroke="#9c0d3c" stroke-width="1"/>
+          <circle cx="84" cy="259" r="6" fill="#ff6f91" stroke="#c0245e" stroke-width="1"/>
+          <g fill="none" stroke="#7a0b2a" stroke-width="1" stroke-linecap="round">
+            <path d="M75,254 Q78,250 81,254 Q78,257 76.5,253"/><path d="M87,254 Q90,250 93,254 Q90,257 88.5,253"/>
+            <path d="M81,246 Q84,242 87,246 Q84,249 82.5,245"/>
+          </g>
+          <path d="M74,262 L94,262 L87,294 L81,294 Z" fill="#f4efe6" stroke="#d9cfbf" stroke-width="1"/>
+          <path d="M77,276 L91,276 L90,281 L78,281 Z" fill="#e0245e" stroke="none"/>` },
+  { id: 'rose-headpiece', label: 'Rose Headpiece', emoji: '🌹', theme: 'metgala', price: 40, color: '#e0245e',
+    svg: `<ellipse cx="102" cy="56" rx="9" ry="4" fill="#4fae48" stroke="none" transform="rotate(-40 102 56)"/>
+          <ellipse cx="140" cy="38" rx="9" ry="4" fill="#4fae48" stroke="none" transform="rotate(20 140 38)"/>
+          <circle cx="114" cy="50" r="10" stroke="#9c0d3c" stroke-width="1"/>
+          <circle cx="129" cy="42" r="8" fill="#ff6f91" stroke="#c0245e" stroke-width="1"/>
+          <circle cx="106" cy="64" r="7" stroke="#9c0d3c" stroke-width="1"/>
+          <g fill="none" stroke="#7a0b2a" stroke-width="1.1" stroke-linecap="round">
+            <path d="M109,50 Q114,44 119,50 Q114,55 111.5,49"/><path d="M125,42 Q129,38 133,42 Q129,45 127,41.5"/>
+            <path d="M102.5,64 Q106,60 109.5,64 Q106,67 104,63.5"/>
+          </g>` },
+  { id: 'gold-clutch', label: 'Gold Clutch', emoji: '👝', theme: 'metgala', price: 35, color: '#e8b84b',
+    svg: `<rect x="199" y="270" width="32" height="18" rx="5" stroke="#b8862a" stroke-width="1.2"/>
+          <path d="M199,276 Q215,284 231,276" fill="none" stroke="#b8862a" stroke-width="1.2"/>
+          <circle cx="215" cy="280" r="2.6" fill="#fff7d6" stroke="none"/>
+          <path d="M205,273 l1,2 l2,1 l-2,1 l-1,2 l-1,-2 l-2,-1 l2,-1 Z M224,283 l1,2 l2,1 l-2,1 l-1,2 l-1,-2 l-2,-1 l2,-1 Z" fill="#fff7d6" stroke="none"/>` },
+  { id: 'pearl-necklace', label: 'Pearl Necklace', emoji: '📿', theme: 'metgala', price: 25, color: '#fbf7ef',
+    svg: Array.from({ length: 13 }, (_, i) => {
+      const t = i / 12;
+      return `<circle cx="${(130 + 40 * t).toFixed(1)}" cy="${(155 + 18 * Math.sin(Math.PI * t)).toFixed(1)}" r="2.7" stroke="#d9d0c0" stroke-width="0.6"/>`;
+    }).join('') + `<circle cx="150" cy="178" r="4" stroke="#d9d0c0" stroke-width="0.6"/><circle cx="149" cy="177" r="1.2" fill="#ffffff" stroke="none"/>` },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 L150,4 L192,58 Z"/>
           <ellipse cx="150" cy="58" rx="44" ry="13" fill="#f4f4f4"/>
@@ -928,6 +1076,8 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #8fd3ff 0%, #c4ecff 55%, #a8e0a0 100%)' },
   { id: 'sunset-flock', label: 'Sunset Flock', emoji: '🌅', theme: 'birds', ambient: 'birds',
     gradient: 'linear-gradient(180deg, #ffb38a 0%, #ff8fab 50%, #9b7ad8 100%)' },
+  { id: 'met-steps', label: 'Met Gala Steps', emoji: '📸', theme: 'metgala', price: 50, ambient: 'flash', decor: 'carpet',
+    gradient: 'linear-gradient(180deg, #1e1a2e 0%, #3b2f4f 60%, #5a4a6a 100%)' },
   { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
     gradient: 'linear-gradient(180deg, #0d0b1f 0%, #241a3d 55%, #3d2b56 100%)' },
 ];
@@ -944,6 +1094,7 @@ const JUDGE_COMMENTS = [
   "Spook-tacular! The judges are howling.",
   "So good it's scary!",
   "Tweet-tastic! The judges are all aflutter.",
+  "Met Gala ready! The cameras can't stop flashing.",
 ];
 
 const WARDROBE_PRESETS = [
@@ -1047,8 +1198,49 @@ function getLevelInfo(total) {
   };
 }
 
-function isUnlocked(item) {
+// ---------- Cash & shop ownership ----------
+// Cash is earned on the runway and spent in the Met Gala Boutique. Items with a
+// `price` stay locked until bought; both are remembered in this browser.
+
+const CASH_KEY = 'runwayReady.cash';
+const OWNED_KEY = 'runwayReady.owned';
+const STARTING_CASH = 100;
+const CASH_PER_STAR = 5;
+const CASH_FOR_FINISH = 10;
+const CASH_ALL_STARS_BONUS = 20;
+
+let cash = STARTING_CASH;
+let owned = new Set();
+try {
+  const savedCash = localStorage.getItem(CASH_KEY);
+  if (savedCash !== null) cash = Number(savedCash) || 0;
+  const savedOwned = JSON.parse(localStorage.getItem(OWNED_KEY) || '[]');
+  if (Array.isArray(savedOwned)) owned = new Set(savedOwned);
+} catch (e) {}
+
+function saveShop() {
+  try {
+    localStorage.setItem(CASH_KEY, String(cash));
+    localStorage.setItem(OWNED_KEY, JSON.stringify([...owned]));
+  } catch (e) {}
+}
+
+function isOwned(item) {
+  return !item.price || owned.has(item.id);
+}
+
+function levelUnlocked(item) {
   return !item.unlockLevel || getLevelInfo(totalStars).level >= item.unlockLevel;
+}
+
+function isUnlocked(item) {
+  return levelUnlocked(item) && isOwned(item);
+}
+
+function renderCash() {
+  document.getElementById('cash-badge').textContent = `💵 $${cash}`;
+  const shopCash = document.getElementById('shop-cash');
+  if (shopCash) shopCash.textContent = `💵 $${cash}`;
 }
 
 function renderLevelBanner() {
@@ -1109,9 +1301,15 @@ function buildOptionButtons(container, items, onPick) {
     btn.className = 'option-btn' + (unlocked ? '' : ' locked');
     btn.dataset.id = item.id;
     btn.innerHTML = `<span class="emoji">${item.emoji}</span>${item.label}`
-      + (unlocked ? '' : `<span class="lock-badge">🔒 Lvl ${item.unlockLevel}</span>`);
+      + (unlocked ? '' : !isOwned(item)
+        ? `<span class="lock-badge">🛍️ $${item.price} in Shop</span>`
+        : `<span class="lock-badge">🔒 Lvl ${item.unlockLevel}</span>`);
     if (unlocked) {
       btn.addEventListener('click', () => onPick(item.id));
+    } else if (!isOwned(item)) {
+      btn.classList.add('shop-locked');
+      btn.title = `Buy ${item.label} in the Shop for $${item.price}`;
+      btn.addEventListener('click', () => openShop());
     } else {
       btn.disabled = true;
       const levelDef = LEVELS.find((l) => l.level === item.unlockLevel);
@@ -1441,6 +1639,7 @@ function setAmbient(type, decor) {
     if (type === 'sparkle') spawnSparkle();
     if (type === 'bats' && Math.random() < 0.2) spawnBat();
     if (type === 'birds' && Math.random() < 0.2) spawnBat(BIRD_SVG);
+    if (type === 'flash' && Math.random() < 0.35) spawnFlash();
   }, 350);
 }
 
@@ -1461,6 +1660,18 @@ function addDecor(decor) {
   if (decor === 'pumpkins') {
     el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
       ${pumpkinSVG(228, 56, 1.15, true)}${pumpkinSVG(272, 62, 0.8, false)}${pumpkinSVG(24, 64, 0.7, true)}
+    </svg>`;
+  } else if (decor === 'carpet') {
+    let steps = '';
+    for (let y = 14; y < 170; y += 20) steps += `<line x1="0" y1="${y}" x2="300" y2="${y}" stroke="#cbbfae" stroke-width="2"/>`;
+    const post = (x) => `<rect x="${x - 2}" y="96" width="4" height="58" fill="#e8b84b"/><circle cx="${x}" cy="94" r="5" fill="#e8b84b"/><ellipse cx="${x}" cy="155" rx="9" ry="3" fill="#b8862a"/>`;
+    el.innerHTML = `<svg viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+      <rect x="0" y="0" width="300" height="170" fill="#ebe3d6"/>
+      ${steps}
+      <path d="M118,0 L182,0 L232,170 L68,170 Z" fill="#b0123f"/>
+      <path d="M118,0 L124,0 L76,170 L68,170 Z M182,0 L176,0 L224,170 L232,170 Z" fill="#e8b84b" opacity="0.8"/>
+      ${post(26)}${post(78)}${post(222)}${post(274)}
+      <path d="M26,100 Q52,118 78,100 M222,100 Q248,118 274,100" fill="none" stroke="#7a0b2a" stroke-width="4"/>
     </svg>`;
   } else if (decor === 'branch') {
     el.classList.add('ambient-decor-top');
@@ -1494,6 +1705,15 @@ const BAT_SVG = `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
 const BIRD_SVG = `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
   <path d="M4,10 Q16,4 30,16 Q44,4 56,10 Q44,8 30,20 Q16,8 4,10 Z" fill="#3a3550" opacity="0.75"/>
 </svg>`;
+
+function spawnFlash() {
+  const flash = document.createElement('div');
+  flash.className = 'ambient-flash';
+  flash.style.left = `${Math.random() * 90}%`;
+  flash.style.top = `${10 + Math.random() * 45}%`;
+  ambientLayer.appendChild(flash);
+  setTimeout(() => flash.remove(), 700);
+}
 
 function spawnBat(svg = BAT_SVG) {
   const bat = document.createElement('div');
@@ -1740,6 +1960,113 @@ wardrobeOverlay.addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !wardrobeOverlay.hidden) closeWardrobe();
+  if (e.key === 'Escape' && !shopOverlay.hidden) closeShop();
+});
+
+// ---------- Met Gala Boutique (shop) ----------
+
+const shopOverlay = document.getElementById('shop-overlay');
+const shopGrid = document.getElementById('shop-grid');
+const shopToast = document.getElementById('shop-toast');
+
+function shopItems() {
+  return [
+    ...OUTFIT_STYLES.filter((i) => i.price).map((item) => ({ item, kind: 'outfit' })),
+    ...ACCESSORIES.filter((i) => i.price).map((item) => ({ item, kind: 'accessory' })),
+    ...BACKGROUNDS.filter((i) => i.price).map((item) => ({ item, kind: 'background' })),
+  ];
+}
+
+function previewLook(item, kind) {
+  const look = {
+    ...state,
+    hair: { ...state.hair },
+    outfit: { ...state.outfit },
+    shoes: { ...state.shoes },
+    accessories: { ...state.accessories },
+  };
+  if (kind === 'outfit') look.outfit.style = item.id;
+  if (kind === 'accessory') look.accessories[item.id] = true;
+  // keep the preview clear of themed add-ons from other themes
+  ACCESSORIES.forEach((a) => { if (a.theme && a.theme !== item.theme && a.id !== item.id) look.accessories[a.id] = false; });
+  const outfitDef = OUTFIT_STYLES.find((o) => o.id === look.outfit.style);
+  if (outfitDef.theme && outfitDef.theme !== item.theme) look.outfit.style = 'aline';
+  return look;
+}
+
+function tryOn(item, kind) {
+  if (item.theme && state.theme !== item.theme) {
+    state.theme = item.theme;
+    sanitizeStateForTheme();
+  }
+  if (kind === 'outfit') state.outfit.style = item.id;
+  if (kind === 'accessory') state.accessories[item.id] = true;
+  if (kind === 'background') state.background = item.id;
+  rebuildThemedLists();
+  render();
+}
+
+function buyItem(item, kind) {
+  if (owned.has(item.id) || cash < item.price) return;
+  cash -= item.price;
+  owned.add(item.id);
+  saveShop();
+  renderCash();
+  tryOn(item, kind);
+  renderShop(`🎉 You bought the ${item.label}! It's on now.`);
+}
+
+function renderShop(message) {
+  renderCash();
+  shopToast.textContent = message || '';
+  shopToast.hidden = !message;
+  shopGrid.innerHTML = '';
+  const currentBg = BACKGROUNDS.find((b) => b.id === state.background);
+  shopItems().forEach(({ item, kind }) => {
+    const card = document.createElement('div');
+    card.className = 'shop-card' + (owned.has(item.id) ? ' owned' : '');
+    const bg = kind === 'background' ? item.gradient : (currentBg ? currentBg.gradient : '#f7eefb');
+    const kindLabel = { outfit: 'Gown', accessory: 'Flowers & Extras', background: 'Backdrop' }[kind];
+    card.innerHTML = `
+      <div class="thumb" style="background:${bg}">
+        <svg viewBox="0 0 300 520">${buildDollSVG(previewLook(item, kind), `shop-${item.id}`)}</svg>
+      </div>
+      <span class="label">${item.emoji} ${item.label}</span>
+      <span class="theme-tag">${kindLabel}</span>
+    `;
+    const btn = document.createElement('button');
+    btn.className = 'btn shop-buy';
+    if (owned.has(item.id)) {
+      btn.textContent = '✓ Owned — Wear it';
+      btn.classList.add('btn-ghost');
+      btn.addEventListener('click', () => { tryOn(item, kind); renderShop(`✨ Wearing the ${item.label}.`); });
+    } else if (cash >= item.price) {
+      btn.textContent = `Buy for $${item.price}`;
+      btn.classList.add('btn-primary');
+      btn.addEventListener('click', () => buyItem(item, kind));
+    } else {
+      btn.textContent = `$${item.price} · need $${item.price - cash} more`;
+      btn.classList.add('btn-ghost');
+      btn.disabled = true;
+    }
+    card.appendChild(btn);
+    shopGrid.appendChild(card);
+  });
+}
+
+function openShop() {
+  renderShop();
+  shopOverlay.hidden = false;
+}
+
+function closeShop() {
+  shopOverlay.hidden = true;
+}
+
+document.getElementById('shop-btn').addEventListener('click', openShop);
+document.getElementById('shop-close').addEventListener('click', closeShop);
+shopOverlay.addEventListener('click', (e) => {
+  if (e.target === shopOverlay) closeShop();
 });
 
 // ---------- Runway Run (mini side-scroller) ----------
@@ -1998,7 +2325,11 @@ function endGame() {
 
   gameScoreDisplay.textContent = `${score.toFixed(1)} / 10`;
   gameCommentDisplay.textContent = comment;
-  gameStarsSummary.textContent = `⭐ ${starsCollected} earned this run · ${totalStars} total`;
+  const cashEarned = starsCollected * CASH_PER_STAR + CASH_FOR_FINISH + (allCollected ? CASH_ALL_STARS_BONUS : 0);
+  cash += cashEarned;
+  saveShop();
+  renderCash();
+  gameStarsSummary.textContent = `⭐ ${starsCollected} earned this run · ${totalStars} total · 💵 +$${cashEarned} (now $${cash})`;
 
   const levelupEl = document.getElementById('game-levelup');
   if (leveledUp) {
@@ -2106,5 +2437,6 @@ gameViewport.addEventListener('touchstart', (e) => e.preventDefault(), { passive
 // ---------- Init ----------
 
 renderLevelBanner();
+renderCash();
 rebuildThemedLists();
 render();
