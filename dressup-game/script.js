@@ -261,6 +261,51 @@ const OUTFIT_STYLES = [
               <path d="M${cx - s + 8},${sY + 10} L${cx - w + 8},${jacketHemY - 10}" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.14" stroke-linecap="round"/>
               <path d="M${cx - s + 24},${sY} L${cx + s - 24},${sY} L${cx},${bY + 33} Z" fill="#fdfdfd"/>
               <path d="M${cx - 8},${sY} L${cx + 8},${sY} L${cx + 4},${bY + 15} L${cx - 4},${bY + 17} Z" fill="#7a1f2b"/>` } },
+  { id: 'kitty-dress', label: 'Kitty Dress', emoji: '🐱',
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY, chest: bY, waist: wY } = TORSO_Y;
+      const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3, w = bt.waistHalf + 4;
+      const hemY = 336, hemHalf = bt.hipHalf + 46, scallops = 7;
+      const step = (hemHalf * 2) / scallops;
+      let hem = '';
+      for (let i = 0; i < scallops; i++) {
+        const x0 = cx + hemHalf - step * i;
+        hem += ` Q${x0 - step / 2},${hemY + 16} ${x0 - step},${hemY}`;
+      }
+      const paw = (x, y) => `<g fill="#ffffff" opacity="0.75">
+          <ellipse cx="${x}" cy="${y}" rx="4.2" ry="3.6"/>
+          <circle cx="${x - 4.6}" cy="${y - 5}" r="1.7"/><circle cx="${x - 1.5}" cy="${y - 6.8}" r="1.7"/>
+          <circle cx="${x + 1.9}" cy="${y - 6.8}" r="1.7"/><circle cx="${x + 4.8}" cy="${y - 5}" r="1.7"/></g>`;
+      const fy = 286;
+      return `<path d="M${cx - s},${sY} L${cx + s},${sY}
+                C${cx + s},${sY + 14} ${cx + c},${bY - 10} ${cx + c},${bY}
+                C${cx + c},${bY + 16} ${cx + w},${wY - 14} ${cx + w},${wY}
+                L${cx + hemHalf},${hemY}${hem}
+                L${cx - w},${wY}
+                C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY}
+                C${cx - c},${bY - 10} ${cx - s},${sY + 14} ${cx - s},${sY} Z"/>
+              <path d="M${cx - s + 7},${sY + 6} L${cx - w + 2},${wY + 110}" fill="none" stroke="#ffffff" stroke-width="6" opacity="0.15" stroke-linecap="round"/>
+              <path d="M${cx - s},${sY} L${cx + s},${sY} L${cx + s - 3},${sY + 14} L${cx - s + 3},${sY + 14} Z" fill="#000000" opacity="0.08"/>
+              <path d="M${cx - 1},${sY + 1} Q${cx - 24},${sY - 1} ${cx - 20},${sY + 12} Q${cx - 10},${sY + 18} ${cx - 1},${sY + 8} Z" fill="#ffffff" stroke="#e7d6e0" stroke-width="1"/>
+              <path d="M${cx + 1},${sY + 1} Q${cx + 24},${sY - 1} ${cx + 20},${sY + 12} Q${cx + 10},${sY + 18} ${cx + 1},${sY + 8} Z" fill="#ffffff" stroke="#e7d6e0" stroke-width="1"/>
+              <rect x="${cx - w}" y="${wY - 4}" width="${w * 2}" height="8" fill="#ffffff" opacity="0.9"/>
+              <path d="M${cx},${wY} L${cx - 14},${wY - 8} L${cx - 14},${wY + 8} Z M${cx},${wY} L${cx + 14},${wY - 8} L${cx + 14},${wY + 8} Z" fill="#ffffff" stroke="#e7d6e0" stroke-width="1"/>
+              <circle cx="${cx}" cy="${wY}" r="3.5" fill="#ff9fc7"/>
+              <path d="M${cx - 20},${fy - 10} L${cx - 17},${fy - 30} L${cx - 5},${fy - 19} Z M${cx + 20},${fy - 10} L${cx + 17},${fy - 30} L${cx + 5},${fy - 19} Z" fill="#ffffff" stroke="#e7d6e0" stroke-width="1"/>
+              <path d="M${cx - 16},${fy - 14} L${cx - 15},${fy - 25} L${cx - 8},${fy - 19} Z M${cx + 16},${fy - 14} L${cx + 15},${fy - 25} L${cx + 8},${fy - 19} Z" fill="#ff9fc7"/>
+              <ellipse cx="${cx}" cy="${fy}" rx="22" ry="19" fill="#ffffff" stroke="#e7d6e0" stroke-width="1"/>
+              <ellipse cx="${cx - 8}" cy="${fy - 3}" rx="2.6" ry="3.6" fill="#2b2b2b"/>
+              <ellipse cx="${cx + 8}" cy="${fy - 3}" rx="2.6" ry="3.6" fill="#2b2b2b"/>
+              <circle cx="${cx - 8.8}" cy="${fy - 4.4}" r="0.9" fill="#ffffff"/>
+              <circle cx="${cx + 7.2}" cy="${fy - 4.4}" r="0.9" fill="#ffffff"/>
+              <path d="M${cx - 2.5},${fy + 3} L${cx + 2.5},${fy + 3} L${cx},${fy + 5.5} Z" fill="#ff9fc7"/>
+              <path d="M${cx - 4},${fy + 7} Q${cx - 2},${fy + 9} ${cx},${fy + 6} Q${cx + 2},${fy + 9} ${cx + 4},${fy + 7}" fill="none" stroke="#2b2b2b" stroke-width="1" stroke-linecap="round"/>
+              <g stroke="#b9a9b3" stroke-width="0.9" stroke-linecap="round">
+                <line x1="${cx - 12}" y1="${fy + 3}" x2="${cx - 26}" y2="${fy}"/><line x1="${cx - 12}" y1="${fy + 6}" x2="${cx - 26}" y2="${fy + 7}"/>
+                <line x1="${cx + 12}" y1="${fy + 3}" x2="${cx + 26}" y2="${fy}"/><line x1="${cx + 12}" y1="${fy + 6}" x2="${cx + 26}" y2="${fy + 7}"/>
+              </g>
+              ${paw(cx - hemHalf + 26, 316)}${paw(cx + hemHalf - 26, 314)}${paw(cx - 40, 248)}${paw(cx + 42, 262)}` } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -449,6 +494,12 @@ const ACCESSORIES = [
           <rect x="205" y="286" width="8" height="6" rx="2" fill="#e8c468"/>
           <line x1="195" y1="299" x2="223" y2="299" stroke="#000000" stroke-width="1" opacity="0.15"/>
           <path d="M198,280 Q209,260 220,280" fill="none" stroke-width="4"/>` },
+  { id: 'cat-ears', label: 'Cat Ears', emoji: '😺', color: '#2b2b2b',
+    svg: `<path d="M104,68 Q150,26 196,68" fill="none" stroke-width="4" stroke-linecap="round"/>
+          <path d="M110,58 L114,24 L138,44 Z"/>
+          <path d="M116,51 L118,33 L131,44 Z" fill="#ff9fc7" stroke="none"/>
+          <path d="M190,58 L186,24 L162,44 Z"/>
+          <path d="M184,51 L182,33 L169,44 Z" fill="#ff9fc7" stroke="none"/>` },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 L150,4 L192,58 Z"/>
           <ellipse cx="150" cy="58" rx="44" ry="13" fill="#f4f4f4"/>
@@ -791,6 +842,11 @@ const WARDROBE_PRESETS = [
       outfit: { style: 'suit', color: '#2b2b2b' }, shoes: { style: 'boots', color: '#2b2b2b' },
       accessories: { glasses: true }, background: 'gold',
       face: { eyebrowShape: 'straight', mouth: 'neutral', blush: false } } },
+  { id: 'kitty-cutie', label: 'Kitty Cutie', theme: 'classic',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[1], hair: { style: 'half-up', color: '#4b2e1e' },
+      outfit: { style: 'kitty-dress', color: '#e0558f' }, shoes: { style: 'flats', color: '#ffffff' },
+      accessories: { 'cat-ears': true }, pet: { species: 'cat', color: '#8a8a8a', accessory: 'bow' },
+      background: 'pink', face: { eyeShape: 'wide' } } },
   { id: 'santas-helper', label: "Santa's Helper", theme: 'christmas',
     look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'ponytail', color: '#8a5a2b' },
       outfit: { style: 'elf-costume', color: '#1e7a46' }, shoes: { style: 'boots', color: '#8a5a2b' },
