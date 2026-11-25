@@ -1617,6 +1617,19 @@ const ACCESSORIES = [
             ${[106, 116, 126, 136, 146, 156, 166, 176, 186, 194].map((x, i) => `<circle cx="${x}" cy="${i % 2 ? 51 : 64}" r="5"/>`).join('')}
             <circle cx="214" cy="76" r="8"/><circle cx="208" cy="80" r="5"/><circle cx="220" cy="81" r="5"/><circle cx="214" cy="69" r="5"/>
           </g>` },
+  { id: 'hot-cocoa', label: 'Hot Cocoa', emoji: '☕', theme: 'christmas', color: '#e05c5c',
+    svg: `<g fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.8">
+            <path class="cocoa-steam" d="M78,236 q-4,-6 0,-12 q4,-6 0,-12"/>
+            <path class="cocoa-steam cocoa-steam-b" d="M88,234 q-4,-6 0,-12 q4,-6 0,-12"/>
+          </g>
+          <path d="M70,248 q-12,0 -12,9 q0,9 12,9" fill="none" stroke="#e05c5c" stroke-width="4"/>
+          <path d="M70,240 L98,240 L96,272 Q84,277 72,272 Z" stroke="#a83232" stroke-width="1.2"/>
+          <ellipse cx="84" cy="241" rx="14" ry="3.6" fill="#6b3f1d" stroke="#a83232" stroke-width="1"/>
+          <rect x="75" y="236" width="7" height="6" rx="2" fill="#ffffff" stroke="#e7d6e0" stroke-width="0.6"/>
+          <rect x="84" y="235" width="7" height="6" rx="2" fill="#fff0f6" stroke="#e7d6e0" stroke-width="0.6" transform="rotate(12 87 238)"/>
+          <g stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" opacity="0.9">
+            <line x1="84" y1="252" x2="84" y2="264"/><line x1="78" y1="258" x2="90" y2="258"/><line x1="80" y1="254" x2="88" y2="262"/><line x1="88" y1="254" x2="80" y2="262"/>
+          </g>` },
   { id: 'candy-cane', label: 'Candy Cane', emoji: '🍬', theme: 'christmas', color: '#e03131',
     svg: `<path d="M205,250 Q222,228 208,212" fill="none" stroke="#e03131" stroke-width="8" stroke-linecap="round"/>
           <path d="M205,250 Q222,228 208,212" fill="none" stroke="#ffffff" stroke-width="8" stroke-dasharray="6 6" stroke-linecap="round"/>` },
@@ -1874,7 +1887,58 @@ const MOUTH_SHAPES = [
 
 const LIP_COLORS = ['#d9a98c', '#c9707d', '#c0293b', '#e0558f', '#e8836b', '#8c4a6b'];
 
+const LASH_STYLES = [
+  { id: 'none', label: 'No Lashes', emoji: '○' },
+  { id: 'natural', label: 'Natural', emoji: '👁️' },
+  { id: 'long', label: 'Long', emoji: '🦋' },
+  { id: 'glam', label: 'Glam', emoji: '💃' },
+  { id: 'sparkle', label: 'Sparkle', emoji: '✨' },
+  { id: 'rainbow', label: 'Rainbow', emoji: '🌈' },
+];
+
+// Upper-lid size for each eye shape, so lashes sit right on the lid.
+const EYE_LID = {
+  round: { cy: 90, rx: 7, ry: 6.5 },
+  almond: { cy: 90, rx: 8, ry: 5 },
+  sleepy: { cy: 91, rx: 7, ry: 3.4 },
+  wide: { cy: 89, rx: 8.5, ry: 7.5 },
+};
+
+function lashesSVG(style, shape, cx, side) {
+  if (!style || style === 'none') return '';
+  const lid = EYE_LID[shape] || EYE_LID.round;
+  const cfg = {
+    natural: { n: 3, len: 3, w: 1.1, curl: 0.3 },
+    long: { n: 4, len: 5.5, w: 1.2, curl: 0.6 },
+    glam: { n: 5, len: 6.5, w: 1.5, curl: 0.7 },
+    sparkle: { n: 4, len: 5.5, w: 1.3, curl: 0.6 },
+    rainbow: { n: 5, len: 5.5, w: 1.5, curl: 0.6 },
+  }[style];
+  const rainbow = ['#e05c5c', '#f2c94c', '#43b581', '#5c7ce0', '#9b6be0'];
+  let out = '';
+  for (let i = 0; i < cfg.n; i++) {
+    const t = 0.15 + (0.85 * i) / Math.max(1, cfg.n - 1);
+    const bx = cx + side * lid.rx * t;
+    const by = lid.cy - lid.ry * Math.sqrt(Math.max(0, 1 - t * t));
+    const ang = -Math.PI / 2 + side * (0.25 + t * 0.9);
+    const ex = bx + Math.cos(ang) * cfg.len, ey = by + Math.sin(ang) * cfg.len;
+    const qx = bx + Math.cos(ang - side * cfg.curl) * cfg.len * 0.6, qy = by + Math.sin(ang - side * cfg.curl) * cfg.len * 0.6;
+    const col = style === 'rainbow' ? rainbow[i % rainbow.length] : style === 'sparkle' ? '#5a3aa8' : '#1a1a1a';
+    out += `<path d="M${bx.toFixed(1)},${by.toFixed(1)} Q${qx.toFixed(1)},${qy.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}" fill="none" stroke="${col}" stroke-width="${cfg.w}" stroke-linecap="round"/>`;
+  }
+  if (style === 'glam') {
+    const ox = cx + side * lid.rx, oy = lid.cy - 1;
+    out = `<path d="M${cx - side * lid.rx * 0.6},${lid.cy - lid.ry * 0.8} Q${cx + side * lid.rx * 0.5},${lid.cy - lid.ry - 0.6} ${ox},${oy} L${ox + side * 5},${oy - 4} L${ox - side * 0.5},${oy + 1.2} Z" fill="#1a1a1a"/>` + out;
+  }
+  if (style === 'sparkle') {
+    const gx = cx + side * (lid.rx + 3), gy = lid.cy + 2;
+    out += `<path d="M${gx},${gy - 2.6} L${gx + 0.8},${gy - 0.8} L${gx + 2.6},${gy} L${gx + 0.8},${gy + 0.8} L${gx},${gy + 2.6} L${gx - 0.8},${gy + 0.8} L${gx - 2.6},${gy} L${gx - 0.8},${gy - 0.8} Z" fill="#c9a6ff"/>`;
+  }
+  return out;
+}
+
 const DEFAULT_FACE = {
+  lashes: 'none',
   eyeShape: 'round',
   eyeColor: '#3b2417',
   eyebrowShape: 'soft',
@@ -1943,6 +2007,8 @@ function buildFaceSVG(face, hairColor) {
     <path d="M147,97 Q150,101 148,102.5" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="1.2" stroke-linecap="round"/>
     ${eyeShapeSVG(face.eyeShape, 132, -1, face.eyeColor)}
     ${eyeShapeSVG(face.eyeShape, 168, 1, face.eyeColor)}
+    ${lashesSVG(face.lashes, face.eyeShape, 132, -1)}
+    ${lashesSVG(face.lashes, face.eyeShape, 168, 1)}
     ${eyebrowSVG(face.eyebrowShape, 132, hairColor)}
     ${eyebrowSVG(face.eyebrowShape, 168, hairColor)}
     ${mouthSVG(face.mouth, face.lipColor)}
@@ -2033,7 +2099,7 @@ const WARDROBE_PRESETS = [
     look: { bodyType: 'feminine', skin: SKIN_TONES[1], hair: { style: 'half-up', color: '#4b2e1e' },
       outfit: { style: 'kitty-dress', color: '#e0558f' }, shoes: { style: 'flats', color: '#ffffff' },
       accessories: { 'cat-ears': true }, pet: { species: 'cat', color: '#8a8a8a', accessory: 'bow' },
-      background: 'pink', face: { eyeShape: 'wide' } } },
+      background: 'pink', face: { eyeShape: 'wide', lashes: 'natural' } } },
   { id: 'weekend-chill', label: 'Weekend Chill', theme: 'classic',
     look: { bodyType: 'neutral', skin: SKIN_TONES[3], hair: { style: 'ponytail', color: '#2b2b2b' },
       outfit: { style: 'baggy-jeans', color: '#ffffff' }, shoes: { style: 'sneakers', color: '#ffffff' },
@@ -2078,7 +2144,7 @@ const WARDROBE_PRESETS = [
   { id: 'prima-ballerina', label: 'Prima Ballerina', theme: 'ballet',
     look: { bodyType: 'feminine', skin: SKIN_TONES[1], hair: { style: 'bun', color: '#4b2e1e' },
       outfit: { style: 'ballet-tutu', color: '#ff8fc7' }, shoes: { style: 'ballet-slippers', color: '#ffb3d6' },
-      accessories: {}, background: 'ballet-stage', face: { eyeShape: 'almond' } } },
+      accessories: {}, background: 'ballet-stage', face: { eyeShape: 'almond', lashes: 'long' } } },
   { id: 'swan-dancer', label: 'Swan Dancer', theme: 'ballet',
     look: { bodyType: 'neutral', skin: SKIN_TONES[4], hair: { style: 'bun', color: '#2b2b2b' },
       outfit: { style: 'swan-tutu', color: '#ffffff' }, shoes: { style: 'ballet-slippers', color: '#ffffff' },
@@ -2091,7 +2157,7 @@ const WARDROBE_PRESETS = [
   { id: 'snow-day', label: 'Snow Day', theme: 'christmas',
     look: { bodyType: 'feminine', skin: SKIN_TONES[3], hair: { style: 'half-up', color: '#4b2e1e' },
       outfit: { style: 'aline', color: '#e05c5c' }, shoes: { style: 'boots', color: '#ffffff' },
-      accessories: { 'santa-hat': true, snowflake: true }, background: 'winter-wonderland', face: { mouth: 'grin' } } },
+      accessories: { 'santa-hat': true, snowflake: true, 'hot-cocoa': true }, background: 'winter-wonderland', face: { mouth: 'grin', lashes: 'natural' } } },
   { id: 'winter-belle', label: 'Winter Belle', theme: 'christmas',
     look: { bodyType: 'feminine', skin: SKIN_TONES[2], hair: { style: 'long', color: '#d9b45a' },
       outfit: { style: 'santa-dress', color: '#c1272d' }, shoes: { style: 'flats', color: '#ffffff' },
@@ -2106,7 +2172,7 @@ const WARDROBE_PRESETS = [
     look: { bodyType: 'feminine', skin: SKIN_TONES[3], hair: { style: 'bun', color: '#2b2b2b' },
       outfit: { style: 'peacock-gown', color: '#1f7a8c' }, shoes: { style: 'heels', color: '#5cc4e0' },
       accessories: { 'diamond-necklace': false }, pet: { species: 'bird', color: '#4aa3df', accessory: 'none' },
-      background: 'sunset-flock', face: { eyeShape: 'almond' } } },
+      background: 'sunset-flock', face: { eyeShape: 'almond', lashes: 'sparkle' } } },
   { id: 'wise-owl', label: 'Wise Owl', theme: 'birds',
     look: { bodyType: 'neutral', skin: SKIN_TONES[1], hair: { style: 'crop', color: '#8a5a2b' },
       outfit: { style: 'owl-costume', color: '#8a5a2b' }, shoes: { style: 'boots', color: '#8a5a2b' },
@@ -2149,7 +2215,7 @@ const WARDROBE_PRESETS = [
     look: { bodyType: 'feminine', skin: SKIN_TONES[4], hair: { style: 'spiderweb', color: '#2b2b2b' },
       outfit: { style: 'aline', color: '#2b2b2b' }, shoes: { style: 'boots', color: '#2b2b2b' },
       accessories: { 'witch-hat': true, 'candy-bag': true }, pet: { species: 'bat', color: '#4b3b63', accessory: 'bow' },
-      background: 'haunted-night', face: { lipColor: '#8c4a6b' } } },
+      background: 'haunted-night', face: { lipColor: '#8c4a6b', lashes: 'glam' } } },
 ];
 
 // ---------- Leveling / unlocks ----------
@@ -2331,6 +2397,11 @@ buildOptionButtons(document.getElementById('eye-shapes'), EYE_SHAPES, (id) => {
 
 buildSwatches(document.getElementById('eye-colors'), EYE_COLORS, (c) => {
   state.face.eyeColor = c;
+  render();
+});
+
+buildOptionButtons(document.getElementById('lash-styles'), LASH_STYLES, (id) => {
+  state.face.lashes = id;
   render();
 });
 
@@ -2588,6 +2659,7 @@ function render() {
   highlightSelection('#eye-shapes', state.face.eyeShape, 'id');
   highlightSelection('#eye-colors', state.face.eyeColor, 'color');
   highlightSelection('#eyebrow-shapes', state.face.eyebrowShape, 'id');
+  highlightSelection('#lash-styles', state.face.lashes || 'none', 'id');
   highlightSelection('#mouth-shapes', state.face.mouth, 'id');
   highlightSelection('#lip-colors', state.face.lipColor, 'color');
   highlightSelection('#hair-colors', state.hair.color, 'color');
@@ -2952,6 +3024,7 @@ document.getElementById('randomize-btn').addEventListener('click', () => {
     eyeShape: pick(EYE_SHAPES).id,
     eyeColor: pick(EYE_COLORS),
     eyebrowShape: pick(EYEBROW_SHAPES).id,
+    lashes: pick(LASH_STYLES).id,
     mouth: pick(MOUTH_SHAPES).id,
     lipColor: pick(LIP_COLORS),
     blush: Math.random() > 0.3,

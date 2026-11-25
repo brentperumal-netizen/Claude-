@@ -1242,3 +1242,13 @@ body {
 .walk-picker .lock-badge { display: inline; margin: 0 0 0 4px; }
 .game-walk-badge { background: linear-gradient(135deg, #8c5ce0, #5cc4e0); }
 #game-walk-styles { margin-bottom: 10px; }
+
+/* ---------- Hot cocoa steam ---------- */
+.cocoa-steam { animation: cocoa-steam 2.4s ease-in-out infinite; }
+.cocoa-steam-b { animation-delay: -1.2s; }
+@keyframes cocoa-steam {
+  0%   { transform: translateY(4px); opacity: 0; }
+  40%  { opacity: 0.85; }
+  100% { transform: translateY(-8px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .cocoa-steam { animation: none; } }
