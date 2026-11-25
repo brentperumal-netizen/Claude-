@@ -196,6 +196,7 @@
           <g id="layer-acc-butterfly-clips"></g>
           <g id="layer-acc-feather-headpiece"></g>
           <g id="layer-acc-sparkle-headband"></g>
+          <g id="layer-acc-candy-clips"></g>
           <g id="layer-acc-beret"></g>
           <g id="layer-acc-angel-halo"></g>
           <g id="layer-acc-star-crown"></g>
@@ -209,6 +210,7 @@
           <g id="layer-acc-glasses"></g>
           <g id="layer-acc-hero-mask"></g>
           <g id="layer-acc-pineapple-glasses"></g>
+          <g id="layer-acc-baddie-shades"></g>
           <g id="layer-acc-heart-sunglasses"></g>
           <g id="layer-acc-headphones"></g>
           <g id="layer-acc-aviator-sunglasses"></g>
@@ -227,11 +229,13 @@
           <g id="layer-acc-sparkle-scarf"></g>
           <g id="layer-acc-bow-tie"></g>
           <g id="layer-acc-gold-chain"></g>
+          <g id="layer-acc-baddie-chain"></g>
           <g id="layer-acc-bag"></g>
           <g id="layer-acc-candy-bag"></g>
           <g id="layer-acc-gold-clutch"></g>
           <g id="layer-acc-cake"></g>
           <g id="layer-acc-hot-cocoa"></g>
+          <g id="layer-acc-lollipop"></g>
           <g id="layer-acc-hero-sword"></g>
           <g id="layer-acc-hero-shield"></g>
           <g id="layer-acc-feather-fan"></g>
@@ -247,6 +251,7 @@
         <button id="randomize-btn" class="btn btn-ghost">🎲 Surprise Me</button>
         <button id="wardrobe-btn" class="btn btn-ghost">👗 Wardrobe</button>
         <button id="shop-btn" class="btn btn-ghost">🛍️ Shop</button>
+        <button id="passes-btn" class="btn btn-ghost">🎟️ Passes</button>
         <button id="show-btn" class="btn btn-primary">🎬 Runway Run</button>
         <button id="catwalk-btn" class="btn btn-primary">💃 Catwalk Show</button>
       </div>
@@ -303,6 +308,20 @@
     </div>
     <p class="modal-subtitle">Pick a complete look and try it on all at once.</p>
     <div class="wardrobe-grid" id="wardrobe-grid"></div>
+  </div>
+</div>
+
+<!-- STYLE PASSES MODAL -->
+<div class="modal-overlay" id="passes-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="passes-title">
+    <div class="modal-header">
+      <h2 id="passes-title">🎟️ Style Passes</h2>
+      <span class="cash-badge shop-cash" id="passes-cash">💵 $100</span>
+      <button class="modal-close" id="passes-close" aria-label="Close passes">✕</button>
+    </div>
+    <p class="modal-subtitle">Buy a pass, then earn pass points in every show to unlock its rewards: each star is 1 point, finishing Runway Run is 2, and each Catwalk Show is 3.</p>
+    <p class="shop-toast" id="passes-toast" hidden></p>
+    <div class="passes-grid" id="passes-grid"></div>
   </div>
 </div>
 

@@ -1252,3 +1252,81 @@ body {
   100% { transform: translateY(-8px); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .cocoa-steam { animation: none; } }
+
+/* ---------- Style Passes ---------- */
+#passes-overlay { z-index: 110; }
+
+.passes-grid { display: grid; gap: 16px; }
+
+.pass-card {
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  background: linear-gradient(135deg, #ffffff, #fff6fb);
+}
+.pass-card.owned { border-color: var(--pass-color); }
+
+.pass-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pass-emoji {
+  font-size: 2rem;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--pass-color);
+}
+.pass-title { flex: 1 1 200px; min-width: 0; }
+.pass-title h3 { margin: 0; font-size: 1.1rem; color: var(--pass-color); }
+.pass-title p { margin: 2px 0 0; font-size: 0.82rem; color: var(--muted); }
+.pass-buy { padding: 8px 14px; font-size: 0.85rem; }
+.pass-buy:disabled { opacity: 0.7; cursor: default; transform: none; }
+
+.pass-progress { margin: 12px 0 10px; }
+.pass-bar { height: 10px; border-radius: 999px; background: var(--border); overflow: hidden; }
+.pass-bar-fill { height: 100%; background: var(--pass-color); transition: width 0.3s ease; }
+.pass-status { display: block; margin-top: 4px; font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+
+.pass-tiers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+.pass-tier {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "num num" "emoji label" "act act";
+  gap: 2px 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #f6f0f8;
+  opacity: 0.75;
+}
+.pass-tier.open { background: #fff; border: 2px solid var(--pass-color); opacity: 1; }
+.tier-num { grid-area: num; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--pass-color); }
+.tier-emoji { grid-area: emoji; font-size: 1.4rem; }
+.tier-label { grid-area: label; font-size: 0.82rem; font-weight: 700; color: var(--ink); min-width: 0; }
+.tier-label small { display: block; font-weight: 500; color: var(--muted); font-size: 0.7rem; }
+.tier-action {
+  grid-area: act;
+  margin-top: 4px;
+  border: none;
+  border-radius: 999px;
+  padding: 5px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--pass-color);
+  color: #fff;
+}
+.tier-action:disabled { background: var(--border); color: var(--muted); cursor: default; }
+.tier-action:focus-visible, .pass-buy:focus-visible { outline: 3px solid #8c5ce0; outline-offset: 2px; }

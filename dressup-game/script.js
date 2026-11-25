@@ -218,6 +218,14 @@ const HAIR_STYLES = [
               <circle cx="194" cy="76" r="6" fill="#ff8fc7" stroke="#e0558f" stroke-width="1"/>
               <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>`;
     })() },
+  { id: 'cotton-candy-puffs', label: 'Cotton Candy Puffs', emoji: '☁️', pass: 'sweetie', passTier: 5,
+    svg: `${[[-1, 108], [1, 192]].map(([d, x]) => `<g class="hair-sway hair-sway-${d < 0 ? 'left' : 'right'}">
+            <circle cx="${x + d * 6}" cy="40" r="20"/><circle cx="${x + d * 18}" cy="52" r="17"/><circle cx="${x - d * 6}" cy="30" r="15"/>
+            <circle cx="${x + d * 10}" cy="26" r="13"/><circle cx="${x + d * 4}" cy="58" r="14"/>
+            <circle cx="${x + d * 2}" cy="34" r="3" fill="#ffffff" opacity="0.35"/></g>`).join('')}
+          <path d="M98,82 A58,58 0 0 1 202,82 Z"/>
+          <rect x="98" y="80" width="12" height="20" rx="6"/><rect x="190" y="80" width="12" height="20" rx="6"/>
+          <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
   { id: 'crop', label: 'Short Crop', emoji: '💈',
     svg: `<path d="M100,78 A52,52 0 0 1 200,78 L198,96 A50,42 0 0 0 102,96 Z"/>
           <path d="M116,64 Q128,56 140,60" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>` },
@@ -1085,6 +1093,70 @@ const OUTFIT_STYLES = [
     svg: (bt) => balletTutuSVG(bt, null) },
   { id: 'swan-tutu', label: 'Swan Tutu', emoji: '🦢', theme: 'ballet', fixedColor: true,
     svg: (bt) => balletTutuSVG(bt, { suit: '#fdfdfd', tutu: '#ffffff', trim: '#d9d0c0', sparkle: '#c9a6ff' }) },
+  { id: 'puffer-jacket', label: 'Puffer & Cargos', emoji: '🧥', pass: 'baddie', passTier: 2, fixedColor: true,
+    svg: (bt) => {
+      const cx = 150, sY = TORSO_Y.shoulder, h = bt.hipHalf + 8;
+      const leg = (d) => {
+        const outer = cx + d * h, inner = cx + d * 2, outerB = cx + d * (h + 8), innerB = cx + d * 5;
+        return `<path d="M${outer},236 L${inner},236 L${inner},262 L${innerB},444 L${outerB},444 Z" fill="#c9b18a" stroke="#a89068" stroke-width="1.2"/>
+          <rect x="${Math.min(outer, outerB) + (d < 0 ? 2 : -18)}" y="312" width="16" height="20" rx="2" fill="#b89f78" stroke="#a89068" stroke-width="1"/>
+          <rect x="${Math.min(outerB, innerB)}" y="436" width="${Math.abs(outerB - innerB)}" height="8" fill="#a89068"/>`;
+      };
+      let puffs = '';
+      for (let y = sY + 2; y < 244; y += 17) {
+        const half = torsoHalfAt(bt, Math.min(y + 8, 250)) + 9;
+        puffs += `<rect x="${cx - half}" y="${y}" width="${half * 2}" height="19" rx="9.5" fill="#26262f" stroke="#111116" stroke-width="1.2"/>
+                  <path d="M${cx - half + 8},${y + 5} L${cx - half + 22},${y + 5}" stroke="#ffffff" stroke-width="1.5" opacity="0.18" stroke-linecap="round"/>`;
+      }
+      return `${leg(-1)}${leg(1)}
+              <ellipse cx="${cx - bt.shoulderHalf - 6}" cy="${sY + 16}" rx="17" ry="20" fill="#26262f" stroke="#111116" stroke-width="1.2"/>
+              <ellipse cx="${cx + bt.shoulderHalf + 6}" cy="${sY + 16}" rx="17" ry="20" fill="#26262f" stroke="#111116" stroke-width="1.2"/>
+              ${puffs}
+              <path d="M${cx - 18},${sY - 4} Q${cx},${sY + 10} ${cx + 18},${sY - 4} L${cx + 16},${sY + 6} Q${cx},${sY + 18} ${cx - 16},${sY + 6} Z" fill="#26262f" stroke="#111116" stroke-width="1"/>
+              <line x1="${cx}" y1="${sY + 10}" x2="${cx}" y2="244" stroke="#d6dbe2" stroke-width="2"/>
+              <rect x="${cx - 2.5}" y="${sY + 16}" width="5" height="9" rx="1" fill="#d6dbe2"/>`;
+    } },
+  { id: 'glam-tracksuit', label: 'Glam Tracksuit', emoji: '💗', pass: 'baddie', passTier: 5, fixedColor: true,
+    svg: (bt) => {
+      const cx = 150, sY = TORSO_Y.shoulder, h = bt.hipHalf + 4;
+      const leg = (d) => {
+        const outer = cx + d * h, inner = cx + d * 2;
+        return `<path d="M${outer},236 L${inner},236 L${cx + d * 5},440 L${cx + d * (h + 16)},440 Z" fill="#ff6fb0" stroke="#e0458f" stroke-width="1"/>
+                <path d="M${outer - d * 3},240 L${cx + d * (h + 12)},438" stroke="#ffffff" stroke-width="3"/>`;
+      };
+      const gems = [[-10, 182], [8, 192], [-4, 206], [12, 214], [-14, 222], [2, 228]].map(([x, y]) =>
+        `<path d="M${cx + x},${y - 2.6} L${cx + x + 2},${y} L${cx + x},${y + 2.6} L${cx + x - 2},${y} Z" fill="#ffffff"/>`).join('');
+      return `${leg(-1)}${leg(1)}
+              <path d="M${cx - 30},${sY - 2} Q${cx},${sY - 18} ${cx + 30},${sY - 2} L${cx + 26},${sY + 6} Q${cx},${sY - 6} ${cx - 26},${sY + 6} Z" fill="#e0458f"/>
+              ${fittedTopSVG(bt, 244, '#ff6fb0')}
+              <rect x="${cx - torsoHalfAt(bt, 240) - 4}" y="236" width="${(torsoHalfAt(bt, 240) + 4) * 2}" height="9" fill="#e0458f"/>
+              <line x1="${cx}" y1="${sY + 4}" x2="${cx}" y2="240" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="${cx}" cy="${sY + 14}" r="3" fill="#ffffff"/>
+              <path d="M${cx - bt.shoulderHalf - 12},${sY + 6} L${cx - bt.shoulderHalf - 12},${sY + 26} M${cx + bt.shoulderHalf + 12},${sY + 6} L${cx + bt.shoulderHalf + 12},${sY + 26}" stroke="#ffffff" stroke-width="3"/>
+              ${gems}`;
+    } },
+  { id: 'cupcake-dress', label: 'Cupcake Dress', emoji: '🧁', pass: 'sweetie', passTier: 2, fixedColor: true,
+    svg: (bt) => {
+      const cx = 150;
+      const { shoulder: sY, waist: wY } = TORSO_Y;
+      const top = bt.waistHalf + 6, hemY = 316, hemHalf = bt.hipHalf + 40;
+      const stripes = Array.from({ length: 9 }, (_, i) => {
+        const f0 = -1 + (2 * i) / 9, f1 = -1 + (2 * (i + 1)) / 9;
+        return `<path d="M${cx + f0 * top},${wY + 6} L${cx + f1 * top},${wY + 6} L${cx + f1 * hemHalf},${hemY} L${cx + f0 * hemHalf},${hemY} Z" fill="${i % 2 ? '#bff0dd' : '#8fe0c0'}"/>`;
+      }).join('');
+      let wave = '';
+      const n = 8, t = torsoHalfAt(bt, wY + 8) + 10, step = (t * 2) / n;
+      for (let k = 0; k < n; k++) { const x0 = cx + t - step * k; wave += ` Q${(x0 - step / 2).toFixed(1)},${wY + 22} ${(x0 - step).toFixed(1)},${wY + 10}`; }
+      const sprinkles = [[-14, 176, '#e05c5c', 20], [10, 168, '#5cc4e0', -30], [-4, 194, '#f2c94c', 60], [16, 206, '#9b6be0', 10], [-18, 210, '#43b581', -50], [4, 182, '#ffffff', 40]]
+        .map(([x, y, c, r]) => `<rect x="${cx + x - 3}" y="${y - 1}" width="6" height="2.2" rx="1.1" fill="${c}" transform="rotate(${r} ${cx + x} ${y})"/>`).join('');
+      return `${stripes}
+              <path d="M${cx - hemHalf},${hemY} L${cx + hemHalf},${hemY}" stroke="#6cc9a6" stroke-width="3"/>
+              ${fittedTopSVG(bt, wY + 10, '#ffb3d6')}
+              <path d="M${cx + t},${wY + 10}${wave} L${cx - t},${wY} L${cx + t},${wY} Z" fill="#ffb3d6"/>
+              ${sprinkles}
+              <circle cx="${cx}" cy="${sY + 2}" r="6" fill="#e0245e"/><path d="M${cx},${sY - 4} q4,-8 10,-8" fill="none" stroke="#3f8f3a" stroke-width="1.6"/>
+              <circle cx="${cx - 2}" cy="${sY}" r="1.6" fill="#ffffff" opacity="0.7"/>`;
+    } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -1244,6 +1316,19 @@ const SHOE_STYLES = [
           <line x1="176" y1="442" x2="192" y2="438" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>` },
 ];
 
+SHOE_STYLES.push({ id: 'platform-boots', label: 'Platform Boots', emoji: '🥾', pass: 'baddie', passTier: 4,
+  svg: [127, 173].map((x) => `
+        <rect x="${x - 13}" y="392" width="26" height="56" rx="8"/>
+        <rect x="${x - 15}" y="446" width="30" height="16" rx="4" fill="#1d1d24" stroke="none"/>
+        <path d="M${x - 15},452 L${x + 15},452" stroke="#ffffff" stroke-width="1" opacity="0.3"/>
+        <path d="M${x - 5},404 L${x + 5},410 M${x + 5},404 L${x - 5},410 M${x - 5},414 L${x + 5},420 M${x + 5},414 L${x - 5},420 M${x - 5},424 L${x + 5},430 M${x + 5},424 L${x - 5},430" fill="none" stroke="#f2c94c" stroke-width="1.4"/>
+        <rect x="${x - 13}" y="392" width="26" height="7" rx="3" fill="#1d1d24" stroke="none"/>`).join('') });
+SHOE_STYLES.push({ id: 'sprinkle-sneakers', label: 'Sprinkle Sneakers', emoji: '👟', pass: 'sweetie', passTier: 3,
+  svg: [0, 46].map((dx) => `
+        <rect x="${104 + dx}" y="446" width="46" height="10" rx="5" fill="#ffb3d6" stroke="none"/>
+        <path d="M${106 + dx},444 Q${106 + dx},428 ${124 + dx},425 Q${144 + dx},423 ${150 + dx},438 Q${152 + dx},444 ${148 + dx},446 L${106 + dx},446 Z"/>
+        ${[[114, 438, '#e05c5c', 20], [124, 432, '#5cc4e0', -30], [134, 438, '#f2c94c', 50], [142, 434, '#43b581', -10], [128, 441, '#9b6be0', 70]].map(([x, y, c, r]) =>
+          `<rect x="${x + dx - 2.5}" y="${y - 0.9}" width="5" height="1.8" rx="0.9" fill="${c}" stroke="none" transform="rotate(${r} ${x + dx} ${y})"/>`).join('')}`).join('') });
 SHOE_STYLES.push({ id: 'ballet-slippers', label: 'Ballet Shoes', emoji: '🩰', theme: 'ballet',
   svg: [127, 173].map((x) => `
         <ellipse cx="${x}" cy="462" rx="9" ry="3" fill="#000000" opacity="0.18" stroke="none"/>
@@ -1608,6 +1693,28 @@ const ACCESSORIES = [
           }).join('')}
           <rect x="108" y="42" width="84" height="12" rx="4" stroke="#c98f1f" stroke-width="1.2"/>
           <circle cx="132" cy="48" r="3" fill="#ff6f91" stroke="none"/><circle cx="150" cy="48" r="3.4" fill="#5cc4e0" stroke="none"/><circle cx="168" cy="48" r="3" fill="#9b6be0" stroke="none"/>` },
+  { id: 'baddie-shades', label: 'Baddie Shades', emoji: '🖤', pass: 'baddie', passTier: 0, color: '#111116',
+    svg: [132, 168].map((x) => `<path d="M${x - 15},84 L${x + 15},84 L${x + 13},95 Q${x},98 ${x - 13},95 Z" fill="#111116" fill-opacity="0.92" stroke="#f2c94c" stroke-width="1.2"/>
+          <path d="M${x - 10},87 L${x - 3},87" stroke="#ffffff" stroke-width="1.4" opacity="0.5" stroke-linecap="round"/>`).join('') +
+      `<path d="M117,84 L183,84" stroke="#f2c94c" stroke-width="1.6"/>
+       <line x1="117" y1="85" x2="105" y2="82" stroke="#111116" stroke-width="2.6"/><line x1="183" y1="85" x2="195" y2="82" stroke="#111116" stroke-width="2.6"/>` },
+  { id: 'baddie-chain', label: 'Heart Bling Chain', emoji: '💛', pass: 'baddie', passTier: 1, color: '#f2c94c',
+    svg: Array.from({ length: 13 }, (_, i) => {
+      const t = i / 12, x = 126 + 48 * t, y = 154 + 26 * Math.sin(Math.PI * t);
+      return `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="4" ry="2.8" fill="none" stroke="#e0b13a" stroke-width="2.4" transform="rotate(${(Math.cos(Math.PI * t) * -40).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+    }).join('') + `<path d="M150,206 C138,198 136,186 144,184 C147,183 150,186 150,189 C150,186 153,183 156,184 C164,186 162,198 150,206 Z" fill="#f2c94c" stroke="#c98f1f" stroke-width="1.2"/>
+      <g fill="#ffffff" stroke="none"><circle cx="146" cy="190" r="1.4"/><circle cx="153" cy="193" r="1.1"/><circle cx="150" cy="198" r="1.2"/></g>` },
+  { id: 'lollipop', label: 'Swirl Lollipop', emoji: '🍭', pass: 'sweetie', passTier: 0, color: '#ff6fb0',
+    svg: `<line x1="214" y1="292" x2="220" y2="236" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round"/>
+          <circle cx="221" cy="220" r="18" fill="#ffffff" stroke="#e0458f" stroke-width="1.5"/>
+          <path d="M221,220 m0,-3 a3,3 0 1 1 -3,3 a6,6 0 1 1 6,6 a9,9 0 1 1 -9,-9 a12,12 0 1 1 12,12 a15,15 0 0 1 -15,-15" fill="none" stroke="#ff6fb0" stroke-width="3.4" stroke-linecap="round"/>
+          <path d="M210,228 q-2,8 6,10" fill="none" stroke="#e0458f" stroke-width="2" stroke-linecap="round"/>
+          <path d="M214,236 l-6,-4 l2,8 Z M222,237 l6,-3 l-1,8 Z" fill="#5cc4e0" stroke="none"/>` },
+  { id: 'candy-clips', label: 'Candy Clips', emoji: '🍬', pass: 'sweetie', passTier: 1, color: '#f2c94c',
+    svg: [[116, 58, '#ff6fb0', -20], [184, 58, '#5cc4e0', 20], [134, 44, '#f2c94c', -10]].map(([x, y, c, r]) => `<g transform="rotate(${r} ${x} ${y})" stroke="none">
+          <path d="M${x - 7},${y} L${x - 14},${y - 6} L${x - 14},${y + 6} Z M${x + 7},${y} L${x + 14},${y - 6} L${x + 14},${y + 6} Z" fill="${c}" opacity="0.85"/>
+          <ellipse cx="${x}" cy="${y}" rx="8" ry="6" fill="${c}"/>
+          <path d="M${x - 4},${y - 4} L${x - 1},${y + 5} M${x + 1},${y - 5} L${x + 4},${y + 4}" stroke="#ffffff" stroke-width="1.6" opacity="0.8"/></g>`).join('') },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 C110,26 136,8 160,10 C186,12 206,36 214,72 C202,58 192,46 180,40 C186,46 190,52 192,58 Z" stroke="#8e1b20" stroke-width="1.2"/>
           <path d="M124,46 C128,30 142,20 158,18" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
@@ -2054,6 +2161,8 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #3a1630 0%, #5a2448 60%, #c9935a 60%, #a8763f 100%)' },
   { id: 'dance-studio', label: 'Dance Studio', emoji: '🪞', theme: 'ballet', decor: 'studio',
     gradient: 'linear-gradient(180deg, #ffeef5 0%, #f6e6ff 58%, #e0b98a 58%, #cfa274 100%)' },
+  { id: 'candy-land', label: 'Candy Land', emoji: '🍬', pass: 'sweetie', passTier: 4, ambient: 'sparkle', decor: 'candyland',
+    gradient: 'linear-gradient(180deg, #ffe0f0 0%, #e8dcff 55%, #c8f2e0 55%, #a8e8cc 100%)' },
   { id: 'met-steps', label: 'Met Gala Steps', emoji: '📸', theme: 'metgala', price: 50, ambient: 'flash', decor: 'carpet',
     gradient: 'linear-gradient(180deg, #1e1a2e 0%, #3b2f4f 60%, #5a4a6a 100%)' },
   { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
@@ -2287,14 +2396,76 @@ function levelUnlocked(item) {
   return !item.unlockLevel || getLevelInfo(totalStars).level >= item.unlockLevel;
 }
 
+// ---------- Style Passes ----------
+// Buy a pass with cash, then earn pass points in every show. Each tier unlocks
+// one exclusive item (tier 0 unlocks as soon as you buy the pass).
+
+const PASS_TIER_POINTS = [0, 5, 12, 20, 30, 42];
+const PASS_POINTS_PER_STAR = 1;
+const PASS_POINTS_FOR_FINISH = 2;
+const PASS_POINTS_PER_CATWALK = 3;
+
+const PASSES = [
+  { id: 'baddie', label: 'Baddie Pass', emoji: '💅', price: 150, color: '#e0458f',
+    blurb: 'Bold shades, bling, a puffer, platform boots, the Baddie Strut and a glam tracksuit.',
+    rewards: ['baddie-shades', 'baddie-chain', 'puffer-jacket', 'baddie-strut', 'platform-boots', 'glam-tracksuit'] },
+  { id: 'sweetie', label: 'Sweetie Pass', emoji: '🍭', price: 100, color: '#9b6be0',
+    blurb: 'A swirl lollipop, candy clips, a cupcake dress, sprinkle sneakers, Candy Land and cotton candy hair.',
+    rewards: ['lollipop', 'candy-clips', 'cupcake-dress', 'sprinkle-sneakers', 'candy-land', 'cotton-candy-puffs'] },
+];
+
+const PASS_KEY = 'runwayReady.passes';
+let passState = {};
+try {
+  const saved = JSON.parse(localStorage.getItem(PASS_KEY) || '{}');
+  if (saved && typeof saved === 'object') passState = saved;
+} catch (e) {}
+
+function savePasses() {
+  try { localStorage.setItem(PASS_KEY, JSON.stringify(passState)); } catch (e) {}
+}
+
+function passOwned(passId) {
+  return !!(passState[passId] && passState[passId].owned);
+}
+
+function passPoints(passId) {
+  return (passState[passId] && passState[passId].xp) || 0;
+}
+
+function passUnlocked(item) {
+  if (!item.pass) return true;
+  return passOwned(item.pass) && passPoints(item.pass) >= PASS_TIER_POINTS[item.passTier];
+}
+
+// Adds points to every owned pass; returns the labels of newly unlocked rewards.
+function addPassPoints(n) {
+  const unlocked = [];
+  PASSES.forEach((pass) => {
+    if (!passOwned(pass.id)) return;
+    const before = passPoints(pass.id);
+    passState[pass.id].xp = before + n;
+    pass.rewards.forEach((id, tier) => {
+      if (before < PASS_TIER_POINTS[tier] && before + n >= PASS_TIER_POINTS[tier]) {
+        const found = findAnyItem(id);
+        if (found) unlocked.push(`${found.item.emoji} ${found.item.label}`);
+      }
+    });
+  });
+  savePasses();
+  return unlocked;
+}
+
 function isUnlocked(item) {
-  return levelUnlocked(item) && isOwned(item);
+  return levelUnlocked(item) && isOwned(item) && passUnlocked(item);
 }
 
 function renderCash() {
   document.getElementById('cash-badge').textContent = `💵 $${cash}`;
   const shopCash = document.getElementById('shop-cash');
   if (shopCash) shopCash.textContent = `💵 $${cash}`;
+  const passesCash = document.getElementById('passes-cash');
+  if (passesCash) passesCash.textContent = `💵 $${cash}`;
 }
 
 function renderLevelBanner() {
@@ -2354,16 +2525,23 @@ function buildOptionButtons(container, items, onPick) {
     const btn = document.createElement('button');
     btn.className = 'option-btn' + (unlocked ? '' : ' locked');
     btn.dataset.id = item.id;
+    const passDef = item.pass ? PASSES.find((x) => x.id === item.pass) : null;
     btn.innerHTML = `<span class="emoji">${item.emoji}</span>${item.label}`
       + (unlocked ? '' : !isOwned(item)
         ? `<span class="lock-badge">🛍️ $${item.price} in Shop</span>`
-        : `<span class="lock-badge">🔒 Lvl ${item.unlockLevel}</span>`);
+        : !passUnlocked(item)
+          ? `<span class="lock-badge">🎟️ ${passDef.label}${passOwned(item.pass) ? ` · Tier ${item.passTier}` : ''}</span>`
+          : `<span class="lock-badge">🔒 Lvl ${item.unlockLevel}</span>`);
     if (unlocked) {
       btn.addEventListener('click', () => onPick(item.id));
     } else if (!isOwned(item)) {
       btn.classList.add('shop-locked');
       btn.title = `Buy ${item.label} in the Shop for $${item.price}`;
       btn.addEventListener('click', () => openShop());
+    } else if (!passUnlocked(item)) {
+      btn.classList.add('shop-locked');
+      btn.title = `Unlock ${item.label} with the ${passDef.label}`;
+      btn.addEventListener('click', () => openPasses());
     } else {
       btn.disabled = true;
       const levelDef = LEVELS.find((l) => l.level === item.unlockLevel);
@@ -2732,6 +2910,17 @@ function addDecor(decor) {
   if (decor === 'pumpkins') {
     el.innerHTML = `<svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
       ${pumpkinSVG(228, 56, 1.15, true)}${pumpkinSVG(272, 62, 0.8, false)}${pumpkinSVG(24, 64, 0.7, true)}
+    </svg>`;
+  } else if (decor === 'candyland') {
+    const pop = (x, y, r, c) => `<line x1="${x}" y1="${y}" x2="${x}" y2="160" stroke="#ffffff" stroke-width="4"/>
+        <circle cx="${x}" cy="${y}" r="${r}" fill="#ffffff"/><path d="M${x},${y} m0,-3 a3,3 0 1 1 -3,3 a6,6 0 1 1 6,6 a9,9 0 1 1 -9,-9 a12,12 0 1 1 12,12" fill="none" stroke="${c}" stroke-width="3.4"/>`;
+    const gum = (x, c) => `<path d="M${x - 12},158 Q${x - 12},140 ${x},138 Q${x + 12},140 ${x + 12},158 Z" fill="${c}"/><circle cx="${x - 4}" cy="146" r="2" fill="#ffffff" opacity="0.5"/>`;
+    const cane = (x) => `<path d="M${x},160 L${x},120 Q${x},110 ${x + 8},110 Q${x + 16},110 ${x + 16},120" fill="none" stroke="#e05c5c" stroke-width="5" stroke-linecap="round"/>
+        <path d="M${x},160 L${x},120 Q${x},110 ${x + 8},110 Q${x + 16},110 ${x + 16},120" fill="none" stroke="#ffffff" stroke-width="5" stroke-dasharray="5 5" stroke-linecap="round"/>`;
+    el.innerHTML = `<svg viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+      ${pop(28, 70, 18, '#ff6fb0')}${pop(270, 60, 20, '#9b6be0')}${pop(60, 96, 13, '#5cc4e0')}
+      ${cane(222)}${cane(240)}
+      ${gum(20, '#43b581')}${gum(46, '#f2c94c')}${gum(254, '#ff6fb0')}${gum(282, '#5cc4e0')}
     </svg>`;
   } else if (decor === 'curtains') {
     const folds = (x0, dir) => Array.from({ length: 5 }, (_, i) => `<path d="M${x0 + dir * i * 11},0 Q${x0 + dir * (i * 11 + 6)},210 ${x0 + dir * (i * 13 + 4)},420" fill="none" stroke="#7a0f2a" stroke-width="3" opacity="0.6"/>`).join('');
@@ -3246,6 +3435,7 @@ wardrobeOverlay.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !wardrobeOverlay.hidden) closeWardrobe();
   if (e.key === 'Escape' && !shopOverlay.hidden) closeShop();
+  if (e.key === 'Escape' && !passesOverlay.hidden) closePasses();
   if (e.key === 'Escape' && !catwalkOverlay.hidden) closeCatwalk();
 });
 
@@ -3291,6 +3481,7 @@ function tryOn(item, kind) {
   if (kind === 'outfit') state.outfit.style = item.id;
   if (kind === 'accessory') state.accessories[item.id] = true;
   if (kind === 'shoes') state.shoes.style = item.id;
+  if (kind === 'hair') state.hair.style = item.id;
   if (kind === 'background') state.background = item.id;
   if (kind === 'walk') {
     selectedWalk = item.id;
@@ -3368,6 +3559,124 @@ shopOverlay.addEventListener('click', (e) => {
   if (e.target === shopOverlay) closeShop();
 });
 
+// ---------- Style Passes UI ----------
+
+const passesOverlay = document.getElementById('passes-overlay');
+const passesGrid = document.getElementById('passes-grid');
+const passesToast = document.getElementById('passes-toast');
+
+function findAnyItem(id) {
+  const lists = [['outfit', OUTFIT_STYLES], ['accessory', ACCESSORIES], ['shoes', SHOE_STYLES], ['hair', HAIR_STYLES], ['background', BACKGROUNDS], ['walk', WALK_STYLES]];
+  for (const [kind, list] of lists) {
+    const item = list.find((x) => x.id === id);
+    if (item) return { item, kind };
+  }
+  return null;
+}
+
+const PASS_KIND_LABEL = { outfit: 'Outfit', accessory: 'Accessory', shoes: 'Shoes', hair: 'Hair', background: 'Backdrop', walk: 'Walk' };
+
+function renderPasses(message) {
+  renderCash();
+  passesToast.textContent = message || '';
+  passesToast.hidden = !message;
+  passesGrid.innerHTML = '';
+  PASSES.forEach((pass) => {
+    const owned = passOwned(pass.id);
+    const pts = passPoints(pass.id);
+    const nextTier = PASS_TIER_POINTS.findIndex((need) => need > pts);
+    const prevNeed = nextTier > 0 ? PASS_TIER_POINTS[nextTier - 1] : PASS_TIER_POINTS[PASS_TIER_POINTS.length - 1];
+    const progress = nextTier === -1 ? 1 : (pts - prevNeed) / (PASS_TIER_POINTS[nextTier] - prevNeed);
+    const card = document.createElement('div');
+    card.className = 'pass-card' + (owned ? ' owned' : '');
+    card.style.setProperty('--pass-color', pass.color);
+    const status = !owned
+      ? 'Buy the pass to start unlocking rewards.'
+      : nextTier === -1
+        ? `🎉 ${pts} pass points · every reward unlocked!`
+        : `${pts} pass points · ${PASS_TIER_POINTS[nextTier] - pts} more to Tier ${nextTier}`;
+    card.innerHTML = `
+      <div class="pass-head">
+        <span class="pass-emoji">${pass.emoji}</span>
+        <div class="pass-title"><h3>${pass.label}</h3><p>${pass.blurb}</p></div>
+      </div>
+      <div class="pass-progress"><div class="pass-bar"><div class="pass-bar-fill" style="width:${owned ? Math.round(progress * 100) : 0}%"></div></div>
+        <span class="pass-status">${status}</span></div>
+      <ol class="pass-tiers"></ol>`;
+    const head = card.querySelector('.pass-head');
+    const buy = document.createElement('button');
+    buy.className = 'btn pass-buy';
+    if (owned) {
+      buy.textContent = '✓ Owned';
+      buy.classList.add('btn-ghost');
+      buy.disabled = true;
+    } else if (cash >= pass.price) {
+      buy.textContent = `Buy for $${pass.price}`;
+      buy.classList.add('btn-primary');
+      buy.addEventListener('click', () => buyPass(pass));
+    } else {
+      buy.textContent = `$${pass.price} · need $${pass.price - cash} more`;
+      buy.classList.add('btn-ghost');
+      buy.disabled = true;
+    }
+    head.appendChild(buy);
+    const tiers = card.querySelector('.pass-tiers');
+    pass.rewards.forEach((id, tier) => {
+      const found = findAnyItem(id);
+      if (!found) return;
+      const { item, kind } = found;
+      const open = owned && pts >= PASS_TIER_POINTS[tier];
+      const li = document.createElement('li');
+      li.className = 'pass-tier' + (open ? ' open' : '');
+      li.innerHTML = `<span class="tier-num">${tier === 0 ? 'Free' : `Tier ${tier}`}</span>
+        <span class="tier-emoji">${item.emoji}</span>
+        <span class="tier-label">${item.label}<small>${PASS_KIND_LABEL[kind]}</small></span>`;
+      const act = document.createElement('button');
+      act.className = 'tier-action';
+      if (open) {
+        act.textContent = kind === 'walk' ? 'Use' : 'Wear';
+        act.addEventListener('click', () => { tryOn(item, kind); renderPasses(`✨ ${kind === 'walk' ? 'Using' : 'Wearing'} the ${item.label}.`); });
+      } else {
+        act.textContent = tier === 0 ? '🔒 Pass' : `🔒 ${PASS_TIER_POINTS[tier]} pts`;
+        act.disabled = true;
+      }
+      li.appendChild(act);
+      tiers.appendChild(li);
+    });
+    passesGrid.appendChild(card);
+  });
+}
+
+function buyPass(pass) {
+  if (passOwned(pass.id) || cash < pass.price) return;
+  cash -= pass.price;
+  saveShop();
+  passState[pass.id] = { owned: true, xp: 0 };
+  savePasses();
+  const first = findAnyItem(pass.rewards[0]);
+  rebuildThemedLists();
+  if (first) tryOn(first.item, first.kind);
+  renderPasses(`🎉 You got the ${pass.label}! ${first ? `${first.item.emoji} ${first.item.label} is unlocked and on now.` : ''} Earn pass points in every show to unlock the rest.`);
+}
+
+function openPasses() {
+  renderPasses();
+  passesOverlay.hidden = false;
+}
+
+function closePasses() {
+  passesOverlay.hidden = true;
+  rebuildThemedLists();
+  render();
+  refreshWalkPickers();
+}
+
+document.getElementById('passes-btn').addEventListener('click', openPasses);
+document.getElementById('passes-close').addEventListener('click', closePasses);
+passesOverlay.addEventListener('click', (e) => {
+  if (e.target === passesOverlay) closePasses();
+});
+
 // ---------- Catwalk Show (walk styles) ----------
 // A second show mode: pick a walk, and the model struts toward the camera down a
 // catwalk with arms, steps and sway animated per frame, then strikes a final pose.
@@ -3424,6 +3733,8 @@ const WALK_STYLES = [
     walkArms: 'hips', finalArms: 'model', comment: 'A spin, a pose, a superstar moment!' },
   { id: 'super-flight', label: 'Super Flight', emoji: '🦸', price: 90, flying: true, previewMid: true, duration: 5, cycle: 0.5, bob: 6, sway: 2, lift: 0, swing: 0,
     walkArms: 'superman', finalArms: 'heroLand', comment: 'Up, up and away! A super landing!' },
+  { id: 'baddie-strut', label: 'Baddie Strut', emoji: '💅', pass: 'baddie', passTier: 3, duration: 5, cycle: 0.9, bob: 4, sway: 5.5, lift: 11, swing: 7,
+    walkArms: 'oneHip', finalArms: 'model', comment: 'Main character energy! That walk was a whole moment.' },
   { id: 'wave', label: 'Royal Wave', emoji: '👋', duration: 5.5, cycle: 0.8, bob: 3, sway: 2, lift: 8, swing: 4,
     walkArms: 'wave', finalArms: 'wave', comment: 'Graceful and regal. Everyone waved back!' },
 ];
@@ -3628,7 +3939,7 @@ function poseLimbs(root, walk, t, finalK, active) {
 
 function currentWalk() {
   const w = WALK_STYLES.find((x) => x.id === selectedWalk);
-  return w && isOwned(w) ? w : WALK_STYLES[0];
+  return w && isOwned(w) && passUnlocked(w) ? w : WALK_STYLES[0];
 }
 
 // Walk pickers appear in both shows; locked walks show their price and open the shop.
@@ -3699,7 +4010,12 @@ function finishCatwalk(walk) {
   renderCash();
   document.getElementById('cw-score').textContent = `${score.toFixed(1)} / 10`;
   document.getElementById('cw-comment').textContent = walk.comment;
-  document.getElementById('cw-cash').textContent = `💵 +$${CATWALK_CASH} (now $${cash})`;
+  const passNew = PASSES.some((x) => passOwned(x.id)) ? addPassPoints(PASS_POINTS_PER_CATWALK) : null;
+  document.getElementById('cw-cash').textContent = `💵 +$${CATWALK_CASH} (now $${cash})`
+    + (passNew ? ` · 🎟️ +${PASS_POINTS_PER_CATWALK} pass points` : '')
+    + (passNew && passNew.length ? ` · Unlocked ${passNew.join(' & ')}!` : '');
+  rebuildThemedLists();
+  render();
   cwResult.hidden = false;
   const confetti = document.getElementById('cw-confetti');
   confetti.innerHTML = '';
@@ -4017,7 +4333,11 @@ function endGame() {
   cash += cashEarned;
   saveShop();
   renderCash();
-  gameStarsSummary.textContent = `⭐ ${starsCollected} earned this run · ${totalStars} total · 💵 +$${cashEarned} (now $${cash})`;
+  const passGain = starsCollected * PASS_POINTS_PER_STAR + PASS_POINTS_FOR_FINISH;
+  const passNew = PASSES.some((x) => passOwned(x.id)) ? addPassPoints(passGain) : null;
+  gameStarsSummary.textContent = `⭐ ${starsCollected} earned this run · ${totalStars} total · 💵 +$${cashEarned} (now $${cash})`
+    + (passNew ? ` · 🎟️ +${passGain} pass points` : '')
+    + (passNew && passNew.length ? ` · Unlocked ${passNew.join(' & ')}!` : '');
 
   const levelupEl = document.getElementById('game-levelup');
   if (leveledUp) {
