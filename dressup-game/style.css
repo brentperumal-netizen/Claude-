@@ -2118,3 +2118,10 @@ body {
 .acc-shelves .option-btn .lock-badge { font-size: 0.56rem; }
 @media (max-width: 420px) { .acc-shelves { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (prefers-reduced-motion: reduce) { .acc-shelves .option-btn:hover .emoji { transform: none; } }
+
+/* ---------- Shoe closet ---------- */
+.closet-shoes { --wood: #c9e6ff; --wood-dark: #7fb3e0; --paper: #f5fbff; --dot: #dcefff; }
+.shoe-shelves .option-btn { min-height: 98px; }
+.shoe-shelves .shoe-pic { display: block; width: 60px; height: 54px; font-size: 0; }
+.shoe-shelves .shoe-pic svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.shoe-shelves .option-btn:hover .shoe-pic { transform: translateY(-3px) rotate(-4deg); }

@@ -3882,6 +3882,67 @@ function refreshHangerColors() {
   });
 }
 
+// ---------- Shoe closet: real little pictures of each pair on a shelf ----------
+const shoeViewBoxCache = {};
+function shoeMarkup(def) { return typeof def.svg === 'function' ? def.svg() : def.svg; }
+function shoeViewBox(def) {
+  if (shoeViewBoxCache[def.id]) return shoeViewBoxCache[def.id];
+  let vb = '96 384 108 122';
+  try {
+    const NS = 'http://www.w3.org/2000/svg';
+    const probe = document.createElementNS(NS, 'svg');
+    probe.setAttribute('width', '300'); probe.setAttribute('height', '520');
+    probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden';
+    probe.innerHTML = `<g>${shoeMarkup(def)}</g>`;
+    document.body.appendChild(probe);
+    const bb = probe.firstChild.getBBox();
+    probe.remove();
+    if (bb.width > 0 && bb.height > 0) {
+      const pad = 4, side = Math.max(bb.width, bb.height) + pad * 2;
+      const x = bb.x + bb.width / 2 - side / 2, y = bb.y + bb.height / 2 - side / 2;
+      vb = `${x.toFixed(1)} ${y.toFixed(1)} ${side.toFixed(1)} ${side.toFixed(1)}`;
+    }
+  } catch (e) { /* keep the default box */ }
+  shoeViewBoxCache[def.id] = vb;
+  return vb;
+}
+function shoePicSVG(def, color) {
+  const gid = `shoepic-${def.id}`;
+  return `<svg viewBox="${shoeViewBox(def)}" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${lighten(color, 0.35)}"/><stop offset="55%" stop-color="${color}"/><stop offset="100%" stop-color="${darken(color, 0.3)}"/>
+    </linearGradient></defs>
+    <g class="shoepic-g" fill="url(#${gid})" stroke="${darken(color, 0.3)}" style="--skin:${state.skin || '#f1c9a5'}">${shoeMarkup(def)}</g>
+  </svg>`;
+}
+function buildShoeShelves(container, items) {
+  buildOptionButtons(container, items, (id) => { state.shoes.style = id; render(); });
+  container.querySelectorAll('.option-btn').forEach((btn) => {
+    const def = items.find((it) => it.id === btn.dataset.id);
+    const emoji = btn.querySelector('.emoji');
+    if (!def || !emoji) return;
+    const pic = document.createElement('span');
+    pic.className = 'emoji shoe-pic';
+    pic.innerHTML = shoePicSVG(def, state.shoes.color);
+    emoji.replaceWith(pic);
+    btn.setAttribute('aria-label', def.label);
+  });
+}
+// Every pair on the shelf shows the colour you've picked.
+function refreshShoeShelfColors() {
+  const c = state.shoes.color;
+  document.querySelectorAll('#shoe-styles linearGradient').forEach((g) => {
+    const stops = g.querySelectorAll('stop');
+    stops[0].setAttribute('stop-color', lighten(c, 0.35));
+    stops[1].setAttribute('stop-color', c);
+    stops[2].setAttribute('stop-color', darken(c, 0.3));
+  });
+  document.querySelectorAll('#shoe-styles .shoepic-g').forEach((g) => {
+    g.setAttribute('stroke', darken(c, 0.3));
+    g.style.setProperty('--skin', state.skin || '#f1c9a5');
+  });
+}
+
 function rebuildThemedLists() {
   buildOptionButtons(document.getElementById('hair-styles'), HAIR_STYLES.filter(itemVisible), (id) => {
     state.hair.style = id;
@@ -3891,10 +3952,7 @@ function rebuildThemedLists() {
   buildHangerRack(document.getElementById('outfit-styles'), visible.filter((o) => pieceKind(o) === 'full'));
   buildHangerRack(document.getElementById('top-styles'), visible.filter((o) => pieceKind(o) === 'top'));
   buildHangerRack(document.getElementById('bottom-styles'), visible.filter((o) => pieceKind(o) === 'bottom'));
-  buildOptionButtons(document.getElementById('shoe-styles'), SHOE_STYLES.filter(itemVisible), (id) => {
-    state.shoes.style = id;
-    render();
-  });
+  buildShoeShelves(document.getElementById('shoe-styles'), SHOE_STYLES.filter(itemVisible));
   buildOptionButtons(document.getElementById('accessory-toggles'), ACCESSORIES.filter(itemVisible), (id) => {
     state.accessories[id] = !state.accessories[id];
     render();
@@ -4119,6 +4177,7 @@ function render() {
   });
   refreshHangerColors();
   highlightSelection('#shoe-styles', state.shoes.style, 'id');
+  refreshShoeShelfColors();
   highlightSelection('#background-styles', state.background, 'id');
 
   document.querySelectorAll('#accessory-toggles .option-btn').forEach((btn) => {
