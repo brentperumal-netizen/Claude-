@@ -2041,3 +2041,80 @@ body {
   box-shadow: inset 0 0 0 3px #ffffff;
 }
 .custom-color:focus-within { outline: 3px solid #8c5ce0; outline-offset: 2px; }
+
+/* ---------- Accessory display cabinet with shelves ---------- */
+.closet-acc { --wood: #ffd9b8; --wood-dark: #e8a66f; --paper: #fffaf3; --dot: #ffe9d4; }
+.acc-inside::before { display: none; }
+.acc-inside {
+  background:
+    linear-gradient(115deg, transparent 0 40%, rgba(255,255,255,0.55) 45%, transparent 52%) ,
+    radial-gradient(circle, var(--dot) 2px, transparent 2.5px) 0 0 / 14px 14px,
+    var(--paper);
+}
+.acc-shelves {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 4px 2px 0;
+}
+.acc-shelves .option-btn {
+  position: relative;
+  min-width: 0;
+  min-height: 92px;
+  margin: 0;
+  padding: 6px 2px 14px;
+  border: 2px solid transparent;
+  border-radius: 12px 12px 0 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  font-size: 0.68rem;
+  line-height: 1.1;
+  text-align: center;
+  word-break: break-word;
+}
+/* the shelf plank under every item */
+.acc-shelves .option-btn::after {
+  content: '';
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  bottom: 0;
+  height: 8px;
+  background: linear-gradient(#fff3e6, var(--wood) 45%, var(--wood-dark));
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.12);
+}
+.acc-shelves .option-btn .emoji {
+  font-size: 1.9rem;
+  line-height: 1;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.18));
+  transition: transform 0.15s ease;
+}
+.acc-shelves .option-btn:hover .emoji { transform: translateY(-3px) rotate(-6deg); }
+.acc-shelves .option-btn.selected {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--accent);
+  border-bottom-color: transparent;
+}
+.acc-shelves .option-btn.selected::before {
+  content: '✓';
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: var(--accent);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+}
+.acc-shelves .option-btn.locked { background: transparent; }
+.acc-shelves .option-btn .lock-badge { font-size: 0.56rem; }
+@media (max-width: 420px) { .acc-shelves { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: reduce) { .acc-shelves .option-btn:hover .emoji { transform: none; } }
