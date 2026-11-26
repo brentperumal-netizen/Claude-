@@ -294,6 +294,48 @@ const HAIR_STYLES = [
           }).join('')}
           ${[[118, 58], [150, 50], [182, 58]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.6" ry="1.6" fill="#f2c94c" stroke="none" transform="rotate(${x < 150 ? -25 : x > 150 ? 25 : 0} ${x} ${y})"/>`).join('')}
           <path d="M112,64 Q126,55 140,60" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
+  // ----- Hairstyles with hair you can see behind the head and shoulders (backSvg) -----
+  { id: 'straight', label: 'Long Straight', emoji: '💁‍♀️',
+    backSvg: `<path d="M94,92 Q90,36 150,33 Q210,36 206,92 L210,252 Q150,260 90,252 Z"/>
+          <path d="M94,92 Q90,36 150,33 Q210,36 206,92 L210,252 Q150,260 90,252 Z" fill="#000000" opacity="0.16" stroke="none"/>
+          ${[100, 112, 188, 200].map((x) => `<line x1="${x}" y1="120" x2="${x + (x < 150 ? -2 : 2)}" y2="248" stroke="#000000" stroke-width="1" opacity="0.15"/>`).join('')}`,
+    svg: `<path d="M97,100 Q94,38 150,36 Q206,38 203,100 Q196,76 176,64 Q160,58 150,58 Q140,58 124,64 Q104,76 97,100 Z"/>
+          <path d="M150,38 L150,58" stroke="#000000" stroke-width="1.2" opacity="0.3"/>
+          <path d="M97,84 Q93,150 98,210 L119,210 Q113,150 116,100 Q112,86 104,80 Z"/>
+          <path d="M203,84 Q207,150 202,210 L181,210 Q187,150 184,100 Q188,86 196,80 Z"/>
+          <path d="M103,110 Q101,160 104,204 M197,110 Q199,160 196,204" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.2" stroke-linecap="round"/>
+          <path d="M112,58 Q126,47 144,46" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.28"/>` },
+  { id: 'lob', label: 'Straight Lob', emoji: '👩',
+    backSvg: `<path d="M96,92 Q92,38 150,35 Q208,38 204,92 L206,170 Q150,178 94,170 Z"/>
+          <path d="M96,92 Q92,38 150,35 Q208,38 204,92 L206,170 Q150,178 94,170 Z" fill="#000000" opacity="0.16" stroke="none"/>`,
+    svg: `<path d="M97,100 Q94,38 150,36 Q206,38 203,100 Q194,74 170,62 Q150,56 132,58 Q110,68 97,100 Z"/>
+          <path d="M132,39 L132,58" stroke="#000000" stroke-width="1.2" opacity="0.3"/>
+          <path d="M97,84 Q94,130 96,166 L120,160 Q113,130 116,100 Q112,86 104,80 Z"/>
+          <path d="M203,84 Q206,130 204,166 L180,160 Q187,130 184,100 Q188,86 196,80 Z"/>
+          <path d="M104,112 Q102,140 104,160 M196,112 Q198,140 196,160" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.2" stroke-linecap="round"/>
+          <path d="M140,46 Q160,44 180,54" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.28"/>` },
+  { id: 'butterfly', label: 'Butterfly Layers', emoji: '🦋',
+    backSvg: `<path d="M94,92 Q90,36 150,33 Q210,36 206,92 L210,236 Q200,250 188,240 Q176,254 162,244 Q150,256 138,244 Q124,254 112,240 Q100,250 90,236 Z"/>
+          <path d="M94,92 Q90,36 150,33 Q210,36 206,92 L210,236 Q200,250 188,240 Q176,254 162,244 Q150,256 138,244 Q124,254 112,240 Q100,250 90,236 Z" fill="#000000" opacity="0.16" stroke="none"/>`,
+    svg: `<path d="M97,100 Q94,38 150,36 Q206,38 203,100 Q196,76 176,64 Q160,58 150,58 Q140,58 124,64 Q104,76 97,100 Z"/>
+          <path d="M150,58 Q132,62 124,80 Q118,96 120,104 Q112,92 110,80 Q118,62 150,56 Z"/>
+          <path d="M150,58 Q168,62 176,80 Q182,96 180,104 Q188,92 190,80 Q182,62 150,56 Z"/>
+          <path d="M97,84 Q92,130 100,160 Q94,176 100,196 Q88,206 84,202 Q96,214 116,206 Q110,186 116,170 Q110,140 116,100 Q112,86 104,80 Z"/>
+          <path d="M203,84 Q208,130 200,160 Q206,176 200,196 Q212,206 216,202 Q204,214 184,206 Q190,186 184,170 Q190,140 184,100 Q188,86 196,80 Z"/>
+          <path d="M104,120 Q102,150 106,170 M196,120 Q198,150 194,170" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.2" stroke-linecap="round"/>
+          <path d="M112,58 Q126,47 144,46" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.28"/>` },
+  { id: 'afro', label: 'Big Afro', emoji: '🌀',
+    backSvg: `<path stroke="none" d="M80,78 a70,70 0 1,0 140,0 a70,70 0 1,0 -140,0 ${Array.from({ length: 22 }, (_, i) => { const a = i / 22 * Math.PI * 2, x = 150 + 66 * Math.cos(a), y = 78 + 64 * Math.sin(a); return `M${(x - 11).toFixed(1)},${y.toFixed(1)} a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0`; }).join(' ')}"/>
+          ${Array.from({ length: 14 }, (_, i) => { const a = i / 14 * Math.PI * 2 + 0.2; return `<circle cx="${(150 + 56 * Math.cos(a)).toFixed(1)}" cy="${(78 + 54 * Math.sin(a)).toFixed(1)}" r="3" fill="#000000" opacity="0.12" stroke="none"/>`; }).join('')}`,
+    svg: `<path d="M100,96 Q96,44 150,40 Q204,44 200,96 Q196,74 180,64 Q150,54 120,64 Q104,74 100,96 Z"/>
+          <path stroke="none" d="${[[108, 70], [118, 58], [132, 52], [150, 50], [168, 52], [182, 58], [192, 70]].map(([x, y]) => `M${x - 8},${y} a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0`).join(' ')}"/>
+          ${[[122, 50], [146, 44], [170, 48]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.2" fill="#ffffff" opacity="0.2" stroke="none"/>`).join('')}` },
+  { id: 'pixie', label: 'Pixie Cut', emoji: '🧚',
+    backSvg: `<path d="M102,96 Q100,44 150,40 Q200,44 198,96 L196,122 Q150,128 104,122 Z"/>`,
+    svg: `<path d="M100,98 Q96,42 150,40 Q204,42 200,98 Q196,80 186,70 Q160,58 128,72 Q112,80 104,98 Z"/>
+          <path d="M116,74 Q138,52 182,62 Q160,66 140,76 Q124,84 112,88 Z"/>
+          <path d="M100,92 L104,110 L108,96 M200,92 L196,110 L192,96" stroke-width="1"/>
+          <path d="M130,50 Q150,44 172,50" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.28"/>` },
   { id: 'crop', label: 'Short Crop', emoji: '💈',
     svg: `<path d="M100,78 A52,52 0 0 1 200,78 L198,96 A50,42 0 0 0 102,96 Z"/>
           <path d="M116,64 Q128,56 140,60" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>` },
@@ -4415,6 +4457,10 @@ function render() {
   hairLayer.innerHTML = hairDef.svg + (hairDef.id === 'none' ? '' : bangsSVG(state.hair.bangs));
   hairLayer.setAttribute('fill', 'url(#hairGradient)');
   hairLayer.setAttribute('stroke', darken(state.hair.color, 0.35));
+  const hairBackLayer = document.getElementById('layer-hair-back');
+  hairBackLayer.innerHTML = hairDef.backSvg || '';
+  hairBackLayer.setAttribute('fill', 'url(#hairGradient)');
+  hairBackLayer.setAttribute('stroke', darken(state.hair.color, 0.35));
 
   // face
   document.getElementById('layer-face').innerHTML = buildFaceSVG(state.face, state.hair.color);
@@ -5061,6 +5107,8 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
     .map((a) => `<g fill="${a.color}" stroke="${a.color}">${typeof a.svg === 'function' ? a.svg(bt, { posed: !!opts.posed }) : a.svg}</g>`)
     .join('');
   // Parts of accessories that sit behind the body (like a backpack).
+  const hairBackDef = HAIR_STYLES.find((h) => h.id === look.hair.style);
+  const hairBackSvg = hairBackDef && hairBackDef.backSvg ? `<g class="hair-back" fill="url(#hairGrad${idSuffix})" stroke="${darken(look.hair.color, 0.35)}">${hairBackDef.backSvg}</g>` : '';
   const accBehindSvg = ACCESSORIES.filter((a) => a.behindSvg && look.accessories && look.accessories[a.id])
     .map((a) => `<g fill="${a.color}" stroke="${a.color}">${a.behindSvg}</g>`)
     .join('');
@@ -5110,6 +5158,7 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
       </linearGradient>
     </defs>
     ${accBehindSvg}
+    ${hairBackSvg}
     <g fill="url(#${skinGrad})">
       ${posed ? '' : `
       <path d="${capsulePath(125, 168, rUpper + outlineGrow, lx, 272, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
