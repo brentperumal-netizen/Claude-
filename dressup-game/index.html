@@ -292,13 +292,43 @@
         <div class="tab-panel active" data-panel="outfit">
           <p class="piece-count" id="piece-count"></p>
           <p class="piece-msg" id="piece-msg" hidden></p>
-          <p class="piece-tip">Layer up to 3 tops, 3 bottoms or skirts and 3 full outfits, all at once! The newest piece goes on top. Your black top and shorts are always underneath and don't count. Tap a piece you're wearing to pick its colour, tap it again to take it off.</p>
-          <h2>👕 Tops</h2>
-          <div class="option-row" id="top-styles"></div>
-          <h2>👖 Bottoms &amp; Skirts</h2>
-          <div class="option-row" id="bottom-styles"></div>
-          <h2>👗 Full Outfits</h2>
-          <div class="option-row" id="outfit-styles"></div>
+          <p class="piece-tip">Layer up to 3 tops, 3 bottoms or skirts and 3 full outfits, all at once! The newest piece goes on top. Your black top and shorts are always underneath and don't count. Swipe sideways in each cabinet to see more. Tap a hanger to put that piece on; tap a piece you're wearing to pick its colour, and tap it again to take it off.</p>
+          <div class="closet closet-tops">
+            <div class="closet-crown"><span class="closet-plaque">👕 Tops</span></div>
+            <div class="closet-body">
+              <div class="closet-door left" aria-hidden="true"><i></i></div>
+              <div class="closet-inside">
+                <div class="option-row" id="top-styles"></div>
+              </div>
+              <div class="closet-door right" aria-hidden="true"><i></i></div>
+            </div>
+            <div class="closet-drawers" aria-hidden="true"><span></span><span></span></div>
+            <div class="closet-feet" aria-hidden="true"><b></b><b></b></div>
+          </div>
+          <div class="closet closet-bottoms">
+            <div class="closet-crown"><span class="closet-plaque">👖 Bottoms &amp; Skirts</span></div>
+            <div class="closet-body">
+              <div class="closet-door left" aria-hidden="true"><i></i></div>
+              <div class="closet-inside">
+                <div class="option-row" id="bottom-styles"></div>
+              </div>
+              <div class="closet-door right" aria-hidden="true"><i></i></div>
+            </div>
+            <div class="closet-drawers" aria-hidden="true"><span></span><span></span></div>
+            <div class="closet-feet" aria-hidden="true"><b></b><b></b></div>
+          </div>
+          <div class="closet closet-full">
+            <div class="closet-crown"><span class="closet-plaque">👗 Full Outfits</span></div>
+            <div class="closet-body">
+              <div class="closet-door left" aria-hidden="true"><i></i></div>
+              <div class="closet-inside">
+                <div class="option-row" id="outfit-styles"></div>
+              </div>
+              <div class="closet-door right" aria-hidden="true"><i></i></div>
+            </div>
+            <div class="closet-drawers" aria-hidden="true"><span></span><span></span></div>
+            <div class="closet-feet" aria-hidden="true"><b></b><b></b></div>
+          </div>
           <h2 id="outfit-color-label">Color</h2>
           <div class="swatch-row" id="outfit-colors"></div>
           <p class="fixed-color-note" id="outfit-fixed-note" hidden>This piece has its own signature colours.</p>
