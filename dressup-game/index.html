@@ -229,6 +229,7 @@
           <g id="layer-acc-flower-crown"></g>
           <g id="layer-acc-tiara"></g>
           <g id="layer-acc-crown"></g>
+          <g id="layer-acc-vip-crown"></g>
           <g id="layer-acc-laurel-crown"></g>
           <g id="layer-acc-sun-crown"></g>
           <g id="layer-acc-sheet-mask"></g>
@@ -236,6 +237,7 @@
           <g id="layer-acc-cucumber-eyes"></g>
           <g id="layer-acc-sleeping-mask"></g>
           <g id="layer-acc-glasses"></g>
+          <g id="layer-acc-vip-shades"></g>
           <g id="layer-acc-tinted-shades"></g>
           <g id="layer-acc-hero-mask"></g>
           <g id="layer-acc-pineapple-glasses"></g>
@@ -250,6 +252,7 @@
           <g id="layer-acc-hoop-earrings"></g>
           <g id="layer-acc-star-earrings"></g>
           <g id="layer-acc-necklace"></g>
+          <g id="layer-acc-vip-badge"></g>
           <g id="layer-acc-gold-collar"></g>
           <g id="layer-acc-snowflake"></g>
           <g id="layer-acc-diamond-necklace"></g>
@@ -283,6 +286,7 @@
         <button id="randomize-btn" class="btn btn-ghost">🎲 Surprise Me</button>
         <button id="wardrobe-btn" class="btn btn-ghost">👗 Wardrobe</button>
         <button id="shop-btn" class="btn btn-ghost">🛍️ Shop</button>
+        <button id="vip-btn" class="btn btn-vip">👑 VIP</button>
         <button id="passes-btn" class="btn btn-ghost">🎟️ Passes</button>
         <button id="minigames-btn" class="btn btn-ghost">🎮 Mini Games</button>
         <button id="hair-salon-btn" class="btn btn-ghost">💇 Hair Salon</button>
@@ -572,6 +576,38 @@
         <h3>Spa Masks <span class="free-tag">FREE</span></h3><div class="option-row walk-picker" id="salon-spa"></div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- VIP LOUNGE MODAL -->
+<div class="modal-overlay" id="vip-overlay" hidden>
+  <div class="modal vip-modal" role="dialog" aria-modal="true" aria-labelledby="vip-title">
+    <div class="modal-header">
+      <h2 id="vip-title">👑 VIP Lounge</h2>
+      <span class="cash-badge shop-cash" id="vip-cash">💵 $100</span>
+      <button class="modal-close" id="vip-close" aria-label="Close VIP lounge">✕</button>
+    </div>
+    <div class="vip-gate" id="vip-gate">
+      <div class="vip-rope" aria-hidden="true"><span class="vip-post"></span><span class="vip-rope-line"></span><span class="vip-post"></span></div>
+      <h3>Members only, darling! ✨</h3>
+      <p>Join VIP to get past the velvet rope:</p>
+      <ul class="vip-perks">
+        <li>💎 VIP Sequin Gown &amp; 🎩 VIP Velvet Suit</li>
+        <li>👑 VIP Diamond Crown, 😎 Gold Shades &amp; 🎫 VIP Pass Badge</li>
+        <li>🥂 The VIP Lounge backdrop</li>
+        <li>🎁 A $25 VIP bonus every day</li>
+        <li>👑 A VIP badge next to your cash</li>
+      </ul>
+      <button class="btn btn-vip vip-join" id="vip-join">👑 Join VIP for $200</button>
+      <p class="vip-note" id="vip-join-note"></p>
+    </div>
+    <div class="vip-inside" id="vip-inside" hidden>
+      <p class="vip-welcome">🥂 Welcome back, VIP! Everything in here is just for members.</p>
+      <button class="btn btn-vip vip-bonus" id="vip-bonus">🎁 Collect today's $25 VIP bonus</button>
+      <h3>👗 VIP Closet</h3>
+      <div class="vip-closet" id="vip-closet"></div>
+    </div>
+    <p class="vip-toast" id="vip-toast" hidden></p>
   </div>
 </div>
 

@@ -2165,3 +2165,41 @@ body {
   border-radius: 50%; border: 2px solid #ffffff; background: #e0558f; color: #ffffff;
   font-size: 0.7rem; font-weight: 800; cursor: pointer; line-height: 1;
 }
+
+/* ---------- VIP ---------- */
+.btn.btn-vip {
+  background: linear-gradient(135deg, #1a1a1a, #3a2a10);
+  color: #f2c94c;
+  border: 2px solid #f2c94c;
+  font-weight: 800;
+}
+.btn.btn-vip:hover:not(:disabled) { filter: brightness(1.15); }
+.btn.btn-vip:disabled { opacity: 0.55; cursor: not-allowed; }
+.vip-modal {
+  background: linear-gradient(180deg, #3a0d1e 0%, #5a1428 100%);
+  color: #fff6e8;
+  border: 3px solid #f2c94c;
+}
+.vip-modal .modal-header h2 { color: #f2c94c; }
+.vip-modal .modal-close { background: #f2c94c; color: #3a0d1e; }
+.vip-gate, .vip-inside { text-align: center; padding: 4px 6px 8px; }
+.vip-gate[hidden], .vip-inside[hidden], .vip-toast[hidden] { display: none; }
+.vip-gate h3, .vip-inside h3 { color: #f2c94c; margin: 10px 0 6px; }
+.vip-rope { display: flex; align-items: flex-end; justify-content: center; height: 60px; margin: 6px auto 4px; max-width: 280px; }
+.vip-post { width: 10px; height: 54px; border-radius: 6px 6px 2px 2px; background: linear-gradient(90deg, #c98f1f, #f2c94c, #c98f1f); box-shadow: 0 -6px 0 2px #f2c94c inset; }
+.vip-rope-line { flex: 1; height: 26px; margin-bottom: 18px; border-bottom: 7px solid #c0245e; border-radius: 0 0 50% 50%; }
+.vip-perks { list-style: none; padding: 0; margin: 6px auto 12px; max-width: 420px; text-align: left; }
+.vip-perks li { padding: 6px 10px; margin: 4px 0; background: rgba(255, 255, 255, 0.08); border-radius: 10px; font-size: 0.9rem; }
+.vip-join { font-size: 1.05rem; padding: 12px 22px; }
+.vip-note { font-size: 0.8rem; color: #ffd6e8; margin: 8px 0 0; }
+.vip-welcome { margin: 4px 0 10px; }
+.vip-closet { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; text-align: center; }
+.vip-card {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 12px 8px; border-radius: 14px;
+  background: rgba(0, 0, 0, 0.3); border: 2px solid rgba(242, 201, 76, 0.6);
+}
+.vip-card-emoji { font-size: 2rem; }
+.vip-card-label { font-weight: 700; font-size: 0.85rem; }
+.vip-try { padding: 6px 14px; font-size: 0.8rem; }
+.vip-toast { margin: 12px 0 0; text-align: center; font-weight: 800; color: #f2c94c; }

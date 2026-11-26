@@ -2024,6 +2024,35 @@ const OUTFIT_STYLES = [
         ${[[-10, 174, -30], [6, 196, 30], [20, 236, -20], [28, 300, 30], [40, 360, -25]].map(([x, y, r]) => `<ellipse cx="${cx + x}" cy="${y}" rx="4" ry="1.8" fill="#43b581" transform="rotate(${r} ${cx + x} ${y})"/>`).join('')}
         ${flowers}`;
     } },
+  { id: 'vip-gown', label: 'VIP Sequin Gown', emoji: '💎', vip: true, fixedColor: true,
+    svg: (bt) => {
+      const cx = 150, wY = TORSO_Y.waist, w = bt.waistHalf + 4, hemHalf = bt.hipHalf + 40;
+      const seq = [];
+      for (let y = 160; y < 428; y += 11) {
+        const half = y < wY ? torsoHalfAt(bt, y) : w + (hemHalf - w) * Math.min(1, (y - wY) / (430 - wY)) * 0.85;
+        for (let x = -half + 5; x < half - 3; x += 9) seq.push(`<circle cx="${(cx + x + (y % 2 ? 4 : 0)).toFixed(1)}" cy="${y}" r="1.3" fill="${(x + y) % 3 ? '#f2c94c' : '#ffffff'}" opacity="${(x + y) % 3 ? 0.75 : 0.9}"/>`);
+      }
+      return `<g fill="#1a1a1a" stroke="#000000" stroke-width="1">${skirtShapeSVG(wY, w, 432, hemHalf, 'straight', 0.55)}${bodiceSVG(bt, wY + 4, 'straps')}</g>
+        <path d="M${cx + w - 2},${wY + 60} L${cx + hemHalf - 22},432" stroke="#2b2b2b" stroke-width="3"/>
+        ${seq.join('')}
+        <rect x="${cx - w - 1}" y="${wY - 3}" width="${(w + 1) * 2}" height="6" rx="2" fill="#f2c94c"/>
+        <path d="M${cx},${wY - 6} l5,6 l-5,6 l-5,-6 Z" fill="#d6f0ff" stroke="#ffffff" stroke-width="0.8"/>`;
+    } },
+  { id: 'vip-suit', label: 'VIP Velvet Suit', emoji: '🎩', vip: true,
+    svg: (bt) => {
+      const cx = 150, sY = TORSO_Y.shoulder, wY = TORSO_Y.waist;
+      return `${pantsSVG(bt, '#1a1a1a')}
+        <rect x="${cx - bt.hipHalf - 6}" y="226" width="${(bt.hipHalf + 6) * 2}" height="7" fill="#111111"/>
+        ${fittedTopSVG(bt, 262, null)}
+        <path d="M${cx - 12},${sY} L${cx},${sY + 46} L${cx + 12},${sY} Z" fill="#ffffff"/>
+        <path d="M${cx - 7},${sY + 4} l7,5 l7,-5 l0,8 l-7,-5 l-7,5 Z" fill="#1a1a1a"/>
+        <path d="M${cx - 12},${sY} L${cx - 26},${sY + 6} L${cx - 4},${wY + 10} L${cx},${sY + 46} Z" fill="#000000" opacity="0.28"/>
+        <path d="M${cx + 12},${sY} L${cx + 26},${sY + 6} L${cx + 4},${wY + 10} L${cx},${sY + 46} Z" fill="#000000" opacity="0.28"/>
+        <path d="M${cx - 12},${sY} L${cx - 26},${sY + 6} L${cx - 4},${wY + 10}" fill="none" stroke="#f2c94c" stroke-width="1.6"/>
+        <path d="M${cx + 12},${sY} L${cx + 26},${sY + 6} L${cx + 4},${wY + 10}" fill="none" stroke="#f2c94c" stroke-width="1.6"/>
+        ${[wY + 18, wY + 36].map((y) => `<circle cx="${cx}" cy="${y}" r="2.6" fill="#f2c94c"/>`).join('')}
+        <path d="M${cx + 18},${sY + 22} l4,-4 l4,4 l-4,3 Z" fill="#d6f0ff" stroke="#ffffff" stroke-width="0.6"/>`;
+    } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -2861,6 +2890,23 @@ const ACCESSORIES = [
         <circle cx="${x}" cy="122" r="3.4" fill="#c9a6ff" stroke="#8c5ce0" stroke-width="0.8"/>
         <path d="M${x + 12},84 l1.2,3 l3,1.2 l-3,1.2 l-1.2,3 l-1.2,-3 l-3,-1.2 l3,-1.2 Z" fill="#ffffff" stroke="none"/>`;
     } },
+  { id: 'vip-crown', label: 'VIP Diamond Crown', emoji: '👑', vip: true, color: '#f2c94c',
+    svg: `<path d="M112,58 L116,30 L130,46 L140,22 L150,40 L160,22 L170,46 L184,30 L188,58 Q150,50 112,58 Z" stroke="#c98f1f" stroke-width="1.2"/>
+          <path d="M112,58 Q150,50 188,58 L188,64 Q150,56 112,64 Z" fill="#c98f1f" stroke="none"/>
+          ${[[116, 30], [140, 22], [160, 22], [184, 30]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3" fill="#ffffff" stroke="#c9d4e2" stroke-width="0.8"/>`).join('')}
+          <path d="M150,42 l6,7 l-6,7 l-6,-7 Z" fill="#d6f0ff" stroke="#ffffff" stroke-width="1"/>
+          ${[128, 172].map((x) => `<path d="M${x},50 l3,4 l-3,4 l-3,-4 Z" fill="#ff8fc7" stroke="#ffffff" stroke-width="0.6"/>`).join('')}` },
+  { id: 'vip-shades', label: 'VIP Gold Shades', emoji: '😎', vip: true, color: '#f2c94c',
+    svg: `${[132, 168].map((x) => `<path d="M${x - 13},84 L${x + 13},84 Q${x + 13},98 ${x},98 Q${x - 13},98 ${x - 13},84 Z" fill="#1a1a1a" stroke="#f2c94c" stroke-width="2"/>
+            <path d="M${x - 8},87 L${x - 2},87" stroke="#ffffff" stroke-width="1.4" opacity="0.6" stroke-linecap="round"/>`).join('')}
+          <path d="M145,86 Q150,82 155,86" fill="none" stroke="#f2c94c" stroke-width="2"/>
+          <line x1="119" y1="86" x2="105" y2="82" stroke="#f2c94c" stroke-width="2"/><line x1="181" y1="86" x2="195" y2="82" stroke="#f2c94c" stroke-width="2"/>
+          <path d="M180,84 l2,2.5 l-2,2.5 l-2,-2.5 Z" fill="#ffffff" stroke="none"/>` },
+  { id: 'vip-badge', label: 'VIP Pass Badge', emoji: '🎫', vip: true, color: '#f2c94c',
+    svg: `<path d="M134,150 L146,196 M166,150 L154,196" stroke="#c0245e" stroke-width="3.4" fill="none"/>
+          <rect x="136" y="194" width="28" height="36" rx="4" fill="#1a1a1a" stroke="#f2c94c" stroke-width="2"/>
+          <text x="150" y="210" font-size="9" font-weight="900" text-anchor="middle" fill="#f2c94c" stroke="none" font-family="Arial Black, Arial, sans-serif">VIP</text>
+          <path d="M150,214 l1.6,3.4 l3.6,0.4 l-2.7,2.4 l0.8,3.6 l-3.3,-1.9 l-3.3,1.9 l0.8,-3.6 l-2.7,-2.4 l3.6,-0.4 Z" fill="#f2c94c" stroke="none"/>` },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 C110,26 136,8 160,10 C186,12 206,36 214,72 C202,58 192,46 180,40 C186,46 190,52 192,58 Z" stroke="#8e1b20" stroke-width="1.2"/>
           <path d="M124,46 C128,30 142,20 158,18" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
@@ -3482,6 +3528,8 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #ffe9b8 0%, #fff4dc 40%, #e3f1ff 100%)' },
   { id: 'moon-temple', label: 'Moonlit Temple', emoji: '🌙', theme: 'goddess', ambient: 'sparkle', decor: 'temple',
     gradient: 'linear-gradient(180deg, #121a3d 0%, #2b3a7a 55%, #6a5cb8 100%)' },
+  { id: 'vip-lounge', label: 'VIP Lounge', emoji: '🥂', vip: true, ambient: 'sparkle', decor: 'vip',
+    gradient: 'linear-gradient(180deg, #3a0d1e 0%, #6b1430 55%, #2b0a16 100%)' },
   { id: 'met-steps', label: 'Met Gala Steps', emoji: '📸', theme: 'metgala', price: 50, ambient: 'flash', decor: 'carpet',
     gradient: 'linear-gradient(180deg, #1e1a2e 0%, #3b2f4f 60%, #5a4a6a 100%)' },
   { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
@@ -3841,12 +3889,20 @@ function addPassPoints(n) {
   return unlocked;
 }
 
+// ---------- VIP membership ($200) ----------
+const VIP_ID = 'vip-membership';
+const VIP_PRICE = 200;
+const VIP_DAILY_BONUS = 25;
+const VIP_BONUS_KEY = 'runwayReady.vipBonusDay';
+function isVip() { return owned.has(VIP_ID); }
+function vipUnlocked(item) { return !item.vip || isVip(); }
+
 function isUnlocked(item) {
-  return levelUnlocked(item) && isOwned(item) && passUnlocked(item);
+  return levelUnlocked(item) && isOwned(item) && passUnlocked(item) && vipUnlocked(item);
 }
 
 function renderCash() {
-  document.getElementById('cash-badge').textContent = `💵 $${cash}`;
+  document.getElementById('cash-badge').textContent = `${isVip() ? '👑 VIP · ' : ''}💵 $${cash}`;
   const shopCash = document.getElementById('shop-cash');
   if (shopCash) shopCash.textContent = `💵 $${cash}`;
   const exCash = document.getElementById('ex-cash');
@@ -3922,13 +3978,19 @@ function buildOptionButtons(container, items, onPick) {
     btn.dataset.id = item.id;
     const passDef = item.pass ? PASSES.find((x) => x.id === item.pass) : null;
     btn.innerHTML = `<span class="emoji">${item.emoji}</span>${item.label}`
-      + (unlocked ? '' : !isOwned(item)
+      + (unlocked ? '' : !vipUnlocked(item)
+        ? '<span class="lock-badge">👑 VIP only</span>'
+        : !isOwned(item)
         ? `<span class="lock-badge">🛍️ $${item.price} in Shop</span>`
         : !passUnlocked(item)
           ? `<span class="lock-badge">🎟️ ${passDef.label}${passOwned(item.pass) ? ` · Tier ${item.passTier}` : ''}</span>`
           : `<span class="lock-badge">🔒 Lvl ${item.unlockLevel}</span>`);
     if (unlocked) {
       btn.addEventListener('click', () => onPick(item.id));
+    } else if (!vipUnlocked(item)) {
+      btn.classList.add('shop-locked');
+      btn.title = `${item.label} is for VIP members. Join VIP for $${VIP_PRICE}!`;
+      btn.addEventListener('click', () => openVip());
     } else if (!isOwned(item)) {
       btn.classList.add('shop-locked');
       btn.title = `Buy ${item.label} in the Shop for $${item.price}`;
@@ -4624,6 +4686,26 @@ function addDecor(decor) {
       ${column(10)}${column(258)}
       ${cloud(40, 400, 1.3)}${cloud(150, 412, 1.6)}${cloud(262, 398, 1.3)}${cloud(250, 150, 0.6)}${cloud(50, 200, 0.5)}
       <path d="M0,384 L300,384" stroke="#e8dcc0" stroke-width="3"/>
+    </svg>`;
+  } else if (decor === 'vip') {
+    const curtain = (x, flip) => `<path d="M${x},0 L${x + flip * 70},0 Q${x + flip * 50},160 ${x + flip * 14},230 Q${x + flip * 36},320 ${x + flip * 26},420 L${x},420 Z" fill="#8a1c3a"/>
+        ${[16, 32, 48].map((d) => `<path d="M${x + flip * d},0 Q${x + flip * (d - 6)},180 ${x + flip * d * 0.4},420" fill="none" stroke="#5a0f24" stroke-width="3" opacity="0.6"/>`).join('')}
+        <path d="M${x + flip * 6},226 Q${x + flip * 30},236 ${x + flip * 22},250" fill="none" stroke="#f2c94c" stroke-width="4"/>`;
+    const post = (x) => `<rect x="${x - 3}" y="330" width="6" height="66" fill="#f2c94c"/><circle cx="${x}" cy="328" r="6" fill="#f2c94c"/><ellipse cx="${x}" cy="398" rx="12" ry="4" fill="#c98f1f"/>`;
+    el.classList.add('ambient-decor-full');
+    el.innerHTML = `<svg viewBox="0 0 300 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <g transform="translate(150,22)">
+        <path d="M-40,0 L40,0 L28,26 L-28,26 Z" fill="#f2c94c" opacity="0.85"/>
+        ${[-30, -15, 0, 15, 30].map((x, i) => `<line x1="${x}" y1="26" x2="${x * 0.9}" y2="${40 + (i % 2) * 8}" stroke="#fff3a8" stroke-width="1"/><path d="M${x * 0.9},${40 + (i % 2) * 8} l3,5 l-3,5 l-3,-5 Z" fill="#d6f0ff"/>`).join('')}
+        <ellipse cx="0" cy="36" rx="60" ry="22" fill="#fff3a8" opacity="0.18"/>
+      </g>
+      ${curtain(0, 1)}${curtain(300, -1)}
+      <rect x="0" y="0" width="300" height="16" fill="#5a0f24"/>
+      ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => `<path d="M${i * 30},16 q15,14 30,0" fill="#8a1c3a" stroke="#f2c94c" stroke-width="1.5"/>`).join('')}
+      <text x="150" y="88" font-size="22" font-weight="900" text-anchor="middle" fill="#f2c94c" opacity="0.85" font-family="Georgia, serif" letter-spacing="6">VIP</text>
+      ${post(36)}${post(264)}
+      <path d="M42,334 Q90,370 150,352 Q210,370 258,334" fill="none" stroke="#c0245e" stroke-width="6"/>
+      <rect x="0" y="396" width="300" height="24" fill="#c0245e" opacity="0.7"/>
     </svg>`;
   } else if (decor === 'skyline') {
     const builds = [[0, 70, 40], [38, 40, 30], [66, 96, 34], [98, 56, 28], [124, 80, 30], [152, 44, 26], [176, 104, 36], [210, 62, 30], [238, 86, 34], [270, 52, 30]];
@@ -5458,7 +5540,7 @@ function clearOnlineTimers() {
 }
 
 function freeItems(list) {
-  return list.filter((i) => !i.price && !i.pass && !i.unlockLevel && i.id !== 'none');
+  return list.filter((i) => !i.price && !i.pass && !i.unlockLevel && !i.vip && i.id !== 'none');
 }
 
 // A robot's look: random everyday pieces, or mostly matching a challenge.
@@ -8466,3 +8548,101 @@ renderLevelBanner();
 renderCash();
 rebuildThemedLists();
 render();
+
+
+// ---------- 👑 VIP Lounge ----------
+const vipOverlay = document.getElementById('vip-overlay');
+
+function vipTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+function vipBonusClaimedToday() {
+  try { return localStorage.getItem(VIP_BONUS_KEY) === vipTodayKey(); } catch (e) { return false; }
+}
+
+function vipItems() {
+  return [
+    ...OUTFIT_STYLES.filter((i) => i.vip).map((item) => ({ item, kind: 'outfit' })),
+    ...ACCESSORIES.filter((i) => i.vip).map((item) => ({ item, kind: 'accessory' })),
+    ...BACKGROUNDS.filter((i) => i.vip).map((item) => ({ item, kind: 'background' })),
+  ];
+}
+
+function vipToast(text) {
+  const el = document.getElementById('vip-toast');
+  el.textContent = text || '';
+  el.hidden = !text;
+}
+
+function renderVip() {
+  const member = isVip();
+  document.getElementById('vip-cash').textContent = `💵 $${cash}`;
+  document.getElementById('vip-gate').hidden = member;
+  document.getElementById('vip-inside').hidden = !member;
+  const join = document.getElementById('vip-join');
+  const short = VIP_PRICE - cash;
+  join.disabled = short > 0;
+  document.getElementById('vip-join-note').textContent = short > 0
+    ? `You have $${cash}. Earn $${short} more on the runway or in the mini games to get past the velvet rope!`
+    : `You have $${cash}. Step right in!`;
+  const bonus = document.getElementById('vip-bonus');
+  const claimed = vipBonusClaimedToday();
+  bonus.disabled = claimed;
+  bonus.textContent = claimed ? '✅ Bonus collected! Come back tomorrow' : `🎁 Collect today's $${VIP_DAILY_BONUS} VIP bonus`;
+  const grid = document.getElementById('vip-closet');
+  grid.innerHTML = '';
+  vipItems().forEach(({ item, kind }) => {
+    const card = document.createElement('div');
+    card.className = 'vip-card';
+    card.innerHTML = `<span class="vip-card-emoji">${item.emoji}</span><span class="vip-card-label">${item.label}</span>`;
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-primary vip-try';
+    btn.textContent = kind === 'background' ? 'Go there' : 'Try on';
+    btn.addEventListener('click', () => {
+      tryOn(item, kind);
+      rebuildThemedLists();
+      render();
+      vipToast(`✨ ${item.label} is on! You look like a superstar.`);
+    });
+    card.appendChild(btn);
+    grid.appendChild(card);
+  });
+}
+
+function joinVip() {
+  if (isVip() || cash < VIP_PRICE) return;
+  cash -= VIP_PRICE;
+  owned.add(VIP_ID);
+  saveShop();
+  renderCash();
+  rebuildThemedLists();
+  render();
+  renderVip();
+  vipToast('🎉 Welcome to VIP! The velvet rope is open just for you.');
+}
+
+function collectVipBonus() {
+  if (!isVip() || vipBonusClaimedToday()) return;
+  try { localStorage.setItem(VIP_BONUS_KEY, vipTodayKey()); } catch (e) {}
+  cash += VIP_DAILY_BONUS;
+  saveShop();
+  renderCash();
+  renderVip();
+  vipToast(`💵 +$${VIP_DAILY_BONUS}! Thanks for being VIP.`);
+}
+
+function openVip() {
+  document.querySelectorAll('.modal-overlay').forEach((o) => { if (o !== vipOverlay) o.hidden = true; });
+  vipToast('');
+  renderVip();
+  vipOverlay.hidden = false;
+}
+function closeVip() { vipOverlay.hidden = true; }
+
+document.getElementById('vip-btn').addEventListener('click', openVip);
+document.getElementById('vip-close').addEventListener('click', closeVip);
+document.getElementById('vip-join').addEventListener('click', joinVip);
+document.getElementById('vip-bonus').addEventListener('click', collectVipBonus);
+vipOverlay.addEventListener('click', (e) => { if (e.target === vipOverlay) closeVip(); });
+renderCash();
