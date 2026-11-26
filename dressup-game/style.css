@@ -2125,3 +2125,8 @@ body {
 .shoe-shelves .shoe-pic { display: block; width: 60px; height: 54px; font-size: 0; }
 .shoe-shelves .shoe-pic svg { width: 100%; height: 100%; display: block; overflow: visible; }
 .shoe-shelves .option-btn:hover .shoe-pic { transform: translateY(-3px) rotate(-4deg); }
+
+/* ---------- Makeup salon: custom colour pickers ---------- */
+.custom-color.custom-color-mini { margin-top: 0; padding: 2px 8px 2px 3px; font-size: 0.72rem; gap: 4px; min-height: 30px; }
+.custom-color.custom-color-mini .custom-color-dot { width: 22px; height: 22px; }
+.salon-tools .walk-picker + .swatch-row, .salon-tools .swatch-row + .walk-picker, .salon-tools .walk-picker + .walk-picker { margin-top: 6px; }

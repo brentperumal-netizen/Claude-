@@ -84,6 +84,7 @@ const THEMES = [
   { id: 'ballet', label: 'Ballet', emoji: '🩰' },
   { id: 'sleepy', label: 'Sleepover', emoji: '😴' },
   { id: 'y2k', label: 'Y2K', emoji: '💿' },
+  { id: 'goddess', label: 'Goddess', emoji: '🏛️' },
 ];
 
 const SKIN_TONES = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5a3825'];
@@ -280,6 +281,19 @@ const HAIR_STYLES = [
     svg: `<path d="M104,84 A46,40 0 0 1 196,84 Z"/>
           ${[[112, 62, 12], [126, 50, 13], [142, 44, 13], [158, 44, 13], [174, 50, 13], [188, 62, 12], [118, 74, 10], [182, 74, 10], [134, 58, 11], [166, 58, 11], [150, 54, 11]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')}
           <circle cx="140" cy="40" r="3" fill="#ffffff" opacity="0.25"/>` },
+  { id: 'goddess-waves', label: 'Goddess Waves', emoji: '🏛️', theme: 'goddess',
+    svg: `<path d="M96,82 A60,60 0 0 1 204,82 Z"/>
+          ${['left', 'right'].map((side) => {
+            const m = (x) => (side === 'left' ? x : 300 - x);
+            return `<g class="hair-sway hair-sway-${side}"><path d="M${m(116)},80 Q${m(122)},126 ${m(112)},168 Q${m(104)},208 ${m(114)},248 Q${m(112)},272 ${m(98)},280 Q${m(84)},252 ${m(94)},212 Q${m(100)},172 ${m(88)},132 Q${m(84)},102 ${m(92)},80 Z"/>
+              <path d="M${m(102)},120 Q${m(108)},160 ${m(98)},200 Q${m(92)},236 ${m(102)},262" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.18" stroke-linecap="round"/></g>`;
+          }).join('')}
+          ${Array.from({ length: 11 }, (_, i) => {
+            const t = i / 10, x = (1 - t) * (1 - t) * 102 + 2 * t * (1 - t) * 150 + t * t * 198, y = (1 - t) * (1 - t) * 74 + 2 * t * (1 - t) * 26 + t * t * 74;
+            return `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="6" ry="4" stroke="#000000" stroke-opacity="0.25" stroke-width="0.8" transform="rotate(${(i % 2 ? 30 : -30) + (t - 0.5) * 80} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+          }).join('')}
+          ${[[118, 58], [150, 50], [182, 58]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.6" ry="1.6" fill="#f2c94c" stroke="none" transform="rotate(${x < 150 ? -25 : x > 150 ? 25 : 0} ${x} ${y})"/>`).join('')}
+          <path d="M112,64 Q126,55 140,60" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
   { id: 'crop', label: 'Short Crop', emoji: '💈',
     svg: `<path d="M100,78 A52,52 0 0 1 200,78 L198,96 A50,42 0 0 0 102,96 Z"/>
           <path d="M116,64 Q128,56 140,60" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>` },
@@ -1927,6 +1941,89 @@ const OUTFIT_STYLES = [
   { id: 'leggings', label: 'Leggings', emoji: '🧘', piece: 'bottom', under: true,
     svg: (bt) => `${pantsSVG(bt, null, 440, 1)}
       <rect x="${150 - bt.hipHalf - 2}" y="234" width="${(bt.hipHalf + 2) * 2}" height="6" fill="#000000" opacity="0.15"/>` },
+  { id: 'grecian-gown', label: 'Grecian Goddess Gown', emoji: '🏛️', theme: 'goddess',
+    svg: (bt) => {
+      const cx = 150, sY = TORSO_Y.shoulder, beltY = TORSO_Y.chest + 12;
+      const sh = bt.shoulderHalf, uY = sY + 22, uw = torsoHalfAt(bt, uY) + 2;
+      const top = torsoHalfAt(bt, beltY) + 3, hemHalf = bt.hipHalf + 30;
+      const drapes = [-2, -1, 0, 1, 2].map((k) => `<path d="M${cx + k * 7},${beltY + 6} Q${cx + k * 13},320 ${(cx + k * hemHalf / 2.6).toFixed(1)},428" fill="none" stroke="#000000" stroke-width="1.3" opacity="0.1"/>
+          <path d="M${cx + k * 7 + 3},${beltY + 8} Q${cx + k * 13 + 4},320 ${(cx + k * hemHalf / 2.6 + 4).toFixed(1)},426" fill="none" stroke="#ffffff" stroke-width="1.6" opacity="0.22"/>`).join('');
+      return `${skirtShapeSVG(beltY, top, 432, hemHalf, 'wave', 0.75)}
+        ${drapes}
+        <path d="M${cx - sh + 2},${sY - 1} L${cx - sh + 16},${sY - 3} Q${cx + 4},${sY + 8} ${cx + uw},${uY} L${cx + top},${beltY} L${cx - top},${beltY} L${cx - uw},${uY} Z"/>
+        ${[0, 7, 14].map((o) => `<path d="M${cx - sh + 8 + o},${sY + 1 + o * 0.4} Q${cx - 4 + o},${sY + 18 + o} ${cx + top - 6},${beltY - 2 - (14 - o) * 0.3}" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.3"/>`).join('')}
+        <rect x="${cx - top}" y="${beltY - 3}" width="${top * 2}" height="6" rx="2" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.8"/>
+        <circle cx="${cx}" cy="${beltY}" r="4.5" fill="#f2c94c" stroke="#c98f1f" stroke-width="1"/>
+        <circle cx="${cx}" cy="${beltY}" r="1.8" fill="#ffffff" opacity="0.7"/>
+        <circle cx="${cx - sh + 9}" cy="${sY + 1}" r="4" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.8"/>
+        <ellipse cx="${cx - sh + 3}" cy="${sY + 4}" rx="3.4" ry="1.6" fill="#f2c94c" transform="rotate(30 ${cx - sh + 3} ${sY + 4})"/>
+        <ellipse cx="${cx - sh + 15}" cy="${sY + 4}" rx="3.4" ry="1.6" fill="#f2c94c" transform="rotate(-30 ${cx - sh + 15} ${sY + 4})"/>`;
+    } },
+  { id: 'olympus-gown', label: 'Olympus Gold Gown', emoji: '👑', theme: 'goddess', fixedColor: true, price: 150, shopLabel: 'Gown',
+    svg: (bt) => {
+      const cx = 150, wY = TORSO_Y.waist, sY = TORSO_Y.shoulder;
+      const w = bt.waistHalf + 4, hemHalf = bt.hipHalf + 44, gold = '#f2c94c', goldDark = '#c98f1f', white = '#fffaf2';
+      const pleats = [-3, -2, -1, 0, 1, 2, 3].map((k) => `<path d="M${cx + k * 5},${wY + 8} L${(cx + k * hemHalf / 3.4).toFixed(1)},${440 + (3 - Math.abs(k)) * 4}" stroke="#e8dcc0" stroke-width="1.2"/>`).join('');
+      const leaves = Array.from({ length: 9 }, (_, i) => {
+        const t = (i + 0.5) / 9, x = cx - hemHalf + t * hemHalf * 2, y = 432 + 20 * (1 - Math.pow(2 * t - 1, 2)) - 9;
+        return `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="4" ry="1.8" fill="${gold}" transform="rotate(${i % 2 ? 30 : -30} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+      }).join('');
+      return `<g fill="${white}" stroke="#e8dcc0" stroke-width="1.2">${skirtShapeSVG(wY, w, 432, hemHalf, 'round', 0.8)}</g>
+        ${pleats}
+        <path d="M${cx - hemHalf},432 Q${cx - hemHalf},454 ${cx},452 Q${cx + hemHalf},454 ${cx + hemHalf},432" fill="none" stroke="${gold}" stroke-width="5"/>
+        ${leaves}
+        <g fill="${white}" stroke="#e8dcc0" stroke-width="1">${bodiceSVG(bt, wY + 4, 'straps')}</g>
+        <path d="M${cx - 10},${sY - 4} L${cx},${sY + 26} L${cx + 10},${sY - 4}" fill="none" stroke="${gold}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M${cx - 14},${sY - 6} Q${cx},${sY + 2} ${cx + 14},${sY - 6}" fill="none" stroke="${gold}" stroke-width="3.5"/>
+        <rect x="${cx - w - 1}" y="${wY - 8}" width="${(w + 1) * 2}" height="14" rx="3" fill="${gold}" stroke="${goldDark}" stroke-width="1"/>
+        ${[-2, -1, 0, 1, 2].map((k) => `<path d="M${cx + k * 6 - 2},${wY - 5} L${cx + k * 6 + 2},${wY + 3}" stroke="${goldDark}" stroke-width="1"/>`).join('')}
+        <g transform="translate(${cx},${wY - 1})">${Array.from({ length: 12 }, (_, i) => `<line x1="0" y1="0" x2="${(9 * Math.cos(i * Math.PI / 6)).toFixed(1)}" y2="${(9 * Math.sin(i * Math.PI / 6)).toFixed(1)}" stroke="${goldDark}" stroke-width="1.2"/>`).join('')}<circle r="4.5" fill="#fff3a8" stroke="${goldDark}"/></g>`;
+    } },
+  { id: 'moon-goddess', label: 'Moon Goddess Gown', emoji: '🌙', theme: 'goddess', fixedColor: true,
+    svg: (bt) => {
+      const cx = 150, wY = TORSO_Y.waist, sY = TORSO_Y.shoulder;
+      const w = bt.waistHalf + 4, hemHalf = bt.hipHalf + 50, s2 = bt.shoulderHalf + 2;
+      const stars = [[-40, 280], [30, 300], [-10, 340], [50, 380], [-62, 400], [12, 410], [-24, 250], [40, 244], [-2, 300], [-50, 340], [62, 340], [22, 365], [-30, 375], [0, 186], [-16, 196], [18, 170]]
+        .map(([x, y], i) => `<circle cx="${cx + x}" cy="${y}" r="${i % 3 ? 1.2 : 1.9}" fill="#e8eef6" opacity="${i % 2 ? 0.75 : 1}"/>`).join('');
+      return `<g fill="#1f2a5c" stroke="#121a3d" stroke-width="1.2">${skirtShapeSVG(wY, w, 434, hemHalf, 'wave', 0.85)}</g>
+        <g fill="#5c6fc2" opacity="0.45">${skirtShapeSVG(wY + 6, w - 2, 420, hemHalf - 26, 'wave', 0.8)}</g>
+        <g fill="#1f2a5c" stroke="#121a3d" stroke-width="1">${bodiceSVG(bt, wY + 4, 'tube')}</g>
+        <ellipse cx="${cx - s2 - 6}" cy="${sY + 14}" rx="12" ry="7" fill="#9fb3ff" opacity="0.55"/>
+        <ellipse cx="${cx + s2 + 6}" cy="${sY + 14}" rx="12" ry="7" fill="#9fb3ff" opacity="0.55"/>
+        <path d="M${cx - s2 - 4},${sY + 2} Q${cx},${sY + 14} ${cx + s2 + 4},${sY + 2}" fill="none" stroke="#c9d4e2" stroke-width="2.5"/>
+        ${stars}
+        <path d="M${cx + 2},${wY - 9} A10,10 0 1,0 ${cx + 2},${wY + 9} A12,12 0 0,1 ${cx + 2},${wY - 9} Z" fill="#e8eef6" stroke="#9aa6b8" stroke-width="0.8"/>
+        <path d="M${cx - w},${wY + 2} L${cx + w},${wY + 2}" stroke="#c9d4e2" stroke-width="2" opacity="0.8"/>`;
+    } },
+  { id: 'goddess-tunic', label: 'Olympian Tunic', emoji: '⚡', theme: 'goddess',
+    svg: (bt) => {
+      const cx = 150, sY = TORSO_Y.shoulder, wY = TORSO_Y.waist;
+      const sh = bt.shoulderHalf, uY = sY + 22, uw = torsoHalfAt(bt, uY) + 2;
+      const ww = torsoHalfAt(bt, wY) + 3, hemHalf = bt.hipHalf + 12, hemY = 304;
+      let key = '';
+      for (let x = cx - hemHalf + 6; x < cx + hemHalf - 10; x += 9) key += `M${x.toFixed(1)},${hemY - 4} l0,-7 l6,0 l0,4 l-3,0`;
+      return `${skirtShapeSVG(wY, ww, hemY, hemHalf, 'straight', 0.6)}
+        <path d="M${cx - sh + 2},${sY - 1} L${cx - sh + 16},${sY - 3} Q${cx + 4},${sY + 8} ${cx + uw},${uY} L${cx + ww},${wY + 2} L${cx - ww},${wY + 2} L${cx - uw},${uY} Z"/>
+        <path d="M${cx - sh + 6},${sY} L${cx + ww - 2},${wY + 40}" stroke="#ffffff" stroke-width="7" opacity="0.22" stroke-linecap="round"/>
+        ${[-1, 0, 1].map((k) => `<path d="M${cx + k * 10},${wY + 8} L${cx + k * 15},${hemY - 12}" stroke="#000000" stroke-width="1.2" opacity="0.12"/>`).join('')}
+        <path d="${key}" fill="none" stroke="#f2c94c" stroke-width="1.6"/>
+        <rect x="${cx - ww}" y="${wY - 2}" width="${ww * 2}" height="7" rx="2" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.8"/>
+        <circle cx="${cx}" cy="${wY + 1.5}" r="4" fill="#f2c94c" stroke="#c98f1f"/>
+        <path d="M${cx - 1.5},${wY - 1} L${cx + 1.5},${wY + 1.5} L${cx - 1},${wY + 1.5} L${cx + 1.5},${wY + 4}" fill="none" stroke="#c98f1f" stroke-width="0.9"/>
+        <circle cx="${cx - sh + 9}" cy="${sY + 1}" r="4" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.8"/>`;
+    } },
+  { id: 'spring-goddess', label: 'Spring Goddess Dress', emoji: '🌺', theme: 'goddess',
+    svg: (bt) => {
+      const cx = 150, wY = TORSO_Y.waist, w = bt.waistHalf + 4, hemHalf = bt.hipHalf + 36;
+      const flowers = [[-16, 168, '#ffffff'], [-4, 186, '#ff8fc7'], [10, 200, '#fff3a8'], [18, 222, '#ffffff'], [24, 250, '#ff8fc7'], [30, 282, '#fff3a8'], [36, 318, '#ffffff'], [42, 356, '#ff8fc7'], [48, 396, '#fff3a8']]
+        .map(([x, y, c]) => `<g transform="translate(${cx + x},${y})">${[0, 72, 144, 216, 288].map((a) => `<ellipse cx="0" cy="-3" rx="2.2" ry="3" fill="${c}" transform="rotate(${a})"/>`).join('')}<circle r="1.6" fill="#f2c94c"/></g>`).join('');
+      return `${skirtShapeSVG(wY, w, 432, hemHalf, 'wave', 0.7)}
+        <g fill="#ffffff" opacity="0.28">${skirtShapeSVG(wY + 4, w - 2, 418, hemHalf - 14, 'wave', 0.75)}</g>
+        ${bodiceSVG(bt, wY + 4, 'straps')}
+        <path d="M${cx - 22},160 Q${cx},190 ${cx + 18},222 Q${cx + 30},300 ${cx + 50},400" fill="none" stroke="#43b581" stroke-width="1.8"/>
+        ${[[-10, 174, -30], [6, 196, 30], [20, 236, -20], [28, 300, 30], [40, 360, -25]].map(([x, y, r]) => `<ellipse cx="${cx + x}" cy="${y}" rx="4" ry="1.8" fill="#43b581" transform="rotate(${r} ${cx + x} ${y})"/>`).join('')}
+        ${flowers}`;
+    } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -2167,6 +2264,16 @@ SHOE_STYLES.push({ id: 'chunky-platforms', label: 'Chunky Platforms', emoji: '�
         <path d="M${106 + dx},444 Q${106 + dx},426 ${124 + dx},423 Q${144 + dx},421 ${150 + dx},436 Q${152 + dx},442 ${148 + dx},444 Z"/>
         <path d="M${126 + dx},430 L${142 + dx},427 M${126 + dx},435 L${144 + dx},432" stroke="#ffffff" stroke-width="1.6"/>
         <path d="M${112 + dx},436 l2,-4 l2,4 l4,1 l-4,1 l-2,4 l-2,-4 l-4,-1 Z" fill="#ffffff" stroke="none"/>`).join('') });
+SHOE_STYLES.push({ id: 'gladiator-sandals', label: 'Gladiator Sandals', emoji: '🏛️', theme: 'goddess',
+  svg: [127, 173].map((cx) => `
+        <ellipse cx="${cx}" cy="463" rx="15" ry="3" fill="#000000" opacity="0.2" stroke="none"/>
+        <ellipse cx="${cx}" cy="458" rx="14" ry="4" stroke-width="0.8"/>
+        <ellipse cx="${cx}" cy="451" rx="11" ry="8" style="fill:var(--skin, #f1c9a5)" stroke="#000000" stroke-opacity="0.15" stroke-width="0.8"/>
+        ${[-6, -2, 2, 6].map((dx, i) => `<circle cx="${cx + dx}" cy="${457 - Math.abs(dx) * 0.3}" r="${i === 1 ? 2.3 : 2}" style="fill:var(--skin, #f1c9a5)" stroke="#000000" stroke-opacity="0.2" stroke-width="0.6"/>`).join('')}
+        <rect x="${cx - 11}" y="449" width="22" height="3.6" rx="1.6" stroke-width="0.6"/>
+        ${[404, 413, 422, 431, 440].map((y) => `<rect x="${cx - 11.5}" y="${y}" width="23" height="3.6" rx="1.6" stroke-width="0.6"/>`).join('')}
+        <rect x="${cx - 1.6}" y="402" width="3.2" height="50" rx="1.4" stroke-width="0.6"/>
+        <circle cx="${cx}" cy="405.8" r="3" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.7"/>`).join('') });
 SHOE_STYLES.push({ id: 'fluffy-slippers', label: 'Fluffy Slippers', emoji: '☁️', theme: 'sleepy',
   svg: [127, 173].map((x) => `
         <ellipse cx="${x}" cy="458" rx="18" ry="5" fill="#000000" opacity="0.15" stroke="none"/>
@@ -2709,6 +2816,51 @@ const ACCESSORIES = [
               <circle cx="${cx}" cy="${sY + 38}" r="2.2" fill="none" stroke="#7d8692" stroke-width="1"/>
               ${fluffy(offTrim)}${fluffy(onTrim)}`;
     } },
+  { id: 'goddess-wings', label: 'Goddess Wings', emoji: '🪽', theme: 'goddess', color: '#fffaf2', svg: '',
+    behindSvg: `<g class="float-bob">${[[126, 1], [174, -1]].map(([rx, m]) => {
+      const rows = [[130, 7, '#fffaf2', 11], [96, 8.5, '#fff3d6', 9], [62, 9.5, '#f7e1b5', 7]];
+      const glow = `<ellipse cx="${150 - m * 70}" cy="150" rx="70" ry="95" fill="#fff3a8" opacity="0.22" stroke="none"/>`;
+      return glow + rows.map(([len, ry, fill, n]) => Array.from({ length: n }, (_, i) => {
+        const a = (218 - i * (78 / (n - 1))) * Math.PI / 180;
+        const dx = Math.cos(a) * m, dy = Math.sin(a);
+        const cx = rx + dx * len / 2, cy = 170 + dy * len / 2;
+        const deg = Math.atan2(dy, dx) * 180 / Math.PI;
+        return `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${len / 2}" ry="${ry}" fill="${fill}" stroke="#d9b45a" stroke-width="1" transform="rotate(${deg.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)})"/>
+          <line x1="${rx + dx * 6}" y1="${170 + dy * 6}" x2="${(rx + dx * (len - 6)).toFixed(1)}" y2="${(170 + dy * (len - 6)).toFixed(1)}" stroke="#e8c468" stroke-width="0.8" opacity="0.7"/>`;
+      }).join('')).join('');
+    }).join('')}</g>` },
+  { id: 'laurel-crown', label: 'Golden Laurel Crown', emoji: '🌿', theme: 'goddess', color: '#f2c94c',
+    svg: Array.from({ length: 12 }, (_, i) => {
+      const t = 0.04 + i * 0.08, q = (a, b, c) => (1 - t) * (1 - t) * a + 2 * t * (1 - t) * b + t * t * c;
+      const x = q(104, 150, 196), y = q(72, 16, 72);
+      const ang = Math.atan2(2 * (1 - t) * (16 - 72) + 2 * t * (72 - 16), 2 * (1 - t) * 46 + 2 * t * 46) * 180 / Math.PI;
+      const dir = t < 0.5 ? 1 : -1;
+      return [35, -35].map((o) => `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="6" ry="2.4" stroke="#c98f1f" stroke-width="0.6" transform="rotate(${(ang + o * dir).toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}) translate(${4 * dir} 0)"/>`).join('');
+    }).join('') + `<circle cx="150" cy="44" r="3.2" fill="#fff3a8" stroke="#c98f1f" stroke-width="0.8"/>` },
+  { id: 'sun-crown', label: 'Sun Goddess Crown', emoji: '☀️', theme: 'goddess', color: '#f2c94c',
+    svg: Array.from({ length: 11 }, (_, i) => {
+      const a = (-160 + i * 14) * Math.PI / 180, r1 = 48, r2 = i % 2 ? 62 : 72, da = 0.07;
+      const p = (r, aa) => `${(150 + r * Math.cos(aa)).toFixed(1)},${(82 + r * Math.sin(aa)).toFixed(1)}`;
+      return `<path d="M${p(r1, a - da)} L${p(r2, a)} L${p(r1, a + da)} Z" stroke="#c98f1f" stroke-width="0.8"/>`;
+    }).join('') + `<path d="M${(150 + 50 * Math.cos(-165 * Math.PI / 180)).toFixed(1)},${(82 + 50 * Math.sin(-165 * Math.PI / 180)).toFixed(1)} A50,50 0 0 1 ${(150 + 50 * Math.cos(-15 * Math.PI / 180)).toFixed(1)},${(82 + 50 * Math.sin(-15 * Math.PI / 180)).toFixed(1)}" fill="none" stroke="#f2c94c" stroke-width="5"/>
+      <path d="M${(150 + 50 * Math.cos(-165 * Math.PI / 180)).toFixed(1)},${(82 + 50 * Math.sin(-165 * Math.PI / 180)).toFixed(1)} A50,50 0 0 1 ${(150 + 50 * Math.cos(-15 * Math.PI / 180)).toFixed(1)},${(82 + 50 * Math.sin(-15 * Math.PI / 180)).toFixed(1)}" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.6"/>
+      <circle cx="150" cy="32" r="5" fill="#e05c5c" stroke="#c98f1f" stroke-width="1.2"/>
+      <circle cx="148.5" cy="30.5" r="1.5" fill="#ffffff" opacity="0.8"/>` },
+  { id: 'gold-collar', label: 'Goddess Gold Collar', emoji: '📿', theme: 'goddess', color: '#f2c94c',
+    svg: `<path d="M126,150 Q150,164 174,150 L180,157 Q150,186 120,157 Z" stroke="#c98f1f" stroke-width="1"/>
+          <path d="M124,155 Q150,176 176,155" fill="none" stroke="#c98f1f" stroke-width="0.8"/>
+          ${[132, 141, 150, 159, 168].map((x, i) => `<circle cx="${x}" cy="${(166 - Math.abs(x - 150) * 0.22).toFixed(1)}" r="2.3" fill="${['#5cc4e0', '#e05c5c', '#43b581', '#e05c5c', '#5cc4e0'][i]}" stroke="#ffffff" stroke-width="0.5"/>`).join('')}
+          ${[136, 150, 164].map((x) => `<path d="M${x},${x === 150 ? 174 : 171} q-2.4,4 0,6.5 q2.4,-2.5 0,-6.5 Z" stroke="#c98f1f" stroke-width="0.6"/>`).join('')}` },
+  { id: 'moon-staff', label: 'Moon Staff', emoji: '🌙', theme: 'goddess', color: '#d9b45a',
+    svg: (bt) => {
+      const x = 210 + bt.armSpread;
+      return `<line x1="${x}" y1="122" x2="${x}" y2="478" stroke="#b8923a" stroke-width="4.5" stroke-linecap="round"/>
+        <line x1="${x - 1}" y1="126" x2="${x - 1}" y2="474" stroke="#fff3a8" stroke-width="1" opacity="0.6"/>
+        <circle cx="${x}" cy="104" r="20" fill="#fff3a8" opacity="0.3" stroke="none"/>
+        <path d="M${x + 4},90 A15,15 0 1,0 ${x + 4},118 A18,18 0 0,1 ${x + 4},90 Z" fill="#fff3a8" stroke="#c98f1f" stroke-width="1"/>
+        <circle cx="${x}" cy="122" r="3.4" fill="#c9a6ff" stroke="#8c5ce0" stroke-width="0.8"/>
+        <path d="M${x + 12},84 l1.2,3 l3,1.2 l-3,1.2 l-1.2,3 l-1.2,-3 l-3,-1.2 l3,-1.2 Z" fill="#ffffff" stroke="none"/>`;
+    } },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 C110,26 136,8 160,10 C186,12 206,36 214,72 C202,58 192,46 180,40 C186,46 190,52 192,58 Z" stroke="#8e1b20" stroke-width="1.2"/>
           <path d="M124,46 C128,30 142,20 158,18" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
@@ -3041,9 +3193,35 @@ function lashesSVG(style, shape, cx, side) {
   return out;
 }
 
-const EYESHADOW_COLORS = ['#c9a6ff', '#ff8fc7', '#5cc4e0', '#f2c94c', '#43b581', '#d9a98c', '#9b6be0'];
-const BLUSH_COLORS = ['#ff8fa3', '#ff6f91', '#ffb38a', '#e0558f', '#c9a6ff'];
-const SALON_LIP_COLORS = ['#d9a98c', '#c9707d', '#c0293b', '#e0558f', '#e8836b', '#8c4a6b', '#9b6be0', '#ff6fb0'];
+const EYESHADOW_COLORS = ['#c9a6ff', '#ff8fc7', '#5cc4e0', '#f2c94c', '#43b581', '#d9a98c', '#9b6be0', '#f7e1b5', '#d4a017', '#8a5a2b', '#c0245e', '#2b4a8a', '#2b2b2b'];
+const BLUSH_COLORS = ['#ff8fa3', '#ff6f91', '#ffb38a', '#e0558f', '#c9a6ff', '#d9826b', '#ffa8c5'];
+const SALON_LIP_COLORS = ['#d9a98c', '#f2a7a0', '#c9707d', '#b5655a', '#c0293b', '#a83232', '#e0558f', '#e8836b', '#ff8a5c', '#8c4a6b', '#5a2a3a', '#9b6be0', '#ff6fb0'];
+const LINER_COLORS = ['#1a1a1a', '#5a3825', '#2b4a8a', '#d4a017', '#8c5ce0', '#43b581', '#ffffff'];
+const HIGHLIGHT_COLORS = ['#fff6e8', '#f7e1b5', '#f2c94c', '#ffc6d9', '#d6f0ff'];
+const SHADOW_STYLES = [
+  { id: 'soft', label: 'Soft Blend', emoji: '🌫️' },
+  { id: 'smoky', label: 'Smoky', emoji: '🖤' },
+  { id: 'crease', label: 'Cut Crease', emoji: '✂️' },
+  { id: 'wing', label: 'Winged', emoji: '🪽' },
+  { id: 'shimmer', label: 'Shimmer', emoji: '✨' },
+];
+const LINER_STYLES = [
+  { id: 'none', label: 'None', emoji: '○' },
+  { id: 'thin', label: 'Thin', emoji: '✏️' },
+  { id: 'bold', label: 'Bold', emoji: '🖊️' },
+  { id: 'wing', label: 'Winged', emoji: '🪽' },
+  { id: 'cat', label: 'Cat-Eye', emoji: '🐱' },
+];
+const LIP_SHAPES = [
+  { id: 'line', label: 'Natural', emoji: '🙂' },
+  { id: 'full', label: 'Full Lips', emoji: '👄' },
+];
+const LIP_FINISHES = [
+  { id: 'satin', label: 'Satin', emoji: '🎀' },
+  { id: 'matte', label: 'Matte', emoji: '🧱' },
+  { id: 'gloss', label: 'Gloss', emoji: '💧' },
+  { id: 'shimmer', label: 'Shimmer', emoji: '✨' },
+];
 const CHEEK_ART = [
   { id: 'none', label: 'None', emoji: '○' },
   { id: 'heart', label: 'Heart', emoji: '💗' },
@@ -3052,17 +3230,93 @@ const CHEEK_ART = [
   { id: 'butterfly', label: 'Butterfly', emoji: '🦋' },
 ];
 
+// Soft, blended makeup drawn under the eyes: contour shading and layered eyeshadow.
 function makeupUnderSVG(face) {
-  if (!face.eyeshadow) return '';
-  return [132, 168].map((cx) => {
-    const lid = EYE_LID[face.eyeShape] || EYE_LID.round;
-    return `<ellipse cx="${cx}" cy="${lid.cy - lid.ry * 0.7}" rx="${lid.rx + 3}" ry="${Math.max(4, lid.ry * 0.95)}" fill="${face.eyeshadow}" opacity="0.6"/>`;
+  let out = '';
+  if (face.contour) {
+    out += [[118, 1], [182, -1]].map(([x, k]) => `<ellipse cx="${x}" cy="104" rx="11" ry="3.4" fill="#7a4a2e" opacity="0.1" transform="rotate(${30 * k} ${x} 104)"/>
+      <ellipse cx="${x}" cy="104" rx="7" ry="2" fill="#7a4a2e" opacity="0.1" transform="rotate(${30 * k} ${x} 104)"/>`).join('')
+      + `<path d="M145,84 Q144,92 145.5,99 M155,84 Q156,92 154.5,99" fill="none" stroke="#7a4a2e" stroke-width="1.6" opacity="0.1" stroke-linecap="round"/>`;
+  }
+  if (!face.eyeshadow) return out;
+  const c = face.eyeshadow, d = darken(c, 0.35), st = face.shadowStyle || 'soft';
+  const lid = EYE_LID[face.eyeShape] || EYE_LID.round;
+  const top = lid.cy - lid.ry;
+  return out + [[132, -1], [168, 1]].map(([cx, side]) => {
+    const outer = cx + side * lid.rx;
+    if (st === 'smoky') {
+      return `<ellipse cx="${cx + side * 1.5}" cy="${top + 1}" rx="${lid.rx + 5}" ry="${lid.ry + 4}" fill="${d}" opacity="0.28"/>
+        <ellipse cx="${cx + side}" cy="${top + 2}" rx="${lid.rx + 2.5}" ry="${lid.ry + 1.5}" fill="${d}" opacity="0.42"/>
+        <ellipse cx="${cx}" cy="${lid.cy + lid.ry * 0.9}" rx="${lid.rx + 1}" ry="2.4" fill="${d}" opacity="0.32"/>`;
+    }
+    if (st === 'crease') {
+      return `<ellipse cx="${cx}" cy="${top + 1.5}" rx="${lid.rx + 2}" ry="${lid.ry * 0.8 + 1.5}" fill="${c}" opacity="0.6"/>
+        <path d="M${cx - lid.rx - 3},${lid.cy - 1} Q${cx},${top - 8} ${cx + lid.rx + 3},${lid.cy - 1}" fill="none" stroke="${d}" stroke-width="2" opacity="0.6" stroke-linecap="round"/>
+        <ellipse cx="${cx}" cy="${top - 0.5}" rx="3" ry="1.5" fill="#ffffff" opacity="0.6"/>`;
+    }
+    let s = `<ellipse cx="${cx + side}" cy="${top + 1}" rx="${lid.rx + 5}" ry="${lid.ry + 3.5}" fill="${c}" opacity="0.18"/>
+        <ellipse cx="${cx + side * 0.5}" cy="${top + 1.5}" rx="${lid.rx + 3}" ry="${lid.ry + 1.5}" fill="${c}" opacity="0.28"/>
+        <ellipse cx="${cx}" cy="${top + 2}" rx="${lid.rx + 1}" ry="${lid.ry * 0.8}" fill="${c}" opacity="0.34"/>`;
+    if (st === 'wing') s += `<path d="M${outer},${lid.cy - 1} L${outer + side * 8},${lid.cy - 6.5} L${outer - side * 1},${top - 2} Z" fill="${c}" opacity="0.55"/>`;
+    if (st === 'shimmer') s += [[-4, -1.5], [0, -3], [4, -2], [-1.5, -4.5], [3, -5]].map(([x, y]) => `<circle cx="${cx + x}" cy="${top + y}" r="0.7" fill="#ffffff" opacity="0.95"/>`).join('');
+    return s;
   }).join('');
 }
 
+// Eyeliner along the upper lash line, with optional wings.
+function linerSVG(face, cx, side) {
+  const st = face.liner;
+  if (!st || st === 'none' || face.eyeShape === 'closed') return '';
+  const lid = EYE_LID[face.eyeShape] || EYE_LID.round;
+  const c = face.linerColor || '#1a1a1a';
+  const inner = cx - side * lid.rx, outer = cx + side * lid.rx, cy = lid.cy;
+  let s = `<path d="M${inner},${cy} Q${cx},${cy - 2 * lid.ry} ${outer},${cy}" fill="none" stroke="${c}" stroke-width="${st === 'thin' ? 1.1 : 1.9}" stroke-linecap="round"/>`;
+  if (st === 'wing' || st === 'cat') {
+    const L = st === 'cat' ? 8.5 : 5.5, H = st === 'cat' ? 6.5 : 4.5;
+    s += `<path d="M${outer - side * 2.5},${(cy - lid.ry * 0.72).toFixed(1)} L${outer + side * L},${cy - H} L${outer},${cy + 0.4} Z" fill="${c}"/>`;
+  }
+  if (st === 'cat') s += `<path d="M${cx},${cy + lid.ry} Q${cx + side * lid.rx * 0.7},${cy + lid.ry * 0.9} ${outer + side},${cy}" fill="none" stroke="${c}" stroke-width="1" opacity="0.85"/>`;
+  return s;
+}
+
+// Realistic full lips with a cupid's bow, in different finishes.
+function lipsSVG(face) {
+  const c = face.lipColor || '#c9707d', d = darken(c, 0.3), l = lighten(c, 0.35);
+  const neutral = face.mouth === 'neutral';
+  const y0 = neutral ? 110 : 108, dip = neutral ? 1 : 8;
+  const finish = face.lipFinish || (face.gloss ? 'gloss' : 'satin');
+  let s = `<path d="M127,${y0} Q137,${y0 - 4.5} 145,${y0 - 3} Q150,${y0 - 1.2} 155,${y0 - 3} Q163,${y0 - 4.5} 173,${y0} Q150,${y0 + dip} 127,${y0} Z" fill="${d}"/>
+    <path d="M127,${y0} Q150,${y0 + dip} 173,${y0} Q165,${y0 + dip / 2 + 7} 150,${y0 + dip / 2 + 7.5} Q135,${y0 + dip / 2 + 7} 127,${y0} Z" fill="${c}"/>
+    <path d="M127,${y0} Q150,${y0 + dip} 173,${y0}" fill="none" stroke="${darken(c, 0.5)}" stroke-width="1" opacity="0.7" stroke-linecap="round"/>`;
+  const ly = y0 + dip / 2 + 4;
+  if (finish === 'satin') s += `<ellipse cx="150" cy="${ly}" rx="6" ry="1.4" fill="${l}" opacity="0.45"/>`;
+  if (finish === 'gloss') s += `<ellipse cx="150" cy="${ly}" rx="6" ry="1.6" fill="#ffffff" opacity="0.85"/><ellipse cx="141" cy="${y0 - 1.5}" rx="2.2" ry="0.8" fill="#ffffff" opacity="0.6"/>`;
+  if (finish === 'shimmer') s += [[-8, 3], [-3, 4.5], [3, 4], [8, 2.5], [-5, -1], [5, -1]].map(([x, y]) => `<circle cx="${150 + x}" cy="${y0 + y + (y > 0 ? dip / 2 : 0)}" r="0.7" fill="#ffffff" opacity="0.95"/>`).join('');
+  return s;
+}
+
+// Highlighter glow on the cheekbones, nose and cupid's bow.
+function highlightSVG(face) {
+  const h = face.highlight;
+  if (!h) return '';
+  return `${[[123, -15], [177, 15]].map(([x, r]) => `<ellipse cx="${x}" cy="97.5" rx="6" ry="2.4" fill="${h}" opacity="0.35" transform="rotate(${r} ${x} 97.5)"/>
+      <ellipse cx="${x}" cy="97.5" rx="3.5" ry="1.3" fill="${h}" opacity="0.55" transform="rotate(${r} ${x} 97.5)"/>`).join('')}
+    ${[[128, 82], [172, 82]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="4" ry="1.1" fill="${h}" opacity="0.4"/>`).join('')}
+    <path d="M150,85 L150,96" stroke="${h}" stroke-width="1.8" opacity="0.45" stroke-linecap="round"/>
+    <circle cx="150" cy="104.6" r="1.2" fill="${h}" opacity="0.6"/>`;
+}
+
+// Little golden goddess face gems along the outer eyes.
+function faceGemsSVG() {
+  return [[132, -1], [168, 1]].map(([cx, side]) => [[9, 97.5, 1.2], [11.6, 94.2, 1], [13.2, 90.6, 0.85], [13.4, 86.8, 0.7]].map(([dx, y, r]) =>
+    `<circle cx="${cx + side * dx}" cy="${y}" r="${r}" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.3"/><circle cx="${cx + side * dx - 0.3}" cy="${y - 0.3}" r="${r * 0.35}" fill="#ffffff"/>`).join('')).join('')
+    + `<path d="M150,70.5 L152,73 L150,75.5 L148,73 Z" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.4"/>`;
+}
+
 function makeupOverSVG(face) {
-  let out = '';
-  if (face.gloss && face.mouth !== 'surprised') {
+  let out = highlightSVG(face);
+  if (face.gems) out += faceGemsSVG();
+  if (face.gloss && face.mouth !== 'surprised' && !(face.lipShape === 'full' && (face.mouth === 'smile' || face.mouth === 'neutral'))) {
     out += `<ellipse cx="143" cy="${face.mouth === 'neutral' ? 111 : 113}" rx="4" ry="1.4" fill="#ffffff" opacity="0.75"/>`;
   }
   if (face.glitter) {
@@ -3091,6 +3345,14 @@ const DEFAULT_FACE = {
   lipColor: '#c9707d',
   blush: true,
   freckles: false,
+  shadowStyle: 'soft',
+  liner: 'none',
+  linerColor: '#1a1a1a',
+  lipShape: 'line',
+  lipFinish: 'satin',
+  highlight: null,
+  contour: false,
+  gems: false,
 };
 
 function eyeShapeSVG(shape, cx, side, color) {
@@ -3150,17 +3412,19 @@ function frecklesSVG() {
 
 function buildFaceSVG(face, hairColor) {
   return `
-    ${face.blush ? `<ellipse cx="130" cy="104" rx="8" ry="5.5" fill="${face.blushColor || '#ff8fa3'}" opacity="0.45"/><ellipse cx="170" cy="104" rx="8" ry="5.5" fill="${face.blushColor || '#ff8fa3'}" opacity="0.45"/>` : ''}
+    ${face.blush ? [130, 170].map((x) => [[11, 7.5, 0.14], [8.5, 5.8, 0.17], [6, 4, 0.2]].map(([rx, ry, o]) => `<ellipse cx="${x}" cy="104" rx="${rx}" ry="${ry}" fill="${face.blushColor || '#ff8fa3'}" opacity="${o}"/>`).join('')).join('') : ''}
     ${makeupUnderSVG(face)}
     ${face.freckles ? frecklesSVG() : ''}
     <path d="M147,97 Q150,101 148,102.5" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="1.2" stroke-linecap="round"/>
     ${eyeShapeSVG(face.eyeShape, 132, -1, face.eyeColor)}
     ${eyeShapeSVG(face.eyeShape, 168, 1, face.eyeColor)}
+    ${linerSVG(face, 132, -1)}
+    ${linerSVG(face, 168, 1)}
     ${lashesSVG(face.lashes, face.eyeShape, 132, -1)}
     ${lashesSVG(face.lashes, face.eyeShape, 168, 1)}
     ${eyebrowSVG(face.eyebrowShape, 132, hairColor)}
     ${eyebrowSVG(face.eyebrowShape, 168, hairColor)}
-    ${mouthSVG(face.mouth, face.lipColor)}
+    ${face.lipShape === 'full' && (face.mouth === 'smile' || face.mouth === 'neutral') ? lipsSVG(face) : mouthSVG(face.mouth, face.lipColor)}
     ${makeupOverSVG(face)}
   `;
 }
@@ -3214,6 +3478,10 @@ const BACKGROUNDS = [
     gradient: 'linear-gradient(180deg, #a8e6ff 0%, #d6c8ff 45%, #ffc6e8 100%)' },
   { id: 'bubblegum-chrome', label: 'Bubblegum Chrome', emoji: '🫧', theme: 'y2k', ambient: 'bubbles',
     gradient: 'linear-gradient(135deg, #ff9fd6 0%, #ffd6ef 30%, #e8eef6 50%, #c8f0ff 70%, #b49fff 100%)' },
+  { id: 'olympus', label: 'Mount Olympus', emoji: '🏛️', theme: 'goddess', ambient: 'sparkle', decor: 'temple',
+    gradient: 'linear-gradient(180deg, #ffe9b8 0%, #fff4dc 40%, #e3f1ff 100%)' },
+  { id: 'moon-temple', label: 'Moonlit Temple', emoji: '🌙', theme: 'goddess', ambient: 'sparkle', decor: 'temple',
+    gradient: 'linear-gradient(180deg, #121a3d 0%, #2b3a7a 55%, #6a5cb8 100%)' },
   { id: 'met-steps', label: 'Met Gala Steps', emoji: '📸', theme: 'metgala', price: 50, ambient: 'flash', decor: 'carpet',
     gradient: 'linear-gradient(180deg, #1e1a2e 0%, #3b2f4f 60%, #5a4a6a 100%)' },
   { id: 'haunted-night', label: 'Haunted Night', emoji: '🦇', theme: 'halloween', ambient: 'bats', decor: 'moon',
@@ -3241,6 +3509,7 @@ const JUDGE_COMMENTS = [
   "Bravo! Graceful as a swan.",
   "Sweet dreams! Cozy and cute.",
   "Totally Y2K! That look is so iconic! 💿",
+  "A true goddess! Mount Olympus is bowing! 🏛️",
 ];
 
 const WARDROBE_PRESETS = [
@@ -3360,6 +3629,20 @@ const WARDROBE_PRESETS = [
     look: { bodyType: 'neutral', skin: SKIN_TONES[3], hair: { style: 'bob', color: '#2b2b2b', bangs: 'straight' },
       outfit: { style: 'striped-shirt', color: '#2b4a8a' }, shoes: { style: 'flats', color: '#e05c5c' },
       accessories: { beret: false }, background: 'spring', face: { mouth: 'grin' } } },
+  { id: 'golden-goddess-look', label: 'Golden Goddess', theme: 'goddess',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[3], hair: { style: 'goddess-waves', color: '#2b2b2b' },
+      outfit: { style: 'grecian-gown', color: '#fffaf2' }, shoes: { style: 'gladiator-sandals', color: '#f2c94c' },
+      accessories: { 'laurel-crown': true, 'gold-collar': true, 'goddess-wings': true }, background: 'olympus',
+      face: { eyeshadow: '#d4a017', shadowStyle: 'shimmer', liner: 'wing', linerColor: '#1a1a1a', lashes: 'long', highlight: '#f2c94c', contour: true, lipColor: '#b5655a', lipShape: 'full', lipFinish: 'gloss', gems: true } } },
+  { id: 'moon-goddess-look', label: 'Moon Goddess', theme: 'goddess',
+    look: { bodyType: 'neutral', skin: SKIN_TONES[1], hair: { style: 'long', color: '#e8e3dc' },
+      outfit: { style: 'grecian-gown', color: '#5c7ce0' }, shoes: { style: 'gladiator-sandals', color: '#c9d4e2' },
+      accessories: { 'moon-staff': true }, background: 'moon-temple',
+      face: { eyeshadow: '#5c7ce0', shadowStyle: 'smoky', liner: 'cat', linerColor: '#2b4a8a', lashes: 'glam', highlight: '#d6f0ff', lipColor: '#8c4a6b', lipShape: 'full', lipFinish: 'shimmer' } } },
+  { id: 'olympian-look', label: 'Olympian', theme: 'goddess',
+    look: { bodyType: 'masculine', skin: SKIN_TONES[4], hair: { style: 'crop', color: '#2b2b2b' },
+      outfit: { style: 'goddess-tunic', color: '#ffffff' }, shoes: { style: 'gladiator-sandals', color: '#8a5a2b' },
+      accessories: { 'laurel-crown': true }, background: 'olympus', face: { highlight: '#f7e1b5', contour: true } } },
   { id: 'santas-helper', label: "Santa's Helper", theme: 'christmas',
     look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'ponytail', color: '#8a5a2b' },
       outfit: { style: 'elf-costume', color: '#1e7a46' }, shoes: { style: 'boots', color: '#8a5a2b' },
@@ -4103,6 +4386,7 @@ function render() {
   const shoeLayer = document.getElementById('layer-shoes');
   const shoeDef = SHOE_STYLES.find((s) => s.id === state.shoes.style);
   shoeLayer.innerHTML = shoeDef.svg;
+  shoeLayer.style.setProperty('--skin', state.skin);
   shoeLayer.setAttribute('fill', 'url(#shoeGradient)');
   shoeLayer.setAttribute('stroke', darken(state.shoes.color, 0.4));
 
@@ -4323,6 +4607,23 @@ function addDecor(decor) {
       ${heart(220, 110, 1.6, '#ff6fb0')}${heart(40, 380, 1.4, '#c9a6ff')}${heart(150, 30, 1, '#ff9fd6')}
       ${fly(80, 130, '#5cc4e0')}${fly(240, 250, '#ff8fc7')}${fly(20, 240, '#c9a6ff')}
       <text x="150" y="410" font-size="18" font-weight="900" text-anchor="middle" fill="#ffffff" opacity="0.8" font-family="Arial Black, Arial, sans-serif" letter-spacing="3">✧ Y2K ✧</text>
+    </svg>`;
+  } else if (decor === 'temple') {
+    const column = (x) => `<g>
+        <rect x="${x - 2}" y="96" width="34" height="10" rx="2" fill="#ffffff" opacity="0.9"/>
+        <path d="M${x - 4},96 q6,-8 12,0 M${x + 22},96 q6,-8 12,0" fill="none" stroke="#e8dcc0" stroke-width="2.4"/>
+        <rect x="${x + 2}" y="106" width="26" height="268" fill="#fffaf2" opacity="0.92"/>
+        ${[7, 13, 19, 25].map((dx) => `<line x1="${x + dx}" y1="110" x2="${x + dx}" y2="370" stroke="#e8dcc0" stroke-width="1.4"/>`).join('')}
+        <rect x="${x - 4}" y="374" width="38" height="10" rx="2" fill="#ffffff" opacity="0.9"/></g>`;
+    const cloud = (x, y, k) => `<g transform="translate(${x},${y}) scale(${k})" fill="#ffffff" opacity="0.85"><ellipse cx="0" cy="0" rx="40" ry="14"/><ellipse cx="-18" cy="-8" rx="18" ry="14"/><ellipse cx="14" cy="-12" rx="22" ry="17"/></g>`;
+    el.classList.add('ambient-decor-full');
+    el.innerHTML = `<svg viewBox="0 0 300 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <g transform="translate(150,70)" opacity="0.5">${Array.from({ length: 16 }, (_, i) => `<path d="M0,0 L${(140 * Math.cos(i * Math.PI / 8 - 0.06)).toFixed(1)},${(140 * Math.sin(i * Math.PI / 8 - 0.06)).toFixed(1)} L${(140 * Math.cos(i * Math.PI / 8 + 0.06)).toFixed(1)},${(140 * Math.sin(i * Math.PI / 8 + 0.06)).toFixed(1)} Z" fill="#fff3a8"/>`).join('')}<circle r="26" fill="#fff3a8"/></g>
+      <path d="M-10,96 L150,34 L310,96 Z" fill="#fffaf2" opacity="0.85" stroke="#e8dcc0" stroke-width="3"/>
+      <path d="M40,88 L150,46 L260,88 Z" fill="none" stroke="#f2c94c" stroke-width="2" opacity="0.8"/>
+      ${column(10)}${column(258)}
+      ${cloud(40, 400, 1.3)}${cloud(150, 412, 1.6)}${cloud(262, 398, 1.3)}${cloud(250, 150, 0.6)}${cloud(50, 200, 0.5)}
+      <path d="M0,384 L300,384" stroke="#e8dcc0" stroke-width="3"/>
     </svg>`;
   } else if (decor === 'skyline') {
     const builds = [[0, 70, 40], [38, 40, 30], [66, 96, 34], [98, 56, 28], [124, 80, 30], [152, 44, 26], [176, 104, 36], [210, 62, 30], [238, 86, 34], [270, 52, 30]];
@@ -5134,6 +5435,7 @@ const CHALLENGES = [
   { id: 'sleepover', label: 'Cozy Sleepover', emoji: '😴', theme: 'sleepy', items: ['cozy-pajamas', 'nightgown', 'bunny-slippers', 'fluffy-slippers', 'unicorn-slippers', 'bear-slippers', 'heart-slippers', 'sleeping-mask'], colors: ['#8c5ce0', '#5cc4e0'], bg: 'cozy-bedroom' },
   { id: 'ballet', label: 'Ballet Recital', emoji: '🩰', theme: 'ballet', items: ['ballet-tutu', 'swan-tutu', 'ballet-slippers', 'bun'], colors: ['#ff8fc7', '#ffffff'], bg: 'ballet-stage' },
   { id: 'y2k', label: 'Totally Y2K', emoji: '💿', theme: 'y2k', items: ['butterfly-flares', 'chrome-dress', 'denim-skirt-tee', 'chunky-platforms', 'tinted-shades', 'flip-phone', 'bucket-hat', 'star-clips', 'flippy-bob'], colors: ['#ff6fb0', '#c9a6ff', '#5cc4e0'], bg: 'cyber-dream' },
+  { id: 'goddess', label: 'Goddess of Glam', emoji: '🏛️', theme: 'goddess', items: ['grecian-gown', 'olympus-gown', 'moon-goddess', 'goddess-tunic', 'spring-goddess', 'gladiator-sandals', 'laurel-crown', 'sun-crown', 'gold-collar', 'moon-staff', 'goddess-wings', 'goddess-waves'], colors: ['#f2c94c', '#fffaf2', '#5c7ce0'], bg: 'olympus' },
   { id: 'school', label: 'First Day of School', emoji: '🎒', theme: 'school', items: ['uniform-skirt', 'uniform-trousers', 'backpack', 'star-backpack', 'big-bow', 'twin-bows'], colors: ['#2b4a8a', '#e05c5c'], bg: 'classroom' },
 ];
 
@@ -6738,11 +7040,31 @@ function salonSet(fn) {
   highlightSalon();
 }
 
+function markSalonCustom(id, value, palette) {
+  const lab = document.querySelector(`#${id} .custom-color`);
+  if (!lab) return;
+  const inPalette = !value || value === 'none' || palette.includes(value);
+  lab.classList.toggle('selected', !inPalette);
+  if (value && value !== 'none' && /^#[0-9a-f]{6}$/i.test(value)) lab.querySelector('input').value = value;
+}
+
 function highlightSalon() {
   const f = state.face;
   highlightSelection('#salon-shadow', f.eyeshadow || 'none', 'color');
   highlightSelection('#salon-blush', f.blush ? (f.blushColor || '#ff8fa3') : 'none', 'color');
   highlightSelection('#salon-lips', f.lipColor, 'color');
+  highlightSelection('#salon-liner-color', f.linerColor || '#1a1a1a', 'color');
+  highlightSelection('#salon-highlight', f.highlight || 'none', 'color');
+  markSalonCustom('salon-shadow', f.eyeshadow, EYESHADOW_COLORS);
+  markSalonCustom('salon-blush', f.blush ? f.blushColor : null, BLUSH_COLORS);
+  markSalonCustom('salon-lips', f.lipColor, SALON_LIP_COLORS);
+  markSalonCustom('salon-liner-color', f.linerColor, LINER_COLORS);
+  markSalonCustom('salon-highlight', f.highlight, HIGHLIGHT_COLORS);
+  highlightSelection('#salon-shadow-style', f.shadowStyle || 'soft', 'id');
+  highlightSelection('#salon-liner', f.liner || 'none', 'id');
+  highlightSelection('#salon-lip-shape', f.lipShape || 'line', 'id');
+  highlightSelection('#salon-lip-finish', f.lipFinish || (f.gloss ? 'gloss' : 'satin'), 'id');
+  document.querySelectorAll('#salon-contour .option-btn').forEach((b) => b.classList.toggle('selected', !!f[b.dataset.id]));
   highlightSelection('#salon-lashes', f.lashes || 'none', 'id');
   highlightSelection('#salon-cheek', f.cheekArt || 'none', 'id');
   document.querySelectorAll('#salon-extras .option-btn').forEach((b) => {
@@ -6753,9 +7075,17 @@ function highlightSalon() {
   });
 }
 
-function buildSalonSwatches(id, colors, onPick, withNone) {
+function buildSalonSwatches(id, colors, onPick, withNone, withCustom = true) {
   const el = document.getElementById(id);
   buildSwatches(el, colors, onPick);
+  if (withCustom) {
+    const lab = document.createElement('label');
+    lab.className = 'custom-color custom-color-mini';
+    lab.title = 'Pick any colour';
+    lab.innerHTML = '<input type="color" value="#e0558f" aria-label="Pick any colour"><span class="custom-color-dot"></span><span>Any</span>';
+    lab.querySelector('input').addEventListener('input', (e) => onPick(e.target.value));
+    el.appendChild(lab);
+  }
   if (withNone) {
     const none = document.createElement('button');
     none.className = 'swatch swatch-none';
@@ -6775,20 +7105,52 @@ function buildSalon() {
     else { state.face.blush = true; state.face.blushColor = c; }
   }), true);
   buildSalonSwatches('salon-lips', SALON_LIP_COLORS, (c) => salonSet(() => { state.face.lipColor = c; }), false);
+  buildSalonSwatches('salon-liner-color', LINER_COLORS, (c) => salonSet(() => {
+    state.face.linerColor = c;
+    if (!state.face.liner || state.face.liner === 'none') state.face.liner = 'thin';
+  }), false);
+  buildSalonSwatches('salon-highlight', HIGHLIGHT_COLORS, (c) => salonSet(() => { state.face.highlight = c === 'none' ? null : c; }), true);
+  buildOptionButtons(document.getElementById('salon-shadow-style'), SHADOW_STYLES, (id) => salonSet(() => {
+    state.face.shadowStyle = id;
+    if (!state.face.eyeshadow) state.face.eyeshadow = EYESHADOW_COLORS[0];
+  }));
+  buildOptionButtons(document.getElementById('salon-liner'), LINER_STYLES, (id) => salonSet(() => { state.face.liner = id; }));
+  buildOptionButtons(document.getElementById('salon-lip-shape'), LIP_SHAPES, (id) => salonSet(() => {
+    state.face.lipShape = id;
+    if (id === 'full' && state.face.mouth !== 'neutral') state.face.mouth = 'smile';
+  }));
+  buildOptionButtons(document.getElementById('salon-lip-finish'), LIP_FINISHES, (id) => salonSet(() => {
+    state.face.lipFinish = id;
+    state.face.gloss = id === 'gloss';
+  }));
+  buildOptionButtons(document.getElementById('salon-contour'), [
+    { id: 'contour', label: 'Contour', emoji: '🎨' },
+  ], (id) => salonSet(() => { state.face[id] = !state.face[id]; }));
+  buildOptionButtons(document.getElementById('salon-presets'), MAKEUP_PRESETS, (id) => salonSet(() => {
+    const preset = MAKEUP_PRESETS.find((m) => m.id === id);
+    Object.assign(state.face, preset.face);
+  }));
   buildOptionButtons(document.getElementById('salon-lashes'), LASH_STYLES, (id) => salonSet(() => { state.face.lashes = id; }));
   buildOptionButtons(document.getElementById('salon-cheek'), CHEEK_ART, (id) => salonSet(() => { state.face.cheekArt = id; }));
   buildOptionButtons(document.getElementById('salon-extras'), [
-    { id: 'gloss', label: 'Lip Gloss', emoji: '💋' },
     { id: 'glitter', label: 'Glitter', emoji: '✨' },
     { id: 'freckles', label: 'Freckles', emoji: '⁘' },
+    { id: 'gems', label: 'Goddess Gems', emoji: '💎' },
   ], (id) => salonSet(() => { state.face[id] = !state.face[id]; }));
   buildOptionButtons(document.getElementById('salon-spa'), ACCESSORIES.filter((a) => ['sheet-mask', 'cucumber-eyes', 'clay-mask', 'sleeping-mask'].includes(a.id)),
     (id) => salonSet(() => { state.accessories[id] = !state.accessories[id]; }));
 }
 
+const MAKEUP_PRESETS = [
+  { id: 'natural', label: 'Natural', emoji: '🌸', face: { eyeshadow: '#d9a98c', shadowStyle: 'soft', liner: 'thin', linerColor: '#5a3825', lashes: 'natural', blush: true, blushColor: '#ff8fa3', lipColor: '#c9707d', lipShape: 'full', lipFinish: 'satin', gloss: false, highlight: '#fff6e8', contour: false, gems: false } },
+  { id: 'glam', label: 'Red Carpet', emoji: '💋', face: { eyeshadow: '#8a5a2b', shadowStyle: 'smoky', liner: 'wing', linerColor: '#1a1a1a', lashes: 'glam', blush: true, blushColor: '#d9826b', lipColor: '#c0293b', lipShape: 'full', lipFinish: 'matte', gloss: false, highlight: '#f7e1b5', contour: true, gems: false } },
+  { id: 'goddess', label: 'Goddess', emoji: '🏛️', face: { eyeshadow: '#d4a017', shadowStyle: 'shimmer', liner: 'cat', linerColor: '#1a1a1a', lashes: 'long', blush: true, blushColor: '#ffb38a', lipColor: '#b5655a', lipShape: 'full', lipFinish: 'gloss', gloss: true, highlight: '#f2c94c', contour: true, gems: true } },
+];
+
 function wipeMakeup() {
   salonSet(() => {
-    Object.assign(state.face, { eyeshadow: null, blushColor: '#ff8fa3', gloss: false, glitter: false, cheekArt: 'none', lashes: 'none', lipColor: '#c9707d', blush: true });
+    Object.assign(state.face, { eyeshadow: null, blushColor: '#ff8fa3', gloss: false, glitter: false, cheekArt: 'none', lashes: 'none', lipColor: '#c9707d', blush: true,
+      shadowStyle: 'soft', liner: 'none', linerColor: '#1a1a1a', lipShape: 'line', lipFinish: 'satin', highlight: null, contour: false, gems: false });
     ['sheet-mask', 'cucumber-eyes', 'clay-mask', 'sleeping-mask'].forEach((id) => { state.accessories[id] = false; });
   });
 }
