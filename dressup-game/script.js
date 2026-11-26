@@ -2071,8 +2071,32 @@ function stilettoPumpsSVG() {
   }).join('');
 }
 
+// Closed-toe heels: a rounded toe box that covers the toes, a low U-shaped
+// opening where the top of the foot shows, an ankle strap with a buckle and a
+// thin stiletto peeking out behind each foot.
+function closedHeelsSVG() {
+  return [[127, -1], [173, 1]].map(([cx, side]) => {
+    const o = (dx) => (cx + dx * side).toFixed(1); // dx > 0 means toward the outside
+    return `
+      <ellipse cx="${cx}" cy="498" rx="15" ry="3.2" fill="#000000" opacity="0.2" stroke="none"/>
+      <ellipse cx="${o(14)}" cy="498" rx="3.5" ry="1.5" fill="#000000" opacity="0.28" stroke="none"/>
+      <path d="M${o(10)},466 L${o(15.2)},466 L${o(14.5)},496 L${o(13.3)},496 Z" stroke-width="0.7"/>
+      <path d="M${o(13.2)},493 L${o(14.6)},493 L${o(14.5)},497.5 L${o(13.3)},497.5 Z" fill="#2b2b2b" stroke="none"/>
+      <path d="M${o(-11.5)},446 Q${o(-14.5)},462 ${o(-13)},478 C${o(-13)},492 ${o(-7.5)},498 ${cx},498 C${o(7.5)},498 ${o(13.5)},492 ${o(13.5)},478 Q${o(14.5)},462 ${o(11.5)},446 Z" stroke-width="1"/>
+      <path d="M${o(-10)},449 L${o(10)},449 Q${o(9.5)},462 ${cx},470 Q${o(-9.5)},462 ${o(-10)},449 Z" style="fill:var(--skin, #f1c9a5)" stroke="none"/>
+      <path d="M${o(-10)},449.5 Q${o(-9.5)},462 ${cx},470 Q${o(9.5)},462 ${o(10)},449.5" fill="none" stroke="#000000" stroke-width="1.3" opacity="0.4"/>
+      <path d="M${o(-2.5)},467 Q${cx},471 ${o(2.5)},467" fill="none" stroke="#000000" stroke-width="0.8" opacity="0.3"/>
+      <path d="M${o(-11)},487 Q${o(-7)},497 ${cx},498 Q${o(7)},497 ${o(11.5)},487" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.28"/>
+      <path d="M${o(-8)},476 Q${o(-7)},487 ${o(-2)},492" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
+      <path d="M${o(-12)},454 Q${o(-13)},462 ${o(-11.8)},469" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.4"/>
+      <path d="M${o(-11.5)},444 Q${cx},448 ${o(11.5)},444 L${o(11.5)},449.5 Q${cx},453.5 ${o(-11.5)},449.5 Z" stroke-width="0.9"/>
+      <rect x="${(cx + 7 * side - 2.2).toFixed(1)}" y="444.6" width="4.4" height="5.4" rx="1" fill="none" stroke="#f2c94c" stroke-width="1.3"/>`;
+  }).join('');
+}
+
 const SHOE_STYLES = [
-  { id: 'heels', label: 'Heel Sandals', emoji: '👡', svg: stilettoPumpsSVG() },
+  { id: 'heels', label: 'Open-Toe Heels', emoji: '👡', svg: stilettoPumpsSVG() },
+  { id: 'closed-heels', label: 'Closed-Toe Heels', emoji: '👠', svg: closedHeelsSVG() },
   { id: 'flats', label: 'Flats', emoji: '🥿',
     svg: `<ellipse cx="127" cy="454" rx="22" ry="6" fill="#000000" opacity="0.25"/>
           <ellipse cx="127" cy="447" rx="21" ry="10"/>
