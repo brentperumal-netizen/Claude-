@@ -2044,28 +2044,35 @@ const CLOTHES_PALETTE = [
   '#8c5ce0', '#5a3aa8', '#ffffff', '#e8e3dc', '#c9b59a', '#8a5a2b', '#9aa3ad', '#2b2b2b',
 ];
 
-// Realistic stiletto pumps seen from the front: a pointed toe box, a low-cut
-// opening around the ankle, and a thin heel peeking out behind each foot.
+// Strappy high-heeled sandals seen from the front: rounded toes peek out,
+// with a toe strap, a crossover strap, an ankle strap with a buckle, and a
+// thin stiletto heel peeking out behind each foot.
 function stilettoPumpsSVG() {
   return [[127, -1], [173, 1]].map(([cx, side]) => {
     const o = (dx) => (cx + dx * side).toFixed(1); // dx > 0 means toward the outside
+    const skin = 'style="fill:var(--skin, #f1c9a5)"';
+    const toes = [[-6.5, 490.6, 2.9], [-1.8, 492.6, 2.8], [2.8, 492.2, 2.5], [6.8, 490.6, 2.2], [10.2, 487.8, 1.9]];
     return `
-      <ellipse cx="${cx}" cy="497" rx="14" ry="3.2" fill="#000000" opacity="0.2" stroke="none"/>
-      <ellipse cx="${o(13)}" cy="497" rx="3.5" ry="1.5" fill="#000000" opacity="0.28" stroke="none"/>
-      <path d="M${o(8)},452 L${o(15.5)},451 L${o(13.6)},495 L${o(12.2)},495 Z" stroke-width="0.8"/>
-      <path d="M${o(12.1)},491 L${o(13.8)},491 L${o(13.6)},496 L${o(12.2)},496 Z" fill="#2b2b2b" stroke="none"/>
-      <path d="M${o(-12.5)},446 Q${o(-14.5)},462 ${o(-12)},475 Q${o(-10)},488 ${o(-3)},494 Q${cx},496.5 ${o(3)},494 Q${o(10)},488 ${o(12)},475 Q${o(14.5)},462 ${o(12.5)},446 Z" stroke-width="1"/>
-      <path d="M${o(-10.5)},445 L${o(10.5)},445 Q${o(9.5)},459 ${cx},467 Q${o(-9.5)},459 ${o(-10.5)},445 Z" style="fill:var(--skin, #f1c9a5)" stroke="none"/>
-      <path d="M${o(-2.5)},464 Q${cx},468 ${o(2.5)},464" fill="none" stroke="#000000" stroke-width="0.8" opacity="0.3"/>
-      <path d="M${o(-10.5)},445.5 Q${o(-9.5)},459 ${cx},467 Q${o(9.5)},459 ${o(10.5)},445.5" fill="none" stroke="#000000" stroke-width="1.3" opacity="0.4"/>
-      <path d="M${o(-9)},483 Q${o(-5)},493 ${cx},496 Q${o(5)},493 ${o(9)},483" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.28"/>
-      <path d="M${o(-7)},473 Q${o(-6)},485 ${o(-2)},490" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
-      <path d="M${o(-11.5)},452 Q${o(-12.5)},460 ${o(-11)},466" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.4"/>`;
+      <ellipse cx="${cx}" cy="498" rx="15" ry="3.2" fill="#000000" opacity="0.2" stroke="none"/>
+      <ellipse cx="${o(14)}" cy="498" rx="3.5" ry="1.5" fill="#000000" opacity="0.28" stroke="none"/>
+      <path d="M${o(10)},466 L${o(15.2)},466 L${o(14.5)},496 L${o(13.3)},496 Z" stroke-width="0.7"/>
+      <path d="M${o(13.2)},493 L${o(14.6)},493 L${o(14.5)},497.5 L${o(13.3)},497.5 Z" fill="#2b2b2b" stroke="none"/>
+      <path d="M${o(-11.5)},489 Q${cx},499.5 ${o(12.8)},488 L${o(12.8)},490.8 Q${cx},502.5 ${o(-11.5)},491.8 Z" stroke-width="0.8"/>
+      <path d="M${o(-10.5)},444 Q${o(-14)},462 ${o(-12.5)},478 Q${o(-11.5)},492 ${cx},495 Q${o(12.5)},492 ${o(13.5)},478 Q${o(14)},462 ${o(10.5)},444 Z" ${skin} stroke="#000000" stroke-opacity="0.18" stroke-width="1"/>
+      ${toes.map(([dx, y, r]) => `<ellipse cx="${o(dx)}" cy="${y}" rx="${r}" ry="${(r * 1.05).toFixed(1)}" ${skin} stroke="#000000" stroke-opacity="0.2" stroke-width="0.7"/>
+        <ellipse cx="${o(dx)}" cy="${(y + r * 0.35).toFixed(1)}" rx="${(r * 0.55).toFixed(1)}" ry="${(r * 0.45).toFixed(1)}" fill="#ff8fb1" stroke="none" opacity="0.9"/>`).join('')}
+      <path d="M${o(-13.2)},474 Q${cx},479 ${o(13.8)},474 L${o(13.6)},482 Q${cx},487 ${o(-12.8)},482 Z" stroke-width="0.9"/>
+      <path d="M${o(-9)},477.5 Q${cx},481 ${o(9)},477.5" fill="none" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
+      <path d="M${o(-12)},458 L${o(-9)},455 L${o(12.8)},467 L${o(10.5)},471 Z" stroke-width="0.8"/>
+      <path d="M${o(12.5)},458 L${o(9.5)},455 L${o(-12)},467 L${o(-10)},471 Z" stroke-width="0.8"/>
+      <path d="M${o(-11.5)},445 Q${cx},449 ${o(11.5)},445 L${o(11.5)},450.5 Q${cx},454.5 ${o(-11.5)},450.5 Z" stroke-width="0.9"/>
+      <rect x="${(cx + 7 * side - 2.2).toFixed(1)}" y="445.6" width="4.4" height="5.4" rx="1" fill="none" stroke="#f2c94c" stroke-width="1.3"/>
+      <circle cx="${cx}" cy="461.5" r="1.8" fill="#ffffff" stroke="none" opacity="0.75"/>`;
   }).join('');
 }
 
 const SHOE_STYLES = [
-  { id: 'heels', label: 'Heels', emoji: '👠', svg: stilettoPumpsSVG() },
+  { id: 'heels', label: 'Heel Sandals', emoji: '👡', svg: stilettoPumpsSVG() },
   { id: 'flats', label: 'Flats', emoji: '🥿',
     svg: `<ellipse cx="127" cy="454" rx="22" ry="6" fill="#000000" opacity="0.25"/>
           <ellipse cx="127" cy="447" rx="21" ry="10"/>
