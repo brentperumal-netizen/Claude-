@@ -3371,7 +3371,6 @@ function colorTargetPiece() {
 // already wearing it, to take it off. Up to 3 pieces: a full outfit, a top and a bottom.
 function pickPiece(id) {
   const def = OUTFIT_STYLES.find((o) => o.id === id);
-  const kind = pieceKind(def);
   let list = wornPieceList();
   const at = list.findIndex((pc) => pc.style === id);
   if (at >= 0) {
@@ -3382,14 +3381,29 @@ function pickPiece(id) {
     render();
     return;
   }
-  const same = list.find((pc) => pieceKind(OUTFIT_STYLES.find((o) => o.id === pc.style)) === kind);
+  // Layering: any mix of tops, bottoms and full outfits, up to 3 pieces.
+  // The newest piece goes on top of its kind; a 4th piece bumps the oldest one off.
   const ctp = colorTargetPiece();
-  const color = same ? same.color : (ctp ? ctp.color : OUTFIT_COLORS[0]);
-  list = list.filter((pc) => pc !== same);
+  const color = ctp ? ctp.color : OUTFIT_COLORS[0];
+  let bumped = null;
+  if (list.length >= MAX_PIECES) bumped = list.shift();
   list.push({ style: id, color });
-  setWornPieceList(list.slice(-MAX_PIECES));
+  setWornPieceList(list);
   colorTarget = id;
   render();
+  if (bumped) {
+    const bdef = OUTFIT_STYLES.find((o) => o.id === bumped.style);
+    pieceMessage(`3 pieces max! Took off the ${bdef.emoji} ${bdef.label} to make room.`);
+  }
+}
+
+let pieceMsgTimer = null;
+function pieceMessage(text) {
+  const el = document.getElementById('piece-msg');
+  el.textContent = text;
+  el.hidden = false;
+  clearTimeout(pieceMsgTimer);
+  pieceMsgTimer = setTimeout(() => { el.hidden = true; }, 3000);
 }
 
 function rebuildThemedLists() {

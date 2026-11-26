@@ -1795,3 +1795,6 @@ body {
 .option-btn.selected.editing { box-shadow: 0 0 0 3px #c9a6ff; }
 
 #outfit-colors[hidden], #outfit-color-label[hidden], #outfit-fixed-note[hidden] { display: none; }
+
+.piece-msg { margin: 0 0 8px; padding: 6px 10px; border-radius: 10px; background: #fff0f6; color: var(--accent-dark); font-weight: 700; font-size: 0.8rem; }
+.piece-msg[hidden] { display: none; }
