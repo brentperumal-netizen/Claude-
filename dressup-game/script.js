@@ -488,14 +488,31 @@ function torsoHalfAt(bt, y) {
 }
 
 // A fitted top (shoulders to just below the waist) with short sleeves.
+// A fitted short sleeve that follows the shoulder line and the arm (no round puff).
+// side: -1 left, 1 right. len: how far down the upper arm it reaches (0..1 of the arm).
+function sleeveSVG(bt, side, f = '', len = 0.3) {
+  const cx = 150, sY = TORSO_Y.shoulder, bY = TORSO_Y.chest;
+  const ax = cx + side * 25, ay = 168, hx = cx + side * (57 + bt.armSpread), hy = 272;
+  const dx = hx - ax, dy = hy - ay, L = Math.hypot(dx, dy);
+  const nx = -dy / L * side * -1, ny = dx / L * side * -1; // normal pointing away from the body
+  const r = bt.limbWidth / 2 * 1.15 + 2.5;
+  const mx = ax + dx * len, my = ay + dy * len;
+  const out = [mx + nx * r, my + ny * r], inn = [mx - nx * r, my - ny * r];
+  const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3;
+  const top = [cx + side * (s - 8), sY], corner = [cx + side * (s + 3), sY + 3];
+  const under = [cx + side * (c - 1), bY - 4];
+  const n = (v) => v.toFixed(1);
+  return `<path d="M${n(top[0])},${n(top[1])} Q${n(corner[0])},${n(corner[1] - 2)} ${n((corner[0] + out[0]) / 2)},${n((corner[1] + out[1]) / 2)} L${n(out[0])},${n(out[1])} L${n(inn[0])},${n(inn[1])} L${n(under[0])},${n(under[1])} Z"${f}/>
+    <path d="M${n(out[0])},${n(out[1])} L${n(inn[0])},${n(inn[1])}" fill="none" stroke="#000000" stroke-width="1" opacity="0.15"/>`;
+}
+
 function fittedTopSVG(bt, hemY, fill) {
   const cx = 150;
   const { shoulder: sY, chest: bY, waist: wY } = TORSO_Y;
   const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3, w = bt.waistHalf + 4;
   const f = fill ? ` fill="${fill}"` : '';
   const hw = torsoHalfAt(bt, hemY) + 4;
-  return `<ellipse cx="${cx - s - 2}" cy="${sY + 12}" rx="12" ry="14"${f}/>
-          <ellipse cx="${cx + s + 2}" cy="${sY + 12}" rx="12" ry="14"${f}/>
+  return `${sleeveSVG(bt, -1, f)}${sleeveSVG(bt, 1, f)}
           <path d="M${cx - s},${sY} L${cx + s},${sY}
             C${cx + s},${sY + 14} ${cx + c},${bY - 10} ${cx + c},${bY}
             C${cx + c},${bY + 16} ${cx + w},${wY - 14} ${cx + w},${wY}
@@ -604,7 +621,7 @@ function bodiceSVG(bt, endY, style = 'cap') {
   }
   const s2 = bt.shoulderHalf + 2;
   return `<path d="M${cx - s2},${sY} L${cx + s2},${sY} C${cx + s2},${sY + 14} ${cx + c},${bY - 10} ${cx + c},${bY} L${cx + e},${endY} L${cx - e},${endY} L${cx - c},${bY} C${cx - c},${bY - 10} ${cx - s2},${sY + 14} ${cx - s2},${sY} Z"/>
-    ${style === 'cap' ? `<ellipse cx="${cx - s2 - 2}" cy="${sY + 8}" rx="11" ry="9"/><ellipse cx="${cx + s2 + 2}" cy="${sY + 8}" rx="11" ry="9"/>` : ''}`;
+    ${style === 'cap' ? `${sleeveSVG(bt, -1, '', 0.16)}${sleeveSVG(bt, 1, '', 0.16)}` : ''}`;
 }
 
 // A skirt from topY (half-width topHalf) down to hemY (half-width hemHalf).
