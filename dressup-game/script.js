@@ -42,6 +42,51 @@ function capsulePath(x1, y1, r1, x2, y2, r2) {
   return `M${p1a[0]},${p1a[1]} L${p2a[0]},${p2a[1]} A${r2},${r2} 0 0 0 ${p2b[0]},${p2b[1]} L${p1b[0]},${p1b[1]} A${r1},${r1} 0 0 0 ${p1a[0]},${p1a[1]} Z`;
 }
 
+// A natural-looking limb: a smooth outline whose width follows a profile along the
+// limb (thigh -> knee -> calf -> ankle, or shoulder -> elbow -> forearm -> wrist).
+// Every width stays inside the old capsule, so clothes drawn as capsules still cover it.
+const LEG_PROFILE = [[0, 1], [0.12, 1], [0.3, 0.93], [0.44, 0.8], [0.5, 0.8], [0.6, 0.97], [0.7, 0.95], [0.84, 0.76], [0.93, 0.68], [1, 0.74]];
+const ARM_PROFILE = [[0, 1], [0.1, 1], [0.3, 0.9], [0.46, 0.8], [0.52, 0.8], [0.64, 0.93], [0.8, 0.84], [0.93, 0.7], [1, 0.75]];
+
+function smoothThrough(pts) {
+  // Catmull-Rom through points -> cubic Bezier commands (starts after the first point).
+  let d = '';
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+
+function limbPath(x1, y1, x2, y2, rU, rL, profile, grow = 0) {
+  const ang = Math.atan2(y2 - y1, x2 - x1) + Math.PI / 2;
+  const nx = Math.cos(ang), ny = Math.sin(ang);
+  const side = (k) => profile.map(([t, f]) => {
+    const r = f * (rU + (rL - rU) * t) + grow;
+    return [x1 + (x2 - x1) * t + k * nx * r, y1 + (y2 - y1) * t + k * ny * r];
+  });
+  const a = side(1), b = side(-1).reverse();
+  const rEnd = profile[profile.length - 1][1] * rL + grow, rStart = profile[0][1] * rU + grow;
+  return `M${a[0][0].toFixed(1)},${a[0][1].toFixed(1)}${smoothThrough(a)}
+    A${rEnd.toFixed(1)},${rEnd.toFixed(1)} 0 0 0 ${b[0][0].toFixed(1)},${b[0][1].toFixed(1)}${smoothThrough(b)}
+    A${rStart.toFixed(1)},${rStart.toFixed(1)} 0 0 0 ${a[0][0].toFixed(1)},${a[0][1].toFixed(1)} Z`;
+}
+const legPath = (x1, y1, x2, y2, rU, rL, grow = 0) => limbPath(x1, y1, x2, y2, rU, rL, LEG_PROFILE, grow);
+const armPath = (x1, y1, x2, y2, rU, rL, grow = 0) => limbPath(x1, y1, x2, y2, rU, rL, ARM_PROFILE, grow);
+
+// A face with a soft jaw and chin, and a neck that flows into the shoulders.
+const HEAD_PATH = 'M102,93 A48,48 0 0 1 198,93 C198,117 188,134 172,141 Q150,149 128,141 C112,134 102,117 102,93 Z';
+const NECK_PATH = 'M139,126 L161,126 Q161,145 166,152 Q172,156 180,158 L120,158 Q128,156 134,152 Q139,145 139,126 Z';
+const BODY_DETAILS = `<path d="M150,136 Q150,145 150,150" fill="none" stroke="rgba(40,28,20,0.08)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M131,160 Q140,157 147,161 M169,160 Q160,157 153,161" fill="none" stroke="rgba(40,28,20,0.16)" stroke-width="1.3" stroke-linecap="round"/>`;
+function jointLinesSVG(lx, rx) {
+  // Soft hints of knees and elbows.
+  return `<path d="M125,345 Q130,349 135,345 M165,345 Q170,349 175,345" fill="none" stroke="rgba(40,28,20,0.16)" stroke-width="1.1" stroke-linecap="round"/>
+    <path d="M${(125 + (lx - 125) * 0.49 + 3).toFixed(1)},220 q3,2 5,0 M${(175 + (rx - 175) * 0.49 - 8).toFixed(1)},220 q3,2 5,0" fill="none" stroke="rgba(40,28,20,0.13)" stroke-width="1" stroke-linecap="round"/>`;
+}
+
 const TORSO_Y = { shoulder: 148, chest: 175, waist: 206, hip: 250 };
 
 // Builds a curved torso silhouette (shoulder -> chest -> waist -> hip) from a body
@@ -4417,14 +4462,16 @@ function applyBodyGeometry(root, bodyTypeId) {
   const rLower = bt.limbWidth / 2 * 0.68;
   const outlineGrow = 2;
 
-  if (armLeft) armLeft.setAttribute('d', capsulePath(125, 168, rUpper, lx, 272, rLower));
-  if (armRight) armRight.setAttribute('d', capsulePath(175, 168, rUpper, rx, 272, rLower));
-  if (armLeftOutline) armLeftOutline.setAttribute('d', capsulePath(125, 168, rUpper + outlineGrow, lx, 272, rLower + outlineGrow));
-  if (armRightOutline) armRightOutline.setAttribute('d', capsulePath(175, 168, rUpper + outlineGrow, rx, 272, rLower + outlineGrow));
-  if (legLeft) legLeft.setAttribute('d', capsulePath(133, 248, rUpper, 127, 445, rLower));
-  if (legRight) legRight.setAttribute('d', capsulePath(167, 248, rUpper, 173, 445, rLower));
-  if (legLeftOutline) legLeftOutline.setAttribute('d', capsulePath(133, 248, rUpper + outlineGrow, 127, 445, rLower + outlineGrow));
-  if (legRightOutline) legRightOutline.setAttribute('d', capsulePath(167, 248, rUpper + outlineGrow, 173, 445, rLower + outlineGrow));
+  if (armLeft) armLeft.setAttribute('d', armPath(125, 168, lx, 272, rUpper, rLower));
+  if (armRight) armRight.setAttribute('d', armPath(175, 168, rx, 272, rUpper, rLower));
+  if (armLeftOutline) armLeftOutline.setAttribute('d', armPath(125, 168, lx, 272, rUpper, rLower, outlineGrow));
+  if (armRightOutline) armRightOutline.setAttribute('d', armPath(175, 168, rx, 272, rUpper, rLower, outlineGrow));
+  if (legLeft) legLeft.setAttribute('d', legPath(133, 248, 127, 445, rUpper, rLower));
+  if (legRight) legRight.setAttribute('d', legPath(167, 248, 173, 445, rUpper, rLower));
+  if (legLeftOutline) legLeftOutline.setAttribute('d', legPath(133, 248, 127, 445, rUpper, rLower, outlineGrow));
+  if (legRightOutline) legRightOutline.setAttribute('d', legPath(167, 248, 173, 445, rUpper, rLower, outlineGrow));
+  const joints = root.querySelector('#body-joints');
+  if (joints) joints.innerHTML = jointLinesSVG(lx, rx);
 
   [armLeftShine, armRightShine, legLeftShine, legRightShine].forEach((l) => l && l.setAttribute('stroke-width', Math.max(2, bt.limbWidth * 0.22)));
 
@@ -5161,10 +5208,10 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
     ${hairBackSvg}
     <g fill="url(#${skinGrad})">
       ${posed ? '' : `
-      <path d="${capsulePath(125, 168, rUpper + outlineGrow, lx, 272, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
-      <path d="${capsulePath(175, 168, rUpper + outlineGrow, rxHand, 272, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
-      <path d="${capsulePath(125, 168, rUpper, lx, 272, rLower)}"/>
-      <path d="${capsulePath(175, 168, rUpper, rxHand, 272, rLower)}"/>
+      <path d="${armPath(125, 168, lx, 272, rUpper, rLower, outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${armPath(175, 168, rxHand, 272, rUpper, rLower, outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${armPath(125, 168, lx, 272, rUpper, rLower)}"/>
+      <path d="${armPath(175, 168, rxHand, 272, rUpper, rLower)}"/>
       <line x1="125" y1="168" x2="${lx}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.28"/>
       <line x1="175" y1="168" x2="${rxHand}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.28"/>
       <g transform="translate(${lx},272)" stroke="rgba(40,28,20,0.28)" stroke-width="1.2">
@@ -5198,21 +5245,23 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
       `}
       ${outfitDef.hidesLegs ? '' : `
       <g class="pl-left">
-      <path d="${capsulePath(133, 248, rUpper + outlineGrow, 127, 445, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
-      <path d="${capsulePath(133, 248, rUpper, 127, 445, rLower)}"/>
+      <path d="${legPath(133, 248, 127, 445, rUpper, rLower, outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${legPath(133, 248, 127, 445, rUpper, rLower)}"/>
       <line x1="133" y1="248" x2="127" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
       </g>
       <g class="pl-right">
-      <path d="${capsulePath(167, 248, rUpper + outlineGrow, 173, 445, rLower + outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
-      <path d="${capsulePath(167, 248, rUpper, 173, 445, rLower)}"/>
+      <path d="${legPath(167, 248, 173, 445, rUpper, rLower, outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${legPath(167, 248, 173, 445, rUpper, rLower)}"/>
       <line x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
       </g>
       `}
       <path d="${bodyTorsoPath(bt)}" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
-      <rect x="137" y="132" width="26" height="26" rx="8" stroke="rgba(40,28,20,0.18)" stroke-width="1.5"/>
+      <path d="${NECK_PATH}" stroke="rgba(40,28,20,0.18)" stroke-width="1.5"/>
+      ${BODY_DETAILS}
+      ${posed ? '' : jointLinesSVG(lx, rxHand)}
       <ellipse cx="104" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"/>
       <ellipse cx="196" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"/>
-      <circle cx="150" cy="93" r="48" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
+      <path d="${HEAD_PATH}" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
       <ellipse cx="128" cy="72" rx="10" ry="7" fill="#ffffff" opacity="0.35"/>
     </g>
     <g fill="url(#${hairGrad})" stroke="${hairDark}">${hairDef.svg}${hairDef.id === 'none' ? '' : bangsSVG(look.hair.bangs)}</g>
