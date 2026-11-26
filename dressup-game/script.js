@@ -1610,10 +1610,10 @@ const OUTFIT_STYLES = [
     } },
 
   // ----- More skirts -----
-  { id: 'tutu-skirt', label: 'Tutu Skirt', emoji: '🩰', piece: 'bottom',
+  { id: 'tutu-skirt', label: 'Tutu Dress', emoji: '🩰',
     svg: (bt) => {
       const wY = TORSO_Y.waist + 4, w = bt.waistHalf + 5;
-      return [0, 1, 2].map((i) => `<g opacity="${0.75 + i * 0.08}">${skirtShapeSVG(wY + i * 4, w, 276 - i * 6, bt.hipHalf + 54 - i * 10, 'scallop', 0.95)}</g>`).join('')
+      return bodiceSVG(bt, wY + 4, 'straps') + [0, 1, 2].map((i) => `<g opacity="${0.75 + i * 0.08}">${skirtShapeSVG(wY + i * 4, w, 276 - i * 6, bt.hipHalf + 54 - i * 10, 'scallop', 0.95)}</g>`).join('')
         + `<rect x="${150 - w}" y="${wY - 2}" width="${w * 2}" height="8" fill="#ffffff" opacity="0.6"/>
            ${[-34, -14, 6, 26].map((x) => `<circle cx="${150 + x}" cy="${256 + (x % 3) * 3}" r="1.6" fill="#ffffff"/>`).join('')}`;
     } },
