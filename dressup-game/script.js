@@ -584,10 +584,23 @@ function pantsSVG(bt, fill, bottomY = 430, extra = 4) {
 }
 
 // Shorts down to hemY.
+// Fitted shorts: they hug the waist and hips, then each leg opening follows the thigh.
 function shortsSVG(bt, fill, hemY = 310) {
-  const cx = 150, h = bt.hipHalf + 6;
+  const cx = 150, wY = 228;
   const f = fill ? ` fill="${fill}"` : '';
-  return `<path d="M${cx - h},230 L${cx + h},230 L${cx + h + 6},${hemY} L${cx + 4},${hemY} L${cx},262 L${cx - 4},${hemY} L${cx - h - 6},${hemY} Z"${f}/>`;
+  const wW = torsoHalfAt(bt, wY) + 3, hH = bt.hipHalf + 3;
+  const t = (hemY - 248) / 197;
+  const rU = bt.limbWidth / 2 * 1.15, rL = bt.limbWidth / 2 * 0.68;
+  const lr = rU + (rL - rU) * t + 3.5;
+  const lcx = 133 - 6 * t, rcx = 167 + 6 * t;
+  const crotchY = Math.min(hemY - 14, 272);
+  const n = (v) => v.toFixed(1);
+  return `<path d="M${n(cx - wW)},${wY} Q${n(cx - hH - 1)},${wY + 10} ${n(cx - hH)},252
+      L${n(lcx - lr)},${hemY} Q${n(lcx)},${hemY + 3} ${n(lcx + lr)},${hemY}
+      L${n(cx - 1.5)},${crotchY} Q${cx},${crotchY + 2} ${n(cx + 1.5)},${crotchY}
+      L${n(rcx - lr)},${hemY} Q${n(rcx)},${hemY + 3} ${n(rcx + lr)},${hemY}
+      L${n(cx + hH)},252 Q${n(cx + hH + 1)},${wY + 10} ${n(cx + wW)},${wY} Z"${f}/>
+    <path d="M${cx},${wY + 6} L${cx},${crotchY - 2}" fill="none" stroke="#000000" stroke-width="1" opacity="0.18"/>`;
 }
 
 // A sleeveless top (tank / jersey).
@@ -604,7 +617,7 @@ function tankSVG(bt, hemY, fill) {
 function basicsSVG(bt, top, bottom) {
   const cx = 150;
   return `${bottom ? `${shortsSVG(bt, '#2b2b2b', 296)}
-      <rect x="${cx - bt.hipHalf - 6}" y="228" width="${(bt.hipHalf + 6) * 2}" height="6" fill="#444444"/>` : ''}
+      <path d="M${(cx - torsoHalfAt(bt, 230) - 3).toFixed(1)},230.5 L${(cx + torsoHalfAt(bt, 230) + 3).toFixed(1)},230.5" stroke="#444444" stroke-width="5"/>` : ''}
     ${top ? `${fittedTopSVG(bt, 240, '#2b2b2b')}
       <path d="M${cx - 12},${TORSO_Y.shoulder} Q${cx},${TORSO_Y.shoulder + 12} ${cx + 12},${TORSO_Y.shoulder}" fill="none" stroke="#555555" stroke-width="2"/>` : ''}`;
 }
@@ -1901,13 +1914,14 @@ const OUTFIT_STYLES = [
   // ----- Even more bottoms -----
   { id: 'jean-shorts', label: 'Jean Shorts', emoji: '🩳', piece: 'bottom', fixedColor: true,
     svg: (bt) => {
-      const cx = 150, h = bt.hipHalf + 6;
-      const fray = (d) => Array.from({ length: 5 }, (_, i) => `<line x1="${cx + d * (8 + i * (h / 5))}" y1="298" x2="${cx + d * (8 + i * (h / 5))}" y2="303" stroke="#ffffff" stroke-width="1.4" opacity="0.8"/>`).join('');
+      const cx = 150, w = torsoHalfAt(bt, 228) + 3;
+      const t = (300 - 248) / 197, rU = bt.limbWidth / 2 * 1.15, rL = bt.limbWidth / 2 * 0.68, lr = rU + (rL - rU) * t + 3.5;
+      const fray = (lc) => Array.from({ length: 5 }, (_, i) => { const x = (lc - lr + 3 + i * ((lr * 2 - 6) / 4)).toFixed(1); return `<line x1="${x}" y1="300" x2="${x}" y2="305" stroke="#ffffff" stroke-width="1.4" opacity="0.8"/>`; }).join('');
       return `<g fill="#6b93cf" stroke="#4f78b0" stroke-width="1.2">${shortsSVG(bt, null, 300)}</g>
-        <rect x="${cx - h}" y="228" width="${h * 2}" height="8" fill="#5a85c0"/>
+        <path d="M${(cx - w).toFixed(1)},232 L${(cx + w).toFixed(1)},232" stroke="#5a85c0" stroke-width="8"/>
         <rect x="${cx - 4}" y="229" width="8" height="6" rx="1" fill="#d6b45a"/>
-        ${fray(-1)}${fray(1)}
-        <path d="M${cx - h + 6},240 Q${cx - h + 14},254 ${cx - 10},244 M${cx + h - 6},240 Q${cx + h - 14},254 ${cx + 10},244" fill="none" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 2" opacity="0.8"/>`;
+        ${fray(133 - 6 * t)}${fray(167 + 6 * t)}
+        <path d="M${cx - w + 5},240 Q${cx - w + 12},254 ${cx - 9},244 M${cx + w - 5},240 Q${cx + w - 12},254 ${cx + 9},244" fill="none" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 2" opacity="0.8"/>`;
     } },
   { id: 'cargo-pants', label: 'Cargo Pants', emoji: '🪖', piece: 'bottom',
     svg: (bt) => `${pantsSVG(bt, null, 432, 6)}
