@@ -2172,54 +2172,44 @@ const ACCESSORIES = [
   { id: 'sweatband', label: 'Sports Headband', emoji: '🏃', color: '#ffffff',
     svg: `<path d="M103,70 Q150,52 197,70 L197,80 Q150,62 103,80 Z" stroke="#d6d6d6" stroke-width="1.2"/>
           <path d="M103,75 Q150,57 197,75" fill="none" stroke="#e05c5c" stroke-width="2.4"/>` },
-  { id: 'off-shoulder-jacket', label: 'Off-Shoulder Jacket', emoji: '🧥', color: '#ffb3d6',
+  { id: 'off-shoulder-jacket', label: 'Off-Shoulder Jacket', emoji: '🧥', color: '#9aa3ad',
+    // A grey cropped jacket zipped up the middle: the left side slips off the
+    // shoulder and down the arm, the right side stays on over the shoulder.
     svg: (bt) => {
       const cx = 150, sY = TORSO_Y.shoulder;
-      const piece = (d) => {
-        const sh = bt.shoulderHalf, c = bt.chestHalf + 4, w = bt.waistHalf + 6, ax = bt.armSpread;
-        return `<path d="M${cx + d * (c - 10)},${sY + 26}
-                  Q${cx + d * (sh + 6)},${sY + 16} ${cx + d * (sh + 22 + ax * 0.4)},${sY + 32}
-                  L${cx + d * (sh + 30 + ax * 0.8)},${sY + 78}
-                  Q${cx + d * (sh + 14)},${sY + 88} ${cx + d * (w + 4)},${sY + 84}
-                  L${cx + d * (w - 2)},${sY + 40} Z" stroke="#e0789f" stroke-width="1.4"/>
-                <path d="M${cx + d * (c - 10)},${sY + 28} L${cx + d * (w - 2)},${sY + 40} L${cx + d * (w + 4)},${sY + 84}" fill="none" stroke="#ffd6e8" stroke-width="4" stroke-linejoin="round"/>
-                <path d="M${cx + d * (w + 4)},${sY + 82} Q${cx + d * (sh + 14)},${sY + 86} ${cx + d * (sh + 30 + ax * 0.8)},${sY + 76}" fill="none" stroke="#e0789f" stroke-width="5" stroke-linecap="round"/>
-                <rect x="${cx + d * (sh + 8) - 7}" y="${sY + 56}" width="14" height="10" rx="2" fill="#ff9fc7" stroke="#e0789f" stroke-width="1"/>
-                <path d="M${cx + d * (sh + 18 + ax * 0.6)},${sY + 40} L${cx + d * (sh + 28 + ax * 0.8)},${sY + 72}" stroke="#e0789f" stroke-width="1" stroke-dasharray="2 3"/>
-                ${[0, 1, 2, 3, 4].map((i) => {
-                  const t = i / 4;
-                  const x = cx + d * ((c - 10) + ((sh + 22 + ax * 0.4) - (c - 10)) * t);
-                  const y = sY + 26 - 4 * Math.sin(Math.PI * t) + 6 * t;
-                  return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.2" fill="#ffffff" stroke="none"/>`;
-                }).join('')}
-                <rect x="${cx + d * (w - 1) - (d < 0 ? 0 : 8)}" y="${sY + 60}" width="8" height="8" rx="2" fill="#ffffff" stroke="none" opacity="0.8"/>`;
-      };
-      // The other side stays on: over the shoulder, down the arm, zipped at the front.
-      const onPiece = (d) => {
-        const sh = bt.shoulderHalf, w = bt.waistHalf + 6, ax = bt.armSpread;
-        const fx = cx + d * 10;
-        const teeth = Array.from({ length: 9 }, (_, i) => `<line x1="${fx - 2.5}" y1="${sY + 10 + i * 8}" x2="${fx + 2.5}" y2="${sY + 10 + i * 8}" stroke="#9aa6b8" stroke-width="1.2"/>`).join('');
-        const trim = Array.from({ length: 5 }, (_, i) => {
-          const t = i / 4;
-          return `<circle cx="${(fx + d * (sh + 2 - 10) * t).toFixed(1)}" cy="${(sY + 2 - 4 * Math.sin(Math.PI * t)).toFixed(1)}" r="5" fill="#ffffff" stroke="none"/>`;
-        }).join('');
-        return `<path d="M${fx},${sY}
-                  L${cx + d * (sh + 2)},${sY + 2}
-                  Q${cx + d * (sh + 20 + ax * 0.4)},${sY + 8} ${cx + d * (sh + 22 + ax * 0.4)},${sY + 32}
-                  L${cx + d * (sh + 30 + ax * 0.8)},${sY + 78}
-                  Q${cx + d * (sh + 14)},${sY + 88} ${cx + d * (w + 4)},${sY + 84}
-                  L${fx},${sY + 86} Z" stroke="#e0789f" stroke-width="1.4"/>
-                <path d="M${cx + d * (w + 4)},${sY + 84} L${fx},${sY + 86}" stroke="#e0789f" stroke-width="5" stroke-linecap="round"/>
-                <path d="M${cx + d * (w + 4)},${sY + 82} Q${cx + d * (sh + 14)},${sY + 86} ${cx + d * (sh + 30 + ax * 0.8)},${sY + 76}" fill="none" stroke="#e0789f" stroke-width="5" stroke-linecap="round"/>
-                <line x1="${fx}" y1="${sY + 4}" x2="${fx}" y2="${sY + 84}" stroke="#d6dbe2" stroke-width="3"/>
-                ${teeth}
-                <rect x="${fx - 3}" y="${sY + 34}" width="6" height="11" rx="2" fill="#c9d4e2" stroke="#9aa6b8" stroke-width="0.8"/>
-                <circle cx="${fx}" cy="${sY + 48}" r="2.2" fill="none" stroke="#9aa6b8" stroke-width="1"/>
-                <path d="M${cx + d * (sh - 4)},${sY + 8} Q${cx + d * (sh + 12)},${sY + 14} ${cx + d * (sh + 18 + ax * 0.4)},${sY + 32}" fill="none" stroke="#e0789f" stroke-width="1" stroke-dasharray="2 3"/>
-                <rect x="${cx + d * (bt.waistHalf - 4) - 7}" y="${sY + 58}" width="14" height="10" rx="2" fill="#ff9fc7" stroke="#e0789f" stroke-width="1"/>
-                ${trim}`;
-      };
-      return `${piece(-1)}${onPiece(1)}`;
+      const sh = bt.shoulderHalf, c = bt.chestHalf + 4, w = bt.waistHalf + 6, ax = bt.armSpread;
+      const dark = '#6f7782', light = '#c9d0d8', pocket = '#b3bbc4';
+      const offArm = { x: cx - (sh + 22 + ax * 0.4), y: sY + 32 };
+      const offCuff = { x: cx - (sh + 30 + ax * 0.8), y: sY + 78 };
+      const onArm = { x: cx + (sh + 22 + ax * 0.4), y: sY + 32 };
+      const onCuff = { x: cx + (sh + 30 + ax * 0.8), y: sY + 78 };
+      const left = `M${cx},${sY + 14}
+        Q${cx - c * 0.45},${sY + 30} ${cx - (c - 10)},${sY + 28}
+        Q${cx - (sh + 6)},${sY + 16} ${offArm.x},${offArm.y}
+        L${offCuff.x},${offCuff.y}
+        Q${cx - (sh + 14)},${sY + 88} ${cx - (w + 4)},${sY + 84}
+        L${cx},${sY + 86} Z`;
+      const right = `M${cx},${sY + 2}
+        L${cx + (sh + 2)},${sY + 2}
+        Q${cx + (sh + 20 + ax * 0.4)},${sY + 8} ${onArm.x},${onArm.y}
+        L${onCuff.x},${onCuff.y}
+        Q${cx + (sh + 14)},${sY + 88} ${cx + (w + 4)},${sY + 84}
+        L${cx},${sY + 86} Z`;
+      const trim = (pts) => pts.map(([x, y]) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="#f1f3f5" stroke="none"/>`).join('');
+      const offTrim = [0, 0.25, 0.5, 0.75, 1].map((t) => [cx + (offArm.x - cx) * t, sY + 14 + (offArm.y - (sY + 14)) * t + 10 * Math.sin(Math.PI * t)]);
+      const onTrim = [0, 0.25, 0.5, 0.75, 1].map((t) => [cx + 6 + (sh - 4) * t, sY + 2 - 3 * Math.sin(Math.PI * t)]);
+      const teeth = Array.from({ length: 9 }, (_, i) => `<line x1="${cx - 2.5}" y1="${sY + 18 + i * 7.5}" x2="${cx + 2.5}" y2="${sY + 18 + i * 7.5}" stroke="#7d8692" stroke-width="1.2"/>`).join('');
+      return `<path d="${left}" stroke="${dark}" stroke-width="1.4"/>
+              <path d="${right}" stroke="${dark}" stroke-width="1.4"/>
+              <path d="M${offCuff.x},${offCuff.y - 2} Q${cx - (sh + 14)},${sY + 86} ${cx - (w + 4)},${sY + 82} L${cx + (w + 4)},${sY + 82} Q${cx + (sh + 14)},${sY + 86} ${onCuff.x},${onCuff.y - 2}" fill="none" stroke="${dark}" stroke-width="5" stroke-linecap="round"/>
+              <path d="M${cx - (sh + 18 + ax * 0.6)},${sY + 44} L${offCuff.x + 2},${offCuff.y - 4} M${cx + (sh + 14)},${sY + 10} Q${cx + (sh + 18)},${sY + 18} ${onArm.x - 2},${onArm.y}" fill="none" stroke="${dark}" stroke-width="1" stroke-dasharray="2 3"/>
+              <rect x="${cx - (bt.waistHalf - 4) - 7}" y="${sY + 58}" width="14" height="10" rx="2" fill="${pocket}" stroke="${dark}" stroke-width="1"/>
+              <rect x="${cx + (bt.waistHalf - 4) - 7}" y="${sY + 58}" width="14" height="10" rx="2" fill="${pocket}" stroke="${dark}" stroke-width="1"/>
+              <line x1="${cx}" y1="${sY + 12}" x2="${cx}" y2="${sY + 86}" stroke="${light}" stroke-width="3.4"/>
+              ${teeth}
+              <rect x="${cx - 3}" y="${sY + 22}" width="6" height="11" rx="2" fill="#e8ecf0" stroke="#7d8692" stroke-width="0.8"/>
+              <circle cx="${cx}" cy="${sY + 36}" r="2.2" fill="none" stroke="#7d8692" stroke-width="1"/>
+              ${trim(offTrim)}${trim(onTrim)}`;
     } },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 C110,26 136,8 160,10 C186,12 206,36 214,72 C202,58 192,46 180,40 C186,46 190,52 192,58 Z" stroke="#8e1b20" stroke-width="1.2"/>
