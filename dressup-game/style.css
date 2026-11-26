@@ -1992,3 +1992,52 @@ body {
 /* let the level + cash bar wrap on narrow phones */
 .level-banner { flex-wrap: wrap; row-gap: 6px; }
 .level-progress { min-width: 120px; }
+
+/* ---------- Clothes colour palette ---------- */
+.palette-box {
+  margin: 4px 0 10px;
+  padding: 10px 10px 8px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff6fb, #f4f0ff);
+  border: 2px solid var(--border);
+}
+.palette-box h2 { margin-top: 0; }
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 6px;
+}
+.palette-grid .swatch { width: 100%; height: auto; aspect-ratio: 1; max-width: 34px; justify-self: center; }
+.custom-color {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 999px;
+  border: 2px solid var(--border);
+  background: #ffffff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--accent-dark);
+  cursor: pointer;
+}
+.custom-color[hidden] { display: none; }
+.custom-color.selected { border-color: var(--accent-dark); }
+.custom-color input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.custom-color-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: conic-gradient(#e05c5c, #f2c94c, #43b581, #5cc4e0, #5c7ce0, #8c5ce0, #e0558f, #e05c5c);
+  box-shadow: inset 0 0 0 3px #ffffff;
+}
+.custom-color:focus-within { outline: 3px solid #8c5ce0; outline-offset: 2px; }

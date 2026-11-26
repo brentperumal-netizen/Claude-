@@ -2036,6 +2036,13 @@ const OUTFIT_STYLES = [
 ];
 
 const OUTFIT_COLORS = ['#e0558f', '#8c5ce0', '#5cc4e0', '#43b581', '#f2c94c', '#e05c5c', '#2b2b2b', '#ffffff'];
+// The big colour palette for clothes, in rainbow order.
+const CLOTHES_PALETTE = [
+  '#ffd6e8', '#ffb3d6', '#ff8fc7', '#e0558f', '#c0245e', '#ff6f61', '#e05c5c', '#a83232',
+  '#ffd2b0', '#ffb38a', '#f2994a', '#fff3a8', '#f2c94c', '#d9b45a', '#c8f2c0', '#8fd8a0',
+  '#43b581', '#2e7d4f', '#bfe9ff', '#5cc4e0', '#5c7ce0', '#2b4a8a', '#e6dcff', '#c9a6ff',
+  '#8c5ce0', '#5a3aa8', '#ffffff', '#e8e3dc', '#c9b59a', '#8a5a2b', '#9aa3ad', '#2b2b2b',
+];
 
 const SHOE_STYLES = [
   { id: 'heels', label: 'Heels', emoji: '👠',
@@ -3682,11 +3689,15 @@ buildSwatches(document.getElementById('hair-colors'), HAIR_COLORS, (c) => {
   render();
 });
 
-buildSwatches(document.getElementById('outfit-colors'), OUTFIT_COLORS, (c) => {
+function paintTargetPiece(c) {
   const t = colorTargetPiece();
   if (t) t.color = c;
   render();
-});
+}
+buildSwatches(document.getElementById('outfit-colors'), CLOTHES_PALETTE, paintTargetPiece);
+// 🌈 Any colour: the device's own colour picker.
+const customColor = document.getElementById('outfit-custom-color');
+customColor.addEventListener('input', (e) => paintTargetPiece(e.target.value));
 
 buildSwatches(document.getElementById('shoe-colors'), SHOE_COLORS, (c) => {
   state.shoes.color = c;
@@ -3983,6 +3994,7 @@ function render() {
   document.getElementById('outfit-color-label').hidden = fixed;
   document.getElementById('outfit-color-label').textContent = targetDef ? `Colour · ${targetDef.emoji} ${targetDef.label}` : 'Colour';
   document.getElementById('outfit-colors').hidden = fixed;
+  document.getElementById('outfit-custom').hidden = fixed;
   document.getElementById('outfit-fixed-note').hidden = !targetDef || !targetDef.fixedColor;
   const perKind = ['top', 'bottom', 'full'].map((k) => `${KIND_LABELS[k].emoji} ${worn.filter((pc) => pieceKind(pc.def) === k).length}/${MAX_PIECES}`).join(' · ');
   document.getElementById('piece-count').textContent = worn.length
@@ -4052,6 +4064,10 @@ function render() {
   highlightSelection('#hair-colors', state.hair.color, 'color');
   const ct = colorTargetPiece();
   highlightSelection('#outfit-colors', ct ? ct.color : '', 'color');
+  if (ct && /^#[0-9a-f]{6}$/i.test(ct.color)) {
+    document.getElementById('outfit-custom-color').value = ct.color;
+    document.getElementById('outfit-custom').classList.toggle('selected', !CLOTHES_PALETTE.includes(ct.color));
+  }
   highlightSelection('#shoe-colors', state.shoes.color, 'color');
   highlightSelection('#hair-styles', state.hair.style, 'id');
   highlightSelection('#bang-styles', state.hair.bangs || 'none', 'id');
