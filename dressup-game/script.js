@@ -7128,7 +7128,7 @@ function buildSalon() {
   ], (id) => salonSet(() => { state.face[id] = !state.face[id]; }));
   buildOptionButtons(document.getElementById('salon-presets'), MAKEUP_PRESETS, (id) => salonSet(() => {
     const preset = MAKEUP_PRESETS.find((m) => m.id === id);
-    Object.assign(state.face, preset.face);
+    Object.assign(state.face, { glitter: false, freckles: false, cheekArt: 'none', gems: false }, preset.face);
   }));
   buildOptionButtons(document.getElementById('salon-lashes'), LASH_STYLES, (id) => salonSet(() => { state.face.lashes = id; }));
   buildOptionButtons(document.getElementById('salon-cheek'), CHEEK_ART, (id) => salonSet(() => { state.face.cheekArt = id; }));
@@ -7145,7 +7145,114 @@ const MAKEUP_PRESETS = [
   { id: 'natural', label: 'Natural', emoji: '🌸', face: { eyeshadow: '#d9a98c', shadowStyle: 'soft', liner: 'thin', linerColor: '#5a3825', lashes: 'natural', blush: true, blushColor: '#ff8fa3', lipColor: '#c9707d', lipShape: 'full', lipFinish: 'satin', gloss: false, highlight: '#fff6e8', contour: false, gems: false } },
   { id: 'glam', label: 'Red Carpet', emoji: '💋', face: { eyeshadow: '#8a5a2b', shadowStyle: 'smoky', liner: 'wing', linerColor: '#1a1a1a', lashes: 'glam', blush: true, blushColor: '#d9826b', lipColor: '#c0293b', lipShape: 'full', lipFinish: 'matte', gloss: false, highlight: '#f7e1b5', contour: true, gems: false } },
   { id: 'goddess', label: 'Goddess', emoji: '🏛️', face: { eyeshadow: '#d4a017', shadowStyle: 'shimmer', liner: 'cat', linerColor: '#1a1a1a', lashes: 'long', blush: true, blushColor: '#ffb38a', lipColor: '#b5655a', lipShape: 'full', lipFinish: 'gloss', gloss: true, highlight: '#f2c94c', contour: true, gems: true } },
+  { id: 'pink', label: 'Pretty in Pink', emoji: '🎀', face: { eyeshadow: '#ff8fc7', shadowStyle: 'soft', liner: 'thin', linerColor: '#5a3825', lashes: 'long', blush: true, blushColor: '#ff6f91', lipColor: '#ff6fb0', lipShape: 'full', lipFinish: 'gloss', gloss: true, highlight: '#ffc6d9', contour: false, gems: false } },
+  { id: 'party', label: 'Sparkle Party', emoji: '🪩', face: { eyeshadow: '#c9a6ff', shadowStyle: 'shimmer', liner: 'wing', linerColor: '#8c5ce0', lashes: 'rainbow', blush: true, blushColor: '#ffa8c5', lipColor: '#9b6be0', lipShape: 'full', lipFinish: 'shimmer', gloss: false, highlight: '#d6f0ff', contour: false, gems: false, glitter: true } },
+  { id: 'smoky', label: 'Smoky Night', emoji: '🌙', face: { eyeshadow: '#2b2b2b', shadowStyle: 'smoky', liner: 'cat', linerColor: '#1a1a1a', lashes: 'glam', blush: true, blushColor: '#d9826b', lipColor: '#8c4a6b', lipShape: 'full', lipFinish: 'matte', gloss: false, highlight: '#f7e1b5', contour: true, gems: false } },
+  { id: 'fresh', label: 'Fresh Face', emoji: '🧼', face: { eyeshadow: null, shadowStyle: 'soft', liner: 'none', lashes: 'none', blush: true, blushColor: '#ff8fa3', lipColor: '#c9707d', lipShape: 'line', lipFinish: 'satin', gloss: false, highlight: null, contour: false, gems: false, glitter: false, cheekArt: 'none' } },
 ];
+
+// ---------- Custom Makeup Kit ($200) and saved faces ----------
+const CUSTOM_MAKEUP_ID = 'custom-makeup-kit';
+const CUSTOM_MAKEUP_PRICE = 200;
+const SAVED_FACES_KEY = 'runwayReady.savedFaces';
+const MAX_SAVED_FACES = 8;
+let savedFaces = [];
+try {
+  const raw = JSON.parse(localStorage.getItem(SAVED_FACES_KEY) || '[]');
+  if (Array.isArray(raw)) savedFaces = raw.filter((f) => f && f.face).slice(0, MAX_SAVED_FACES);
+} catch (e) {}
+
+function hasCustomMakeup() { return owned.has(CUSTOM_MAKEUP_ID); }
+function persistSavedFaces() {
+  try { localStorage.setItem(SAVED_FACES_KEY, JSON.stringify(savedFaces)); } catch (e) {}
+}
+
+function faceThumbSVG(face) {
+  return `<svg viewBox="108 62 84 62" xmlns="http://www.w3.org/2000/svg">
+    <rect x="100" y="55" width="100" height="80" fill="${state.skin}"/>
+    ${buildFaceSVG({ ...DEFAULT_FACE, ...face }, state.hair.color)}
+  </svg>`;
+}
+
+function salonMessage(text) {
+  const el = document.getElementById('salon-save-msg');
+  el.textContent = text;
+  el.hidden = !text;
+}
+
+function renderSavedFaces() {
+  const box = document.getElementById('salon-saved-box');
+  const list = document.getElementById('salon-saved');
+  box.hidden = !hasCustomMakeup();
+  list.innerHTML = '';
+  if (!savedFaces.length) {
+    list.innerHTML = '<p class="saved-empty">No saved faces yet. Make a look, then tap 💾 Save Face!</p>';
+    return;
+  }
+  savedFaces.forEach((sf, i) => {
+    const card = document.createElement('div');
+    card.className = 'saved-face';
+    const use = document.createElement('button');
+    use.className = 'saved-face-use';
+    use.setAttribute('aria-label', `Put on ${sf.name}`);
+    use.innerHTML = `<span class="saved-face-pic">${faceThumbSVG(sf.face)}</span><span>${sf.name}</span>`;
+    use.addEventListener('click', () => salonSet(() => { Object.assign(state.face, sf.face); }));
+    const del = document.createElement('button');
+    del.className = 'saved-face-del';
+    del.setAttribute('aria-label', `Delete ${sf.name}`);
+    del.textContent = '✕';
+    del.addEventListener('click', () => {
+      savedFaces.splice(i, 1);
+      persistSavedFaces();
+      renderSavedFaces();
+      salonMessage(`🗑️ ${sf.name} deleted.`);
+    });
+    card.append(use, del);
+    list.appendChild(card);
+  });
+}
+
+function saveCurrentFace() {
+  if (!hasCustomMakeup()) return;
+  if (savedFaces.length >= MAX_SAVED_FACES) {
+    salonMessage(`You can save up to ${MAX_SAVED_FACES} faces. Tap ✕ on one to make room.`);
+    return;
+  }
+  let n = savedFaces.length + 1;
+  while (savedFaces.some((f) => f.name === `My Face ${n}`)) n++;
+  savedFaces.push({ name: `My Face ${n}`, face: { ...state.face } });
+  persistSavedFaces();
+  renderSavedFaces();
+  salonMessage(`💾 Saved as "My Face ${n}"!`);
+}
+
+function renderSalonLock() {
+  const unlocked = hasCustomMakeup();
+  document.getElementById('salon-lock').hidden = unlocked;
+  document.getElementById('salon-custom').hidden = !unlocked;
+  document.getElementById('salon-save').hidden = !unlocked;
+  document.getElementById('salon-subtitle').textContent = unlocked
+    ? 'Tap a colour or style to try it on, or tap 🌈 Any to mix your own colour. Tap 💾 Save Face to keep a look!'
+    : 'Tap a default face to try it on for free. Buy the Custom Makeup Kit to make your own!';
+  const buy = document.getElementById('salon-buy');
+  const note = document.getElementById('salon-lock-note');
+  const short = CUSTOM_MAKEUP_PRICE - cash;
+  buy.disabled = short > 0;
+  note.textContent = short > 0
+    ? `You have $${cash}. Earn $${short} more on the runway or in the mini games. Until then, try the free Default Faces above!`
+    : `You have $${cash}. You can buy it now!`;
+  renderSavedFaces();
+}
+
+function buyCustomMakeup() {
+  if (hasCustomMakeup() || cash < CUSTOM_MAKEUP_PRICE) return;
+  cash -= CUSTOM_MAKEUP_PRICE;
+  owned.add(CUSTOM_MAKEUP_ID);
+  saveShop();
+  renderCash();
+  renderSalonLock();
+  salonMessage('🎉 You bought the Custom Makeup Kit! Make any face you like and save it.');
+}
 
 function wipeMakeup() {
   salonSet(() => {
@@ -7157,6 +7264,8 @@ function wipeMakeup() {
 
 function openSalon() {
   buildSalon();
+  renderSalonLock();
+  salonMessage('');
   renderSalonMirror();
   highlightSalon();
   salonOverlay.hidden = false;
@@ -7172,6 +7281,8 @@ document.getElementById('salon-btn').addEventListener('click', openSalon);
 document.getElementById('salon-close').addEventListener('click', closeSalon);
 document.getElementById('salon-done').addEventListener('click', closeSalon);
 document.getElementById('salon-wipe').addEventListener('click', wipeMakeup);
+document.getElementById('salon-save').addEventListener('click', saveCurrentFace);
+document.getElementById('salon-buy').addEventListener('click', buyCustomMakeup);
 salonOverlay.addEventListener('click', (e) => {
   if (e.target === salonOverlay) closeSalon();
 });

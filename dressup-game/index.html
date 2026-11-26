@@ -531,17 +531,30 @@
       <h2 id="salon-title">💄 Makeup Salon</h2>
       <button class="modal-close" id="salon-close" aria-label="Close salon">✕</button>
     </div>
-    <p class="modal-subtitle">Tap a colour or style to try it on, or tap 🌈 Any to mix your own colour. Your look updates everywhere.</p>
+    <p class="modal-subtitle" id="salon-subtitle">Tap a face to try it on. Your look updates everywhere.</p>
     <div class="salon-layout">
       <div class="salon-mirror-wrap">
         <div class="salon-mirror" id="salon-mirror"></div>
         <div class="salon-mirror-actions">
           <button class="btn btn-ghost" id="salon-wipe">🧽 Wipe Off</button>
+          <button class="btn btn-ghost" id="salon-save" hidden>💾 Save Face</button>
           <button class="btn btn-primary" id="salon-done">✅ Done</button>
         </div>
+        <p class="salon-save-msg" id="salon-save-msg" hidden></p>
       </div>
       <div class="salon-tools">
-        <h3>✨ Quick Looks</h3><div class="option-row walk-picker" id="salon-presets"></div>
+        <h3>🎨 Default Faces <span class="free-tag">FREE</span></h3><div class="option-row walk-picker" id="salon-presets"></div>
+        <div id="salon-saved-box" hidden>
+          <h3>💾 My Saved Faces</h3>
+          <div class="saved-faces" id="salon-saved"></div>
+        </div>
+        <div class="salon-lock" id="salon-lock">
+          <div class="salon-lock-title">🔒 Custom Makeup Kit · <b>$200</b></div>
+          <p>Mix your own eyeshadow, eyeliner, lashes, blush, contour, highlighter, lipstick, sparkles and face paint, in any colour, and save your favourite faces!</p>
+          <button class="btn btn-primary" id="salon-buy">💵 Buy for $200</button>
+          <p class="salon-lock-note" id="salon-lock-note"></p>
+        </div>
+        <div id="salon-custom" hidden>
         <h3>Eyeshadow</h3><div class="swatch-row" id="salon-shadow"></div>
         <div class="option-row walk-picker" id="salon-shadow-style"></div>
         <h3>Eyeliner</h3><div class="option-row walk-picker" id="salon-liner"></div>
@@ -555,7 +568,8 @@
         <div class="option-row walk-picker" id="salon-lip-finish"></div>
         <h3>Sparkle</h3><div class="option-row walk-picker" id="salon-extras"></div>
         <h3>Face Paint</h3><div class="option-row walk-picker" id="salon-cheek"></div>
-        <h3>Spa Masks</h3><div class="option-row walk-picker" id="salon-spa"></div>
+        </div>
+        <h3>Spa Masks <span class="free-tag">FREE</span></h3><div class="option-row walk-picker" id="salon-spa"></div>
       </div>
     </div>
   </div>

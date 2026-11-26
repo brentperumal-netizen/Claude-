@@ -2130,3 +2130,38 @@ body {
 .custom-color.custom-color-mini { margin-top: 0; padding: 2px 8px 2px 3px; font-size: 0.72rem; gap: 4px; min-height: 30px; }
 .custom-color.custom-color-mini .custom-color-dot { width: 22px; height: 22px; }
 .salon-tools .walk-picker + .swatch-row, .salon-tools .swatch-row + .walk-picker, .salon-tools .walk-picker + .walk-picker { margin-top: 6px; }
+
+/* ---------- Custom Makeup Kit lock + saved faces ---------- */
+.free-tag { font-size: 0.62rem; background: #43b581; color: #ffffff; border-radius: 999px; padding: 1px 7px; vertical-align: middle; letter-spacing: 0.04em; }
+.salon-lock {
+  margin: 14px 0 6px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 2px dashed #e0558f;
+  background: linear-gradient(135deg, #fff0f6, #f6efff);
+  text-align: center;
+}
+.salon-lock[hidden] { display: none; }
+.salon-lock-title { font-weight: 800; color: var(--accent-dark); font-size: 1rem; }
+.salon-lock p { margin: 6px 0 10px; font-size: 0.82rem; color: var(--ink); }
+.salon-lock .salon-lock-note { margin: 8px 0 0; color: var(--muted); font-size: 0.78rem; }
+.salon-lock .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+#salon-custom[hidden], #salon-saved-box[hidden], #salon-save[hidden], .salon-save-msg[hidden] { display: none; }
+.salon-save-msg { margin: 8px 0 0; text-align: center; font-weight: 700; font-size: 0.82rem; color: var(--accent-dark); }
+.saved-faces { display: flex; flex-wrap: wrap; gap: 8px; }
+.saved-empty { margin: 0; font-size: 0.8rem; color: var(--muted); }
+.saved-face { position: relative; }
+.saved-face-use {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  width: 78px; padding: 4px 4px 6px; border-radius: 12px;
+  border: 2px solid var(--border); background: #ffffff; cursor: pointer;
+  font-size: 0.68rem; font-weight: 700; color: var(--ink);
+}
+.saved-face-use:hover { border-color: var(--accent); }
+.saved-face-pic { display: block; width: 66px; height: 49px; border-radius: 8px; overflow: hidden; }
+.saved-face-pic svg { width: 100%; height: 100%; display: block; }
+.saved-face-del {
+  position: absolute; top: -6px; right: -6px; width: 22px; height: 22px;
+  border-radius: 50%; border: 2px solid #ffffff; background: #e0558f; color: #ffffff;
+  font-size: 0.7rem; font-weight: 800; cursor: pointer; line-height: 1;
+}
