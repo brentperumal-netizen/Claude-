@@ -1487,6 +1487,80 @@ const OUTFIT_STYLES = [
               <path d="M${cx - 14},${sY} Q${cx},${sY + 12} ${cx + 14},${sY}" fill="none" stroke="#d6d6d6" stroke-width="2"/>
               <rect x="${cx - bt.hipHalf - 2}" y="244" width="${(bt.hipHalf + 2) * 2}" height="6" fill="#3d6199"/>`;
     } },
+  // ----- Separates: tops and bottoms you can mix and match -----
+  { id: 'tee', label: 'T-Shirt', emoji: '👕', piece: 'top',
+    svg: (bt) => `${fittedTopSVG(bt, 246, null)}
+      <path d="M${150 - 12},${TORSO_Y.shoulder} Q150,${TORSO_Y.shoulder + 12} ${150 + 12},${TORSO_Y.shoulder}" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.18"/>` },
+  { id: 'tank', label: 'Tank Top', emoji: '🎽', piece: 'top',
+    svg: (bt) => `${tankSVG(bt, 246, null)}
+      <path d="M136,${TORSO_Y.shoulder - 2} Q150,${TORSO_Y.shoulder + 18} 164,${TORSO_Y.shoulder - 2}" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5"/>` },
+  { id: 'ruffle-blouse', label: 'Ruffle Blouse', emoji: '🎀', piece: 'top',
+    svg: (bt) => {
+      const sY = TORSO_Y.shoulder;
+      const ruffles = Array.from({ length: 7 }, (_, i) => {
+        const t = i / 6, x = 150 - 22 + 44 * t, y = sY + 2 + 10 * Math.sin(Math.PI * t);
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5" stroke="#000000" stroke-opacity="0.15" stroke-width="1"/>`;
+      }).join('');
+      return `${fittedTopSVG(bt, 244, null)}${ruffles}
+        <path d="M150,${sY + 16} l-8,-5 l0,10 Z M150,${sY + 16} l8,-5 l0,10 Z" fill="#ffffff"/><circle cx="150" cy="${sY + 16}" r="2.4" fill="#ffffff"/>
+        ${[190, 206, 222].map((y) => `<circle cx="150" cy="${y}" r="1.8" fill="#ffffff" opacity="0.9"/>`).join('')}`;
+    } },
+  { id: 'cozy-sweater', label: 'Cozy Sweater', emoji: '🧶', piece: 'top',
+    svg: (bt) => {
+      const sY = TORSO_Y.shoulder, hw = torsoHalfAt(bt, 252) + 4;
+      const ribs = Array.from({ length: 12 }, (_, i) => `<line x1="${150 - hw + 4 + i * ((hw * 2 - 8) / 11)}" y1="248" x2="${150 - hw + 4 + i * ((hw * 2 - 8) / 11)}" y2="258" stroke="#000000" stroke-width="1" opacity="0.2"/>`).join('');
+      return `${fittedTopSVG(bt, 258, null)}
+        <rect x="${150 - hw}" y="247" width="${hw * 2}" height="11" rx="3" fill="#000000" opacity="0.12"/>${ribs}
+        <path d="M${150 - 14},${sY - 1} Q150,${sY + 12} ${150 + 14},${sY - 1}" fill="none" stroke="#000000" stroke-width="4" opacity="0.15"/>
+        <path d="M140,${sY + 16} q6,8 0,16 q-6,8 0,16 q6,8 0,16 q-6,8 0,16 M160,${sY + 16} q-6,8 0,16 q6,8 0,16 q-6,8 0,16 q6,8 0,16" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.35"/>`;
+    } },
+  { id: 'stripe-tee', label: 'Striped Tee', emoji: '🦓', piece: 'top',
+    svg: (bt) => {
+      let stripes = '';
+      for (let y = TORSO_Y.shoulder + 8; y < 244; y += 12) {
+        const half = torsoHalfAt(bt, Math.min(y + 3, 250)) + 4;
+        stripes += `<rect x="${150 - half}" y="${y}" width="${half * 2}" height="5" rx="1"/>`;
+      }
+      return `${fittedTopSVG(bt, 246, '#ffffff')}${stripes}
+        <path d="M${150 - 14},${TORSO_Y.shoulder} Q150,${TORSO_Y.shoulder + 12} ${150 + 14},${TORSO_Y.shoulder}" fill="none" stroke="#d6d6d6" stroke-width="2"/>`;
+    } },
+  { id: 'mini-skirt', label: 'Mini Skirt', emoji: '👗', piece: 'bottom',
+    svg: (bt) => {
+      const cx = 150, wY = TORSO_Y.waist, tw = bt.waistHalf + 5, hw = bt.hipHalf + 24;
+      return `<path d="M${cx - tw},${wY + 4} L${cx + tw},${wY + 4} Q${cx + hw - 8},260 ${cx + hw},298 Q${cx},306 ${cx - hw},298 Q${cx - hw + 8},260 ${cx - tw},${wY + 4} Z"/>
+        <rect x="${cx - tw}" y="${wY + 2}" width="${tw * 2}" height="8" fill="#000000" opacity="0.15"/>
+        <path d="M${cx - tw + 6},${wY + 14} L${cx - hw + 16},292" stroke="#ffffff" stroke-width="5" opacity="0.15" stroke-linecap="round"/>`;
+    } },
+  { id: 'pleated-skirt', label: 'Pleated Skirt', emoji: '🩰', piece: 'bottom',
+    svg: (bt) => {
+      const cx = 150, wY = TORSO_Y.waist, tw = bt.waistHalf + 6, hw = bt.hipHalf + 30, hemY = 318;
+      const pleats = Array.from({ length: 8 }, (_, i) => {
+        const f = -1 + (2 * (i + 0.5)) / 8;
+        return `<line x1="${cx + f * tw}" y1="${wY + 6}" x2="${cx + f * hw}" y2="${hemY}" stroke="#000000" stroke-width="1.2" opacity="0.2"/>`;
+      }).join('');
+      return `<path d="M${cx - tw},${wY + 4} L${cx + tw},${wY + 4} L${cx + hw},${hemY} L${cx - hw},${hemY} Z"/>${pleats}
+        <rect x="${cx - tw}" y="${wY + 2}" width="${tw * 2}" height="8" fill="#000000" opacity="0.15"/>`;
+    } },
+  { id: 'maxi-skirt', label: 'Long Flowy Skirt', emoji: '🌸', piece: 'bottom',
+    svg: (bt) => {
+      const cx = 150, wY = TORSO_Y.waist, tw = bt.waistHalf + 5, hw = bt.hipHalf + 40, hemY = 418;
+      let hem = '';
+      const n = 8, step = (hw * 2) / n;
+      for (let k = 0; k < n; k++) { const x0 = cx + hw - step * k; hem += ` Q${(x0 - step / 2).toFixed(1)},${hemY + (k % 2 ? 6 : 12)} ${(x0 - step).toFixed(1)},${hemY}`; }
+      return `<path d="M${cx - tw},${wY + 4} L${cx + tw},${wY + 4} C${cx + tw + 20},300 ${cx + hw - 10},360 ${cx + hw},${hemY}${hem} C${cx - hw + 10},360 ${cx - tw - 20},300 ${cx - tw},${wY + 4} Z"/>
+        <path d="M${cx - 10},${wY + 20} Q${cx - 22},320 ${cx - 30},${hemY - 6} M${cx + 16},${wY + 20} Q${cx + 26},330 ${cx + 34},${hemY - 6}" fill="none" stroke="#000000" stroke-width="1.2" opacity="0.15"/>
+        <rect x="${cx - tw}" y="${wY + 2}" width="${tw * 2}" height="8" fill="#000000" opacity="0.15"/>`;
+    } },
+  { id: 'skinny-jeans', label: 'Jeans', emoji: '👖', piece: 'bottom', under: true, fixedColor: true,
+    svg: (bt) => `${pantsSVG(bt, '#5b86c4', 434, 3)}
+      <line x1="133" y1="262" x2="128" y2="430" stroke="#3d6199" stroke-width="1"/><line x1="167" y1="262" x2="172" y2="430" stroke="#3d6199" stroke-width="1"/>
+      <rect x="${150 - bt.hipHalf - 2}" y="232" width="${(bt.hipHalf + 2) * 2}" height="7" fill="#3d6199"/>` },
+  { id: 'shorts', label: 'Shorts', emoji: '🩳', piece: 'bottom',
+    svg: (bt) => `${shortsSVG(bt, null, 300)}
+      <rect x="${150 - bt.hipHalf - 6}" y="228" width="${(bt.hipHalf + 6) * 2}" height="7" fill="#000000" opacity="0.15"/>` },
+  { id: 'leggings', label: 'Leggings', emoji: '🧘', piece: 'bottom', under: true,
+    svg: (bt) => `${pantsSVG(bt, null, 440, 1)}
+      <rect x="${150 - bt.hipHalf - 2}" y="234" width="${(bt.hipHalf + 2) * 2}" height="6" fill="#000000" opacity="0.15"/>` },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -3112,6 +3186,7 @@ const state = {
   accessories: Object.fromEntries(ACCESSORIES.map((a) => [a.id, false])),
   pet: { species: 'none', color: '#c68642', accessory: 'none' },
   background: 'pink',
+  extras: [],
   nails: [null, null, null, null, null],
   nailArt: [[], [], [], [], []],
   nailTopCoat: false,
@@ -3242,7 +3317,8 @@ buildSwatches(document.getElementById('hair-colors'), HAIR_COLORS, (c) => {
 });
 
 buildSwatches(document.getElementById('outfit-colors'), OUTFIT_COLORS, (c) => {
-  state.outfit.color = c;
+  const t = colorTargetPiece();
+  if (t) t.color = c;
   render();
 });
 
@@ -3263,15 +3339,57 @@ buildOptionButtons(document.getElementById('pet-accessories'), PET_ACCESSORIES, 
   render();
 });
 
+let colorTarget = null;
+
+function wornPieceList() {
+  return [state.outfit, ...(state.extras || [])].filter((pc) => pc && pc.style);
+}
+
+function setWornPieceList(list) {
+  state.outfit = list[0];
+  state.extras = list.slice(1);
+}
+
+function colorTargetPiece() {
+  const list = wornPieceList();
+  return list.find((pc) => pc.style === colorTarget) || list[list.length - 1];
+}
+
+// Tap a piece to put it on (it replaces a piece of the same kind) or, if you're
+// already wearing it, to take it off. Up to 3 pieces: a full outfit, a top and a bottom.
+function pickPiece(id) {
+  const def = OUTFIT_STYLES.find((o) => o.id === id);
+  const kind = pieceKind(def);
+  let list = wornPieceList();
+  const at = list.findIndex((pc) => pc.style === id);
+  if (at >= 0) {
+    if (colorTarget !== id) { colorTarget = id; render(); return; }
+    if (list.length > 1) {
+      list.splice(at, 1);
+      setWornPieceList(list);
+      colorTarget = list[list.length - 1].style;
+    }
+    render();
+    return;
+  }
+  const same = list.find((pc) => pieceKind(OUTFIT_STYLES.find((o) => o.id === pc.style)) === kind);
+  const color = same ? same.color : (colorTargetPiece() || state.outfit).color || OUTFIT_COLORS[0];
+  list = list.filter((pc) => pc !== same);
+  list.push({ style: id, color });
+  setWornPieceList(list.slice(-MAX_PIECES));
+  colorTarget = id;
+  render();
+}
+
 function rebuildThemedLists() {
   buildOptionButtons(document.getElementById('hair-styles'), HAIR_STYLES.filter(itemVisible), (id) => {
     state.hair.style = id;
     render();
   });
-  buildOptionButtons(document.getElementById('outfit-styles'), OUTFIT_STYLES.filter(itemVisible), (id) => {
-    state.outfit.style = id;
-    render();
-  });
+  const visible = OUTFIT_STYLES.filter(itemVisible);
+  buildOptionButtons(document.getElementById('outfit-styles'), visible.filter((o) => pieceKind(o) === 'full'), pickPiece);
+  buildOptionButtons(document.getElementById('top-styles'), visible.filter((o) => pieceKind(o) === 'top'), pickPiece);
+  buildOptionButtons(document.getElementById('bottom-styles'), visible.filter((o) => pieceKind(o) === 'bottom'), pickPiece);
   buildOptionButtons(document.getElementById('shoe-styles'), SHOE_STYLES.filter(itemVisible), (id) => {
     state.shoes.style = id;
     render();
@@ -3292,6 +3410,7 @@ function sanitizeStateForTheme() {
 
   const outfitDef = OUTFIT_STYLES.find((o) => o.id === state.outfit.style);
   if (!itemVisible(outfitDef)) state.outfit.style = OUTFIT_STYLES.find((o) => !o.theme).id;
+  state.extras = (state.extras || []).filter((pc) => itemVisible(OUTFIT_STYLES.find((o) => o.id === pc.style)));
 
   const shoeDef = SHOE_STYLES.find((s) => s.id === state.shoes.style);
   if (!itemVisible(shoeDef)) state.shoes.style = SHOE_STYLES.find((s) => !s.theme).id;
@@ -3399,20 +3518,22 @@ function render() {
   // outfit
   const bt = BODY_TYPES.find((b) => b.id === state.bodyType);
   const outfitLayer = document.getElementById('layer-outfit');
-  const outfitDef = OUTFIT_STYLES.find((o) => o.id === state.outfit.style);
-  outfitLayer.innerHTML = typeof outfitDef.svg === 'function' ? outfitDef.svg(bt) : outfitDef.svg;
-  if (outfitDef.fixedColor) {
-    outfitLayer.removeAttribute('fill');
-  } else {
-    setGradient('outfitGradient', state.outfit.color, 0.4, 0.3);
-    outfitLayer.setAttribute('fill', 'url(#outfitGradient)');
-  }
+  const worn = outfitPieces(state);
+  outfitLayer.removeAttribute('fill');
+  outfitLayer.innerHTML = piecesSVG(state, bt, 'main');
   // A mermaid tail replaces the legs and feet.
+  const hideLegs = worn.some((pc) => pc.def.hidesLegs);
   ['leg-left', 'leg-right', 'leg-left-outline', 'leg-right-outline', 'leg-left-shine', 'leg-right-shine', 'layer-shoes']
-    .forEach((id) => { document.getElementById(id).style.display = outfitDef.hidesLegs ? 'none' : ''; });
-  document.getElementById('outfit-color-label').hidden = !!outfitDef.fixedColor;
-  document.getElementById('outfit-colors').hidden = !!outfitDef.fixedColor;
-  document.getElementById('outfit-fixed-note').hidden = !outfitDef.fixedColor;
+    .forEach((id) => { document.getElementById(id).style.display = hideLegs ? 'none' : ''; });
+  // the colour swatches paint the piece you tapped most recently
+  const target = colorTargetPiece();
+  const targetDef = target && OUTFIT_STYLES.find((o) => o.id === target.style);
+  const fixed = !targetDef || !!targetDef.fixedColor;
+  document.getElementById('outfit-color-label').hidden = fixed;
+  document.getElementById('outfit-color-label').textContent = targetDef ? `Colour · ${targetDef.emoji} ${targetDef.label}` : 'Colour';
+  document.getElementById('outfit-colors').hidden = fixed;
+  document.getElementById('outfit-fixed-note').hidden = !fixed;
+  document.getElementById('piece-count').textContent = `👗 Wearing ${worn.length} / ${MAX_PIECES} pieces: ${worn.map((pc) => `${pc.def.emoji} ${pc.def.label}`).join(' + ')}`;
 
   // shoes
   setGradient('shoeGradient', state.shoes.color, 0.35, 0.3);
@@ -3475,11 +3596,18 @@ function render() {
   highlightSelection('#mouth-shapes', state.face.mouth, 'id');
   highlightSelection('#lip-colors', state.face.lipColor, 'color');
   highlightSelection('#hair-colors', state.hair.color, 'color');
-  highlightSelection('#outfit-colors', state.outfit.color, 'color');
+  const ct = colorTargetPiece();
+  highlightSelection('#outfit-colors', ct ? ct.color : '', 'color');
   highlightSelection('#shoe-colors', state.shoes.color, 'color');
   highlightSelection('#hair-styles', state.hair.style, 'id');
   highlightSelection('#bang-styles', state.hair.bangs || 'none', 'id');
-  highlightSelection('#outfit-styles', state.outfit.style, 'id');
+  const wornIds = new Set(outfitPieces(state).map((pc) => pc.style));
+  ['#outfit-styles', '#top-styles', '#bottom-styles'].forEach((sel) => {
+    document.querySelectorAll(`${sel} [data-id]`).forEach((elm) => {
+      elm.classList.toggle('selected', wornIds.has(elm.dataset.id));
+      elm.classList.toggle('editing', elm.dataset.id === (ct && ct.style));
+    });
+  });
   highlightSelection('#shoe-styles', state.shoes.style, 'id');
   highlightSelection('#background-styles', state.background, 'id');
 
@@ -3899,7 +4027,9 @@ document.getElementById('randomize-btn').addEventListener('click', () => {
     freckles: Math.random() > 0.6,
   };
   state.hair = { style: pick(HAIR_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(HAIR_COLORS), bangs: Math.random() < 0.35 ? pick(BANG_STYLES).id : 'none' };
-  state.outfit = { style: pick(OUTFIT_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(OUTFIT_COLORS) };
+  state.outfit = { style: pick(OUTFIT_STYLES.filter(itemVisible).filter(isUnlocked).filter((o) => pieceKind(o) === 'full')).id, color: pick(OUTFIT_COLORS) };
+  state.extras = [];
+  colorTarget = null;
   state.shoes = { style: pick(SHOE_STYLES.filter(itemVisible).filter(isUnlocked)).id, color: pick(SHOE_COLORS) };
   ACCESSORIES.filter(itemVisible).forEach((a) => { state.accessories[a.id] = isUnlocked(a) && Math.random() > 0.5; });
   const petDef = pick(PETS);
@@ -3927,11 +4057,46 @@ function launchConfetti(layer) {
 // opts.posed: draw the arms as bendable two-part limbs (on top of the outfit, so
 // hands can rest on hips) and split each leg + shoe into its own group, so the
 // Catwalk Show can animate arms and steps every frame.
+// ---------- Outfit pieces ----------
+// You can wear up to 3 clothing pieces at once: one full outfit, one top and one
+// bottom. look.outfit is the first piece and look.extras holds the rest; each
+// piece keeps its own colour. Pieces are drawn bottoms -> full outfits -> tops.
+// Leggings and jeans go under a dress; skirts and shorts go over it.
+const PIECE_ORDER = { under: 0, full: 1, bottom: 2, top: 3 };
+function pieceLayer(def) {
+  const k = pieceKind(def);
+  return k === 'bottom' && def.under ? 'under' : k;
+}
+const MAX_PIECES = 3;
+
+function pieceKind(def) {
+  return (def && def.piece) || 'full';
+}
+
+function outfitPieces(look) {
+  return [look.outfit, ...(look.extras || [])]
+    .filter((pc) => pc && pc.style)
+    .map((pc) => ({ ...pc, def: OUTFIT_STYLES.find((o) => o.id === pc.style) }))
+    .filter((pc) => pc.def)
+    .sort((a, b) => PIECE_ORDER[pieceLayer(a.def)] - PIECE_ORDER[pieceLayer(b.def)]);
+}
+
+function piecesSVG(look, bt, suffix) {
+  return outfitPieces(look).map((pc, i) => {
+    const body = typeof pc.def.svg === 'function' ? pc.def.svg(bt) : pc.def.svg;
+    if (pc.def.fixedColor) return `<g fill="none">${body}</g>`;
+    const id = `pc${suffix}_${i}`;
+    return `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${lighten(pc.color, 0.4)}"/><stop offset="55%" stop-color="${pc.color}"/><stop offset="100%" stop-color="${darken(pc.color, 0.3)}"/>
+      </linearGradient></defs><g fill="url(#${id})">${body}</g>`;
+  }).join('');
+}
+
 function buildDollSVG(look, idSuffix = '', opts = {}) {
   const posed = !!opts.posed;
   const bt = BODY_TYPES.find((b) => b.id === look.bodyType);
   const hairDef = HAIR_STYLES.find((h) => h.id === look.hair.style);
-  const outfitDef = OUTFIT_STYLES.find((o) => o.id === look.outfit.style);
+  const outfitDef = { hidesLegs: outfitPieces(look).some((pc) => pc.def.hidesLegs) };
   const shoeDef = SHOE_STYLES.find((s) => s.id === look.shoes.style);
   const lx = 93 - bt.armSpread;
   const rxHand = 207 + bt.armSpread;
@@ -3964,7 +4129,6 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
   const outfitDark = darken(look.outfit.color, 0.3);
   const shoeLight = lighten(look.shoes.color, 0.35);
   const shoeDark = darken(look.shoes.color, 0.3);
-  const outfitFill = outfitDef.fixedColor ? 'none' : `url(#${outfitGrad})`;
 
   return `
     <defs>
@@ -4054,7 +4218,7 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
       <g class="pl-left"><g clip-path="url(#shoeClipL${idSuffix})" fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g></g>
       <g class="pl-right"><g clip-path="url(#shoeClipR${idSuffix})" fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g></g>`
       : `<g fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g>`}
-    <g fill="${outfitFill}">${typeof outfitDef.svg === 'function' ? outfitDef.svg(bt) : outfitDef.svg}</g>
+    ${piecesSVG(look, bt, idSuffix)}
     ${posed ? posedArmsSVG(skinGrad, look.nails) : ''}
     ${accSvg}
   `;
@@ -4090,6 +4254,8 @@ function applyPreset(preset) {
   state.face = { ...DEFAULT_FACE, ...(look.face || {}) };
   state.hair = { ...look.hair };
   state.outfit = { ...look.outfit };
+  state.extras = (look.extras || []).map((pc) => ({ ...pc }));
+  colorTarget = null;
   state.shoes = { ...look.shoes };
   state.accessories = Object.fromEntries(ACCESSORIES.map((a) => [a.id, !!(look.accessories && look.accessories[a.id])]));
   state.pet = look.pet ? { ...look.pet } : { species: 'none', color: '#c68642', accessory: 'none' };
@@ -4426,7 +4592,8 @@ function robotLook(challenge) {
     bodyType: pick(BODY_TYPES).id,
     skin: pick(SKIN_TONES),
     hair: { style: pick(freeItems(HAIR_STYLES)).id, color: pick(SALON_HAIR_COLORS), bangs: Math.random() < 0.3 ? pick(BANG_STYLES).id : 'none' },
-    outfit: { style: pick(freeItems(OUTFIT_STYLES).filter((o) => !o.theme)).id, color: pick(OUTFIT_COLORS) },
+    outfit: { style: pick(freeItems(OUTFIT_STYLES).filter((o) => !o.theme && pieceKind(o) === 'full')).id, color: pick(OUTFIT_COLORS) },
+    extras: [],
     shoes: { style: pick(freeItems(SHOE_STYLES).filter((o) => !o.theme)).id, color: pick(SHOE_COLORS) },
     accessories: {},
     face: { ...DEFAULT_FACE, eyeShape: pick(EYE_SHAPES.filter((e) => e.id !== 'closed')).id, mouth: pick(MOUTH_SHAPES).id, lipColor: pick(LIP_COLORS), lashes: pick(LASH_STYLES).id, eyeColor: pick(EYE_COLORS) },
@@ -4459,6 +4626,7 @@ function currentLookCopy() {
     ...state,
     hair: { ...state.hair },
     outfit: { ...state.outfit },
+    extras: (state.extras || []).map((pc) => ({ ...pc })),
     shoes: { ...state.shoes },
     accessories: { ...state.accessories },
     face: { ...state.face },
@@ -4573,7 +4741,7 @@ function scorePlayer(challenge) {
   let score = 6;
   const reasons = [];
   if (challenge.theme && state.theme === challenge.theme) { score += 1.2; reasons.push('on theme'); }
-  const worn = [state.outfit.style, state.shoes.style, state.hair.style, ...Object.keys(state.accessories).filter((k) => state.accessories[k])];
+  const worn = [...outfitPieces(state).map((pc) => pc.style), state.shoes.style, state.hair.style, ...Object.keys(state.accessories).filter((k) => state.accessories[k])];
   const hits = challenge.items.filter((id) => worn.includes(id)).length;
   if (hits) { score += Math.min(2, hits * 0.7); reasons.push(`${hits} matching piece${hits === 1 ? '' : 's'}`); }
   if (challenge.colors.includes(state.outfit.color)) { score += 0.7; reasons.push('great colours'); }
@@ -6885,7 +7053,7 @@ const GAME_MODES = {
 
 function computeGameMode() {
   const outfitDef = OUTFIT_STYLES.find((o) => o.id === state.outfit.style);
-  if (outfitDef && ['mermaid', 'mermaid-tail', 'ocean-sparkle-tail'].includes(outfitDef.id)) return 'swim';
+  if (outfitPieces(state).some((pc) => ['mermaid', 'mermaid-tail', 'ocean-sparkle-tail'].includes(pc.style))) return 'swim';
   if (state.pet.species === 'horse') return 'ride';
   if (['fairy-wings', 'feather-wings', 'hero-cape', 'rainbow-wings'].some((a) => state.accessories[a])) return 'fly';
   if (currentWalk().flying) return 'fly';

@@ -1788,3 +1788,10 @@ body {
 .town-pad-mid { display: grid; gap: 6px; }
 .town-pad .game-btn { padding: 10px 18px; }
 @media (prefers-reduced-motion: reduce) { .town-actor.walking .town-bob, .town-fountain { animation: none; } }
+
+/* ---------- Mix & match pieces ---------- */
+.piece-count { margin: 0 0 4px; font-weight: 800; color: var(--accent-dark); font-size: 0.85rem; }
+.piece-tip { margin: 0 0 10px; color: var(--muted); font-size: 0.78rem; }
+.option-btn.selected.editing { box-shadow: 0 0 0 3px #c9a6ff; }
+
+#outfit-colors[hidden], #outfit-color-label[hidden], #outfit-fixed-note[hidden] { display: none; }
