@@ -483,6 +483,14 @@ function tankSVG(bt, hemY, fill) {
             C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY} Q${cx - c},${bY - 12} ${cx - s2},${sY - 2} Z"${f}/>`;
 }
 
+function basicsSVG(bt, top, bottom) {
+  const cx = 150;
+  return `${bottom ? `${shortsSVG(bt, '#2b2b2b', 296)}
+      <rect x="${cx - bt.hipHalf - 6}" y="228" width="${(bt.hipHalf + 6) * 2}" height="6" fill="#444444"/>` : ''}
+    ${top ? `${fittedTopSVG(bt, 240, '#2b2b2b')}
+      <path d="M${cx - 12},${TORSO_Y.shoulder} Q${cx},${TORSO_Y.shoulder + 12} ${cx + 12},${TORSO_Y.shoulder}" fill="none" stroke="#555555" stroke-width="2"/>` : ''}`;
+}
+
 const OUTFIT_STYLES = [
   { id: 'aline', label: 'A-Line Dress', emoji: '👗',
     svg: (bt) => {
@@ -1487,6 +1495,10 @@ const OUTFIT_STYLES = [
               <path d="M${cx - 14},${sY} Q${cx},${sY + 12} ${cx + 14},${sY}" fill="none" stroke="#d6d6d6" stroke-width="2"/>
               <rect x="${cx - bt.hipHalf - 2}" y="244" width="${(bt.hipHalf + 2) * 2}" height="6" fill="#3d6199"/>`;
     } },
+  // ----- Basics: a black top and black shorts that are always on underneath.
+  // They never count toward the 3 pieces and only show where nothing covers them.
+  { id: 'basics', label: 'Black Basics', emoji: '🖤', piece: 'base', fixedColor: true,
+    svg: (bt) => basicsSVG(bt, true, true) },
   // ----- Separates: tops and bottoms you can mix and match -----
   { id: 'tee', label: 'T-Shirt', emoji: '👕', piece: 'top',
     svg: (bt) => `${fittedTopSVG(bt, 246, null)}
@@ -3181,7 +3193,7 @@ const state = {
   skin: SKIN_TONES[0],
   face: { ...DEFAULT_FACE },
   hair: { style: 'bob', color: HAIR_COLORS[0] },
-  outfit: { style: 'aline', color: OUTFIT_COLORS[0] },
+  outfit: { style: 'basics', color: '#2b2b2b' },
   shoes: { style: 'heels', color: SHOE_COLORS[0] },
   accessories: Object.fromEntries(ACCESSORIES.map((a) => [a.id, false])),
   pet: { species: 'none', color: '#c68642', accessory: 'none' },
@@ -3342,11 +3354,11 @@ buildOptionButtons(document.getElementById('pet-accessories'), PET_ACCESSORIES, 
 let colorTarget = null;
 
 function wornPieceList() {
-  return [state.outfit, ...(state.extras || [])].filter((pc) => pc && pc.style);
+  return [state.outfit, ...(state.extras || [])].filter((pc) => pc && pc.style && pc.style !== 'basics');
 }
 
 function setWornPieceList(list) {
-  state.outfit = list[0];
+  state.outfit = list[0] || { style: 'basics', color: '#2b2b2b' };
   state.extras = list.slice(1);
 }
 
@@ -3364,16 +3376,15 @@ function pickPiece(id) {
   const at = list.findIndex((pc) => pc.style === id);
   if (at >= 0) {
     if (colorTarget !== id) { colorTarget = id; render(); return; }
-    if (list.length > 1) {
-      list.splice(at, 1);
-      setWornPieceList(list);
-      colorTarget = list[list.length - 1].style;
-    }
+    list.splice(at, 1);
+    setWornPieceList(list);
+    colorTarget = list.length ? list[list.length - 1].style : null;
     render();
     return;
   }
   const same = list.find((pc) => pieceKind(OUTFIT_STYLES.find((o) => o.id === pc.style)) === kind);
-  const color = same ? same.color : (colorTargetPiece() || state.outfit).color || OUTFIT_COLORS[0];
+  const ctp = colorTargetPiece();
+  const color = same ? same.color : (ctp ? ctp.color : OUTFIT_COLORS[0]);
   list = list.filter((pc) => pc !== same);
   list.push({ style: id, color });
   setWornPieceList(list.slice(-MAX_PIECES));
@@ -3409,7 +3420,7 @@ function sanitizeStateForTheme() {
   if (!itemVisible(hairDef)) state.hair.style = HAIR_STYLES.find((h) => !h.theme).id;
 
   const outfitDef = OUTFIT_STYLES.find((o) => o.id === state.outfit.style);
-  if (!itemVisible(outfitDef)) state.outfit.style = OUTFIT_STYLES.find((o) => !o.theme).id;
+  if (!itemVisible(outfitDef)) state.outfit = { style: 'basics', color: '#2b2b2b' };
   state.extras = (state.extras || []).filter((pc) => itemVisible(OUTFIT_STYLES.find((o) => o.id === pc.style)));
 
   const shoeDef = SHOE_STYLES.find((s) => s.id === state.shoes.style);
@@ -3532,8 +3543,10 @@ function render() {
   document.getElementById('outfit-color-label').hidden = fixed;
   document.getElementById('outfit-color-label').textContent = targetDef ? `Colour · ${targetDef.emoji} ${targetDef.label}` : 'Colour';
   document.getElementById('outfit-colors').hidden = fixed;
-  document.getElementById('outfit-fixed-note').hidden = !fixed;
-  document.getElementById('piece-count').textContent = `👗 Wearing ${worn.length} / ${MAX_PIECES} pieces: ${worn.map((pc) => `${pc.def.emoji} ${pc.def.label}`).join(' + ')}`;
+  document.getElementById('outfit-fixed-note').hidden = !targetDef || !targetDef.fixedColor;
+  document.getElementById('piece-count').textContent = worn.length
+    ? `👗 Wearing ${worn.length} / ${MAX_PIECES} pieces: ${worn.map((pc) => `${pc.def.emoji} ${pc.def.label}`).join(' + ')}`
+    : `👗 Wearing 0 / ${MAX_PIECES} pieces · 🖤 black basics on (they don't count)`;
 
   // shoes
   setGradient('shoeGradient', state.shoes.color, 0.35, 0.3);
@@ -4075,14 +4088,17 @@ function pieceKind(def) {
 
 function outfitPieces(look) {
   return [look.outfit, ...(look.extras || [])]
-    .filter((pc) => pc && pc.style)
+    .filter((pc) => pc && pc.style && pc.style !== 'basics')
     .map((pc) => ({ ...pc, def: OUTFIT_STYLES.find((o) => o.id === pc.style) }))
     .filter((pc) => pc.def)
     .sort((a, b) => PIECE_ORDER[pieceLayer(a.def)] - PIECE_ORDER[pieceLayer(b.def)]);
 }
 
 function piecesSVG(look, bt, suffix) {
-  return outfitPieces(look).map((pc, i) => {
+  const pcs = outfitPieces(look);
+  const kinds = new Set(pcs.map((pc) => pieceKind(pc.def)));
+  const base = kinds.has('full') ? '' : basicsSVG(bt, !kinds.has('top'), !kinds.has('bottom'));
+  return base + pcs.map((pc, i) => {
     const body = typeof pc.def.svg === 'function' ? pc.def.svg(bt) : pc.def.svg;
     if (pc.def.fixedColor) return `<g fill="none">${body}</g>`;
     const id = `pc${suffix}_${i}`;
@@ -4331,7 +4347,7 @@ function tryOn(item, kind) {
     state.theme = item.theme;
     sanitizeStateForTheme();
   }
-  if (kind === 'outfit') state.outfit.style = item.id;
+  if (kind === 'outfit' && !wornPieceList().some((pc) => pc.style === item.id)) pickPiece(item.id);
   if (kind === 'accessory') state.accessories[item.id] = true;
   if (kind === 'shoes') state.shoes.style = item.id;
   if (kind === 'hair') state.hair.style = item.id;
