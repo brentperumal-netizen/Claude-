@@ -3765,15 +3765,82 @@ function pieceMessage(text) {
   pieceMsgTimer = setTimeout(() => { el.hidden = true; }, 3000);
 }
 
+// ---------- Clothes on hangers ----------
+// Each piece is drawn as a little garment hanging on a hanger (tops and dresses)
+// or a clip hanger (bottoms and skirts). Tap the hanger to put it on.
+const HANGER_COLORS = ['#e0558f', '#8c5ce0', '#5cc4e0', '#43b581', '#f2994a', '#e05c5c', '#ff8fc7'];
+const HANGER_BODY = { id: 'hanger', shoulderHalf: 34, chestHalf: 36, waistHalf: 26, hipHalf: 36, limbWidth: 22, armSpread: 0 };
+const HANGER_VIEW = { top: '62 108 176 170', full: '30 108 240 400', bottom: '34 182 232 290' };
+
+function hangerColorFor(def, i) {
+  const worn = wornPieceList().find((pc) => pc.style === def.id);
+  return worn ? worn.color : HANGER_COLORS[i % HANGER_COLORS.length];
+}
+
+function hangerSVG(def, color) {
+  const kind = pieceKind(def);
+  const body = typeof def.svg === 'function' ? def.svg(HANGER_BODY) : def.svg;
+  const gid = `hg-${def.id}`;
+  const metal = '#a8a29a';
+  const fill = def.fixedColor ? 'none' : `url(#${gid})`;
+  const grad = def.fixedColor ? '' : `<defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${lighten(color, 0.4)}"/><stop offset="55%" stop-color="${color}"/><stop offset="100%" stop-color="${darken(color, 0.3)}"/></linearGradient></defs>`;
+  if (kind === 'bottom') {
+    const y = 204;
+    return `<svg viewBox="${HANGER_VIEW.bottom}" xmlns="http://www.w3.org/2000/svg">${grad}
+      <path d="M150,${y - 20} q8,0 8,-7 q0,-7 -8,-7" fill="none" stroke="${metal}" stroke-width="3.4" stroke-linecap="round"/>
+      <line x1="150" y1="${y - 20}" x2="150" y2="${y - 4}" stroke="${metal}" stroke-width="3.4"/>
+      <line x1="94" y1="${y - 4}" x2="206" y2="${y - 4}" stroke="${metal}" stroke-width="5" stroke-linecap="round"/>
+      <g fill="${fill}">${body}</g>
+      <rect x="112" y="${y - 6}" width="10" height="14" rx="2" fill="#c9c3bb" stroke="${metal}" stroke-width="1"/>
+      <rect x="178" y="${y - 6}" width="10" height="14" rx="2" fill="#c9c3bb" stroke="${metal}" stroke-width="1"/>
+    </svg>`;
+  }
+  const y = 150;
+  return `<svg viewBox="${HANGER_VIEW[kind] || HANGER_VIEW.full}" xmlns="http://www.w3.org/2000/svg">${grad}
+    <path d="M150,${y - 8} L104,${y + 8} Q97,${y + 12} 104,${y + 13} L196,${y + 13} Q203,${y + 12} 196,${y + 8} Z" fill="none" stroke="${metal}" stroke-width="4" stroke-linejoin="round"/>
+    <g fill="${fill}">${body}</g>
+    <path d="M150,${y - 8} L150,${y - 18} q0,-8 8,-8 q8,0 8,7" fill="none" stroke="${metal}" stroke-width="3.4" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function buildHangerRack(container, items) {
+  buildOptionButtons(container, items, pickPiece);
+  container.classList.add('hanger-rack');
+  container.querySelectorAll('.option-btn').forEach((btn, i) => {
+    const def = items.find((it) => it.id === btn.dataset.id);
+    if (!def) return;
+    btn.classList.add('hanger-btn');
+    const pic = document.createElement('span');
+    pic.className = 'hanger-pic';
+    pic.innerHTML = hangerSVG(def, hangerColorFor(def, i));
+    const emoji = btn.querySelector('.emoji');
+    if (emoji) emoji.replaceWith(pic);
+    btn.setAttribute('aria-label', def.label);
+  });
+}
+
+// Keep the hanger pictures in the colours you picked for the pieces you're wearing.
+function refreshHangerColors() {
+  wornPieceList().forEach((pc) => {
+    const stops = document.querySelectorAll(`#hg-${CSS.escape(pc.style)} stop`);
+    if (stops.length === 3) {
+      stops[0].setAttribute('stop-color', lighten(pc.color, 0.4));
+      stops[1].setAttribute('stop-color', pc.color);
+      stops[2].setAttribute('stop-color', darken(pc.color, 0.3));
+    }
+  });
+}
+
 function rebuildThemedLists() {
   buildOptionButtons(document.getElementById('hair-styles'), HAIR_STYLES.filter(itemVisible), (id) => {
     state.hair.style = id;
     render();
   });
   const visible = OUTFIT_STYLES.filter(itemVisible);
-  buildOptionButtons(document.getElementById('outfit-styles'), visible.filter((o) => pieceKind(o) === 'full'), pickPiece);
-  buildOptionButtons(document.getElementById('top-styles'), visible.filter((o) => pieceKind(o) === 'top'), pickPiece);
-  buildOptionButtons(document.getElementById('bottom-styles'), visible.filter((o) => pieceKind(o) === 'bottom'), pickPiece);
+  buildHangerRack(document.getElementById('outfit-styles'), visible.filter((o) => pieceKind(o) === 'full'));
+  buildHangerRack(document.getElementById('top-styles'), visible.filter((o) => pieceKind(o) === 'top'));
+  buildHangerRack(document.getElementById('bottom-styles'), visible.filter((o) => pieceKind(o) === 'bottom'));
   buildOptionButtons(document.getElementById('shoe-styles'), SHOE_STYLES.filter(itemVisible), (id) => {
     state.shoes.style = id;
     render();
@@ -3995,6 +4062,7 @@ function render() {
       elm.classList.toggle('editing', elm.dataset.id === (ct && ct.style));
     });
   });
+  refreshHangerColors();
   highlightSelection('#shoe-styles', state.shoes.style, 'id');
   highlightSelection('#background-styles', state.background, 'id');
 
