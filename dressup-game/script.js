@@ -2044,20 +2044,28 @@ const CLOTHES_PALETTE = [
   '#8c5ce0', '#5a3aa8', '#ffffff', '#e8e3dc', '#c9b59a', '#8a5a2b', '#9aa3ad', '#2b2b2b',
 ];
 
+// Realistic stiletto pumps seen from the front: a pointed toe box, a low-cut
+// opening around the ankle, and a thin heel peeking out behind each foot.
+function stilettoPumpsSVG() {
+  return [[127, -1], [173, 1]].map(([cx, side]) => {
+    const o = (dx) => (cx + dx * side).toFixed(1); // dx > 0 means toward the outside
+    return `
+      <ellipse cx="${cx}" cy="497" rx="14" ry="3.2" fill="#000000" opacity="0.2" stroke="none"/>
+      <ellipse cx="${o(13)}" cy="497" rx="3.5" ry="1.5" fill="#000000" opacity="0.28" stroke="none"/>
+      <path d="M${o(8)},452 L${o(15.5)},451 L${o(13.6)},495 L${o(12.2)},495 Z" stroke-width="0.8"/>
+      <path d="M${o(12.1)},491 L${o(13.8)},491 L${o(13.6)},496 L${o(12.2)},496 Z" fill="#2b2b2b" stroke="none"/>
+      <path d="M${o(-12.5)},446 Q${o(-14.5)},462 ${o(-12)},475 Q${o(-10)},488 ${o(-3)},494 Q${cx},496.5 ${o(3)},494 Q${o(10)},488 ${o(12)},475 Q${o(14.5)},462 ${o(12.5)},446 Z" stroke-width="1"/>
+      <path d="M${o(-10.5)},445 L${o(10.5)},445 Q${o(9.5)},459 ${cx},467 Q${o(-9.5)},459 ${o(-10.5)},445 Z" style="fill:var(--skin, #f1c9a5)" stroke="none"/>
+      <path d="M${o(-2.5)},464 Q${cx},468 ${o(2.5)},464" fill="none" stroke="#000000" stroke-width="0.8" opacity="0.3"/>
+      <path d="M${o(-10.5)},445.5 Q${o(-9.5)},459 ${cx},467 Q${o(9.5)},459 ${o(10.5)},445.5" fill="none" stroke="#000000" stroke-width="1.3" opacity="0.4"/>
+      <path d="M${o(-9)},483 Q${o(-5)},493 ${cx},496 Q${o(5)},493 ${o(9)},483" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.28"/>
+      <path d="M${o(-7)},473 Q${o(-6)},485 ${o(-2)},490" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
+      <path d="M${o(-11.5)},452 Q${o(-12.5)},460 ${o(-11)},466" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.4"/>`;
+  }).join('');
+}
+
 const SHOE_STYLES = [
-  { id: 'heels', label: 'Heels', emoji: '👠',
-    svg: `<ellipse cx="127" cy="497" rx="9" ry="3" fill="#000000" opacity="0.22"/>
-          <path d="M123,449 L131,449 L128,495 L126,495 Z"/>
-          <path d="M113,428 Q127,420 141,428 Q145,440 141,452 Q136,462 127,464 Q118,462 113,452 Q109,440 113,428 Z"/>
-          <path d="M113,431 Q127,437 141,431 L141,436 Q127,442 113,436 Z" fill="#8a6247"/>
-          <circle cx="141" cy="433" r="2.6" fill="#8a6247"/>
-          <path d="M119,435 Q127,439 135,435" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.3"/>
-          <ellipse cx="173" cy="497" rx="9" ry="3" fill="#000000" opacity="0.22"/>
-          <path d="M169,449 L177,449 L174,495 L172,495 Z"/>
-          <path d="M159,428 Q173,420 187,428 Q191,440 187,452 Q182,462 173,464 Q164,462 159,452 Q155,440 159,428 Z"/>
-          <path d="M159,431 Q173,437 187,431 L187,436 Q173,442 159,436 Z" fill="#8a6247"/>
-          <circle cx="187" cy="433" r="2.6" fill="#8a6247"/>
-          <path d="M165,435 Q173,439 181,435" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.3"/>` },
+  { id: 'heels', label: 'Heels', emoji: '👠', svg: stilettoPumpsSVG() },
   { id: 'flats', label: 'Flats', emoji: '🥿',
     svg: `<ellipse cx="127" cy="454" rx="22" ry="6" fill="#000000" opacity="0.25"/>
           <ellipse cx="127" cy="447" rx="21" ry="10"/>
@@ -4690,9 +4698,9 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
     ${outfitDef.hidesLegs ? '' : posed ? `
       <clipPath id="shoeClipL${idSuffix}"><rect x="0" y="0" width="150" height="520"/></clipPath>
       <clipPath id="shoeClipR${idSuffix}"><rect x="150" y="0" width="150" height="520"/></clipPath>
-      <g class="pl-left"><g clip-path="url(#shoeClipL${idSuffix})" fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g></g>
-      <g class="pl-right"><g clip-path="url(#shoeClipR${idSuffix})" fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g></g>`
-      : `<g fill="url(#${shoeGrad})" stroke="${shoeDark}">${shoeDef.svg}</g>`}
+      <g class="pl-left"><g clip-path="url(#shoeClipL${idSuffix})" fill="url(#${shoeGrad})" stroke="${shoeDark}" style="--skin:url(#${skinGrad})">${shoeDef.svg}</g></g>
+      <g class="pl-right"><g clip-path="url(#shoeClipR${idSuffix})" fill="url(#${shoeGrad})" stroke="${shoeDark}" style="--skin:url(#${skinGrad})">${shoeDef.svg}</g></g>`
+      : `<g fill="url(#${shoeGrad})" stroke="${shoeDark}" style="--skin:url(#${skinGrad})">${shoeDef.svg}</g>`}
     ${piecesSVG(look, bt, idSuffix)}
     ${posed ? posedArmsSVG(skinGrad, look.nails) : ''}
     ${accSvg}
