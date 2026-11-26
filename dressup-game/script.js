@@ -1454,6 +1454,39 @@ const OUTFIT_STYLES = [
               <circle cx="${cx}" cy="${TORSO_Y.chest + 14}" r="19" fill="#ffffff" opacity="0.9"/>
               <text x="${cx}" y="${TORSO_Y.chest + 25}" font-size="26" text-anchor="middle">🦖</text>`;
     } },
+  { id: 'low-rise-jeans', label: 'Low-Rise Y2K Jeans', emoji: '👖', theme: 'y2k',
+    svg: (bt) => {
+      const cx = 150, h = bt.hipHalf + 6;
+      const leg = (d) => {
+        const outer = cx + d * h, inner = cx + d * 2;
+        return `<path d="M${outer},244 L${inner},244 L${inner},268 L${cx + d * 4},360 L${cx + d * 2},446 L${cx + d * (h + 20)},446 L${cx + d * (h + 3)},360 Z" fill="#9cc0ea" stroke="#6f97c8" stroke-width="1.4"/>
+          <path d="M${cx + d * (h - 4)},262 L${cx + d * (h + 12)},440" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 4" opacity="0.8"/>
+          <path d="M${cx + d * 8},330 Q${cx + d * 18},336 ${cx + d * 28},330" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.5"/>
+          <path d="M${cx + d * (h - 22)},282 l3,4 l-3,4 l-3,-4 Z" fill="#ffffff"/>`;
+      };
+      return `${leg(-1)}${leg(1)}
+              <rect x="${cx - h}" y="240" width="${h * 2}" height="9" fill="#86ade0" stroke="#6f97c8" stroke-width="1"/>
+              ${fittedTopSVG(bt, 244, null)}
+              <path d="M${cx - h + 2},252 Q${cx},266 ${cx + h - 2},252" fill="none" stroke="#d6dbe2" stroke-width="2.4" stroke-dasharray="4 2"/>
+              <path d="M${cx - 6},${TORSO_Y.chest + 2} l6,-8 l6,8 l-6,8 Z" fill="#ffffff" opacity="0.9"/>
+              <path d="M${cx - 12},${TORSO_Y.shoulder} Q${cx},${TORSO_Y.shoulder + 12} ${cx + 12},${TORSO_Y.shoulder}" fill="none" stroke="#ffffff" stroke-width="3"/>`;
+    } },
+  { id: 'striped-shirt', label: 'Striped Shirt & Jeans', emoji: '🦓',
+    svg: (bt) => {
+      const cx = 150, sY = TORSO_Y.shoulder;
+      let stripes = '';
+      for (let y = sY + 8; y < 246; y += 12) {
+        const half = torsoHalfAt(bt, Math.min(y + 3, 250)) + 4;
+        stripes += `<rect x="${cx - half}" y="${y}" width="${half * 2}" height="5" rx="1"/>`;
+      }
+      const sleeve = (d) => `<rect x="${cx + d * (bt.shoulderHalf + 2) - 10}" y="${sY + 4}" width="20" height="4" rx="1"/><rect x="${cx + d * (bt.shoulderHalf + 2) - 10}" y="${sY + 14}" width="20" height="4" rx="1"/>`;
+      return `${pantsSVG(bt, '#5b86c4', 432, 4)}
+              <line x1="133" y1="262" x2="128" y2="428" stroke="#3d6199" stroke-width="1"/><line x1="167" y1="262" x2="172" y2="428" stroke="#3d6199" stroke-width="1"/>
+              ${fittedTopSVG(bt, 250, '#ffffff')}
+              ${stripes}${sleeve(-1)}${sleeve(1)}
+              <path d="M${cx - 14},${sY} Q${cx},${sY + 12} ${cx + 14},${sY}" fill="none" stroke="#d6d6d6" stroke-width="2"/>
+              <rect x="${cx - bt.hipHalf - 2}" y="244" width="${(bt.hipHalf + 2) * 2}" height="6" fill="#3d6199"/>`;
+    } },
   { id: 'santa-dress', label: 'Santa Dress', emoji: '🎅', theme: 'christmas', fixedColor: true,
     svg: `<path d="M106,150 L194,150 L214,338 Q150,356 86,338 Z" fill="#c1272d"/>
           <path d="M92,320 L208,320 L214,338 Q150,356 86,338 Z" fill="#f5f5f5"/>
@@ -2139,6 +2172,31 @@ const ACCESSORIES = [
   { id: 'sweatband', label: 'Sports Headband', emoji: '🏃', color: '#ffffff',
     svg: `<path d="M103,70 Q150,52 197,70 L197,80 Q150,62 103,80 Z" stroke="#d6d6d6" stroke-width="1.2"/>
           <path d="M103,75 Q150,57 197,75" fill="none" stroke="#e05c5c" stroke-width="2.4"/>` },
+  { id: 'off-shoulder-jacket', label: 'Off-Shoulder Jacket', emoji: '🧥', color: '#ffb3d6',
+    svg: (bt) => {
+      const cx = 150, sY = TORSO_Y.shoulder;
+      const piece = (d) => {
+        const sh = bt.shoulderHalf, c = bt.chestHalf + 4, w = bt.waistHalf + 6, ax = bt.armSpread;
+        return `<path d="M${cx + d * (c - 10)},${sY + 26}
+                  Q${cx + d * (sh + 6)},${sY + 16} ${cx + d * (sh + 22 + ax * 0.4)},${sY + 32}
+                  L${cx + d * (sh + 30 + ax * 0.8)},${sY + 78}
+                  Q${cx + d * (sh + 14)},${sY + 88} ${cx + d * (w + 4)},${sY + 84}
+                  L${cx + d * (w - 2)},${sY + 40} Z" stroke="#e0789f" stroke-width="1.4"/>
+                <path d="M${cx + d * (c - 10)},${sY + 28} L${cx + d * (w - 2)},${sY + 40} L${cx + d * (w + 4)},${sY + 84}" fill="none" stroke="#ffd6e8" stroke-width="4" stroke-linejoin="round"/>
+                <path d="M${cx + d * (w + 4)},${sY + 82} Q${cx + d * (sh + 14)},${sY + 86} ${cx + d * (sh + 30 + ax * 0.8)},${sY + 76}" fill="none" stroke="#e0789f" stroke-width="5" stroke-linecap="round"/>
+                <rect x="${cx + d * (sh + 8) - 7}" y="${sY + 56}" width="14" height="10" rx="2" fill="#ff9fc7" stroke="#e0789f" stroke-width="1"/>
+                <path d="M${cx + d * (sh + 18 + ax * 0.6)},${sY + 40} L${cx + d * (sh + 28 + ax * 0.8)},${sY + 72}" stroke="#e0789f" stroke-width="1" stroke-dasharray="2 3"/>
+                ${[0, 1, 2, 3, 4].map((i) => {
+                  const t = i / 4;
+                  const x = cx + d * ((c - 10) + ((sh + 22 + ax * 0.4) - (c - 10)) * t);
+                  const y = sY + 26 - 4 * Math.sin(Math.PI * t) + 6 * t;
+                  return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.2" fill="#ffffff" stroke="none"/>`;
+                }).join('')}
+                <rect x="${cx + d * (w - 1) - (d < 0 ? 0 : 8)}" y="${sY + 60}" width="8" height="8" rx="2" fill="#ffffff" stroke="none" opacity="0.8"/>`;
+      };
+      return `${piece(-1)}${piece(1)}
+              <path d="M${cx - bt.waistHalf - 6},${sY + 84} Q${cx},${sY + 92} ${cx + bt.waistHalf + 6},${sY + 84}" fill="none" stroke="#ffffff" stroke-width="0"/>`;
+    } },
   { id: 'santa-hat', label: 'Santa Hat', emoji: '🎅', theme: 'christmas', color: '#c1272d',
     svg: `<path d="M108,58 C110,26 136,8 160,10 C186,12 206,36 214,72 C202,58 192,46 180,40 C186,46 190,52 192,58 Z" stroke="#8e1b20" stroke-width="1.2"/>
           <path d="M124,46 C128,30 142,20 158,18" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
@@ -2782,6 +2840,14 @@ const WARDROBE_PRESETS = [
     look: { bodyType: 'neutral', skin: SKIN_TONES[2], hair: { style: 'curly-top', color: '#4b2e1e' },
       outfit: { style: 'flannel-chinos', color: '#c0392b' }, shoes: { style: 'boots', color: '#8a5a2b' },
       accessories: { 'baseball-cap': false }, background: 'spring', face: { mouth: 'smile' } } },
+  { id: 'mall-day', label: 'Mall Day', theme: 'y2k',
+    look: { bodyType: 'feminine', skin: SKIN_TONES[1], hair: { style: 'half-up', color: '#4b2e1e', bangs: 'curtain' },
+      outfit: { style: 'low-rise-jeans', color: '#c9a6ff' }, shoes: { style: 'chunky-platforms', color: '#ffffff' },
+      accessories: { 'off-shoulder-jacket': true, 'tinted-shades': true }, background: 'bubblegum-chrome', face: { lashes: 'natural', lipColor: '#e0558f' } } },
+  { id: 'seaside-stripes', label: 'Seaside Stripes', theme: 'classic',
+    look: { bodyType: 'neutral', skin: SKIN_TONES[3], hair: { style: 'bob', color: '#2b2b2b', bangs: 'straight' },
+      outfit: { style: 'striped-shirt', color: '#2b4a8a' }, shoes: { style: 'flats', color: '#e05c5c' },
+      accessories: { beret: false }, background: 'spring', face: { mouth: 'grin' } } },
   { id: 'santas-helper', label: "Santa's Helper", theme: 'christmas',
     look: { bodyType: 'neutral', skin: SKIN_TONES[0], hair: { style: 'ponytail', color: '#8a5a2b' },
       outfit: { style: 'elf-costume', color: '#1e7a46' }, shoes: { style: 'boots', color: '#8a5a2b' },
@@ -3341,7 +3407,7 @@ function render() {
       backLayer.style.display = state.accessories[acc.id] ? '' : 'none';
     }
     if (state.accessories[acc.id]) {
-      layer.innerHTML = acc.svg;
+      layer.innerHTML = typeof acc.svg === 'function' ? acc.svg(bt) : acc.svg;
       layer.setAttribute('fill', acc.color);
       layer.setAttribute('stroke', acc.color);
       layer.style.display = '';
@@ -3845,7 +3911,7 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
   const rxHand = 207 + bt.armSpread;
 
   const accSvg = ACCESSORIES.filter((a) => look.accessories && look.accessories[a.id])
-    .map((a) => `<g fill="${a.color}" stroke="${a.color}">${a.svg}</g>`)
+    .map((a) => `<g fill="${a.color}" stroke="${a.color}">${typeof a.svg === 'function' ? a.svg(bt) : a.svg}</g>`)
     .join('');
   // Parts of accessories that sit behind the body (like a backpack).
   const accBehindSvg = ACCESSORIES.filter((a) => a.behindSvg && look.accessories && look.accessories[a.id])
