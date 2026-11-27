@@ -234,38 +234,57 @@ function spiderWebSVG(cx, cy, r) {
   return `<path d="${lines} ${rings}" fill="none" stroke="#ffffff" stroke-width="1" stroke-linejoin="round" opacity="0.85"/>`;
 }
 
-// Curly hair built from many small ringlets on a soft base (no big bubbles).
-// sideBottom: how far the side curls fall (0 = short curls around the head only).
-function curlyHairSVG(sideBottom) {
-  const ring = (x, y, r) => `M${(x - r).toFixed(1)},${y.toFixed(1)} a${r},${r} 0 1,0 ${r * 2},0 a${r},${r} 0 1,0 ${-r * 2},0`;
-  const curl = (x, y, r) => `<path d="M${(x - r * 0.55).toFixed(1)},${(y - r * 0.1).toFixed(1)} q${(r * 0.5).toFixed(1)},${(-r * 0.7).toFixed(1)} ${(r * 1).toFixed(1)},${(r * 0.15).toFixed(1)}" fill="none" stroke="#000000" stroke-width="0.9" opacity="0.25"/>`;
-  // crown ringlets around the top of the head
-  const crown = [];
-  for (let a = 192; a <= 348; a += 13) {
-    const t = a * Math.PI / 180;
-    crown.push([150 + 56 * Math.cos(t), 94 + 58 * Math.sin(t), 8.5]);
+// Youthful curly hair: a smooth crown with a side part, then loose, bouncy curls
+// lower down (not tight curls all over). bottom = where the curls end.
+function wavyEdge(x0, y0, y1, amp, step, dir) {
+  // a bumpy outer edge made of round curl bulges between y0 and y1
+  let d = '';
+  for (let y = y0; y < y1; y += step) {
+    const yn = Math.min(y1, y + step);
+    d += ` Q${(x0 + dir * amp).toFixed(1)},${((y + yn) / 2).toFixed(1)} ${x0},${yn}`;
   }
-  for (let a = 210; a <= 330; a += 20) {
-    const t = a * Math.PI / 180;
-    crown.push([150 + 40 * Math.cos(t), 92 + 46 * Math.sin(t), 7]);
-  }
-  const base = 'M94,100 Q90,36 150,34 Q210,36 206,100 Q198,72 176,62 Q150,54 124,62 Q102,72 94,100 Z';
-  let sides = '';
-  ['left', 'right'].forEach((side) => {
-    const mx = (x) => (side === 'left' ? x : 300 - x);
-    const bottom = sideBottom || 128;
-    const r = [];
-    for (let y = 98; y <= bottom; y += 13) {
-      r.push([mx(91 + ((y / 13) % 2) * 3), y, 8]);
-      r.push([mx(106 + ((y / 13) % 2) * 2), y + 6, 7]);
+  return d;
+}
+function curlyHairSVG(bottom, withBack) {
+  const sides = ['left', 'right'].map((side) => {
+    const m = (x) => (side === 'left' ? x : 300 - x);
+    const dir = side === 'left' ? -1 : 1;
+    // outer edge bulges outward in curl-sized bumps; inner edge frames the face
+    const outer = wavyEdge(m(92), 100, bottom, 9 * dir * (side === 'left' ? 1 : -1) * -1, 18, 1).replace(/Q([\d.]+)/g, (q, x) => `Q${(+x).toFixed(1)}`);
+    let d = `M${m(104)},80 Q${m(92)},86 ${m(92)},100`;
+    for (let y = 100; y < bottom; y += 18) {
+      const yn = Math.min(bottom, y + 18);
+      d += ` Q${m(83)},${(y + yn) / 2} ${m(92)},${yn}`;
     }
-    if (sideBottom) for (let x = 90; x <= 116; x += 9) r.push([mx(x), bottom + 6, 7]);
-    const curtain = sideBottom ? `M${mx(98)},84 L${mx(116)},92 L${mx(114)},${bottom} L${mx(90)},${bottom} L${mx(88)},96 Z` : `M${mx(96)},86 L${mx(112)},92 L${mx(110)},${bottom} L${mx(90)},${bottom} Z`;
-    sides += `<g class="hair-sway hair-sway-${side}"><path stroke="none" d="${curtain}"/><path stroke="none" d="${r.map((c) => ring(...c)).join(' ')}"/>${r.map((c) => curl(...c)).join('')}</g>`;
-  });
-  return `${sides}
-    <path stroke="none" d="${base}"/><path stroke="none" d="${crown.map((c) => ring(...c)).join(' ')}"/>
-    ${crown.map((c) => curl(...c)).join('')}`;
+    const bx = [m(92), m(102), m(112), m(121)];
+    d += ` Q${m(97)},${bottom + 10} ${bx[1]},${bottom + 2} Q${m(107)},${bottom + 11} ${bx[2]},${bottom + 1} Q${m(118)},${bottom + 9} ${bx[3]},${bottom - 4}`;
+    for (let y = bottom - 4; y > 104; y -= 20) {
+      const yn = Math.max(104, y - 20);
+      d += ` Q${m(126)},${(y + yn) / 2} ${m(119)},${yn}`;
+    }
+    d += ` Q${m(116)},92 ${m(104)},80 Z`;
+    // loose spiral curl strokes
+    const spirals = [];
+    for (let y = 118; y < bottom - 6; y += 22) {
+      const x = m(105 + ((y / 22) % 2) * 3);
+      spirals.push(`<path d="M${x - 6 * -dir},${y} q${4 * -dir},-7 ${9 * -dir},-1 q${4 * -dir},6 ${-1 * -dir},10 q${-5 * -dir},4 ${-9 * -dir},-1" fill="none" stroke="#000000" stroke-width="1.1" opacity="0.22" stroke-linecap="round"/>`);
+      spirals.push(`<path d="M${x - 4 * -dir},${y - 3} q${3 * -dir},-4 ${6 * -dir},-1" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.25" stroke-linecap="round"/>`);
+    }
+    return `<g class="hair-sway hair-sway-${side}"><path d="${d}"/>${spirals.join('')}</g>`;
+  }).join('');
+  const crown = `<path d="M96,104 Q92,36 150,34 Q208,36 204,104 Q196,74 172,62 Q152,54 134,58 Q114,64 104,82 Q100,92 96,104 Z"/>
+    <path d="M134,37 Q133,48 134,58" stroke="#000000" stroke-width="1" opacity="0.25" fill="none"/>
+    <path d="M134,58 Q118,66 112,86 Q108,100 112,110 Q101,100 100,88 Q104,70 134,58 Z"/>
+    <path d="M140,46 Q160,44 182,56" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.28"/>`;
+  return sides + crown;
+}
+function curlyBackSVG(bottom) {
+  let d = 'M94,96 Q90,34 150,32 Q210,34 206,96';
+  for (let y = 96; y < bottom; y += 20) d += ` Q${y > 120 ? 218 : 210},${y + 10} 208,${Math.min(bottom, y + 20)}`;
+  for (let x = 208; x > 92; x -= 19) d += ` Q${x - 9.5},${bottom + 12} ${Math.max(92, x - 19)},${bottom}`;
+  for (let y = bottom; y > 96; y -= 20) d += ` Q${y > 120 ? 82 : 90},${y - 10} 92,${Math.max(96, y - 20)}`;
+  d += ' Z';
+  return `<path d="${d}"/><path d="${d}" fill="#000000" opacity="0.16" stroke="none"/>`;
 }
 
 const HAIR_STYLES = [
@@ -285,10 +304,12 @@ const HAIR_STYLES = [
           <path d="M110,64 Q127,52 146,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
           <path d="M100,110 Q103,160 98,200" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.18"/>` },
   { id: 'curly', label: 'Curly', emoji: '✨',
-    // Long curls: a soft curly mass made of many small ringlets, falling past the shoulders (with sway).
-    svg: curlyHairSVG(252) },
+    // Long, loose, bouncy curls past the shoulders with a smooth top (and gentle sway).
+    backSvg: curlyBackSVG(240),
+    svg: curlyHairSVG(236) },
   { id: 'short-curly', label: 'Short Curls', emoji: '🌀',
-    svg: curlyHairSVG(0) },
+    backSvg: curlyBackSVG(146),
+    svg: curlyHairSVG(142) },
   { id: 'ponytail', label: 'Ponytail', emoji: '🎀',
     svg: `<path d="M198,70 q34,10 26,90 q-4,26 -26,30 q14,-40 4,-70 q-6,-24 -4,-50 Z"/>
           <path d="M100,98 Q96,40 150,38 Q204,40 200,98 Q198,78 184,66 Q150,52 116,66 Q102,78 100,98 Z"/>
@@ -3475,10 +3496,10 @@ const LASH_STYLES = [
 
 // Upper-lid size for each eye shape, so lashes sit right on the lid.
 const EYE_LID = {
-  round: { cy: 90, rx: 8, ry: 5.8 },
-  almond: { cy: 90, rx: 8.6, ry: 4.8 },
-  sleepy: { cy: 91, rx: 7.6, ry: 3.4 },
-  wide: { cy: 89.5, rx: 8.6, ry: 6.8 },
+  round: { cy: 90, rx: 8.6, ry: 6.8 },
+  almond: { cy: 90, rx: 9, ry: 5.6 },
+  sleepy: { cy: 91, rx: 8, ry: 3.8 },
+  wide: { cy: 89.5, rx: 9, ry: 7.8 },
   closed: { cy: 91, rx: 7.5, ry: 2.6 },
 };
 
@@ -3609,9 +3630,9 @@ function lipsSVG(face) {
   const y0 = neutral ? 110 : 108.5, dip = neutral ? 1 : 5;
   const finish = face.lipFinish || (face.gloss ? 'gloss' : 'satin');
   let s = `<path d="M136,${y0} Q141,${y0 - 3} 146.5,${y0 - 2.2} Q150,${y0 - 0.8} 153.5,${y0 - 2.2} Q159,${y0 - 3} 164,${y0} Q150,${y0 + dip} 136,${y0} Z" fill="${d}"/>
-    <path d="M136,${y0} Q150,${y0 + dip} 164,${y0} Q159,${y0 + dip / 2 + 4.6} 150,${y0 + dip / 2 + 4.8} Q141,${y0 + dip / 2 + 4.6} 136,${y0} Z" fill="${c}"/>
+    <path d="M136,${y0} Q150,${y0 + dip} 164,${y0} Q159,${y0 + dip / 2 + 5.6} 150,${y0 + dip / 2 + 5.8} Q141,${y0 + dip / 2 + 5.6} 136,${y0} Z" fill="${c}"/>
     <path d="M136,${y0} Q150,${y0 + dip} 164,${y0}" fill="none" stroke="${darken(c, 0.5)}" stroke-width="0.9" opacity="0.7" stroke-linecap="round"/>
-    <circle cx="135.5" cy="${y0 - 0.2}" r="0.8" fill="#7a4a2e" opacity="0.25"/><circle cx="164.5" cy="${y0 - 0.2}" r="0.8" fill="#7a4a2e" opacity="0.25"/>`;
+`;
   const ly = y0 + dip / 2 + 2.6;
   if (finish === 'satin') s += `<ellipse cx="150" cy="${ly}" rx="4.5" ry="1.2" fill="${l}" opacity="0.45"/>`;
   if (finish === 'gloss') s += `<ellipse cx="150" cy="${ly}" rx="4.5" ry="1.4" fill="#ffffff" opacity="0.85"/><ellipse cx="143" cy="${y0 - 1.4}" rx="1.8" ry="0.7" fill="#ffffff" opacity="0.6"/>`;
@@ -3666,14 +3687,14 @@ const DEFAULT_FACE = {
   eyeColor: '#3b2417',
   eyebrowShape: 'soft',
   mouth: 'smile',
-  lipColor: '#c9707d',
+  lipColor: '#e07a8a',
   blush: true,
   freckles: false,
   shadowStyle: 'soft',
   liner: 'none',
   linerColor: '#1a1a1a',
   lipShape: 'full',
-  lipFinish: 'satin',
+  lipFinish: 'gloss',
   highlight: null,
   contour: false,
   gems: false,
@@ -3684,20 +3705,18 @@ const DEFAULT_FACE = {
 function eyeShapeSVG(shape, cx, side, color) {
   if (shape === 'closed') {
     return `<path d="M${cx - 8},89.5 Q${cx},95.5 ${cx + 8},89.5" fill="none" stroke="#2b1c14" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M${cx - 6},85.5 Q${cx},82.5 ${cx + 6.5},85" fill="none" stroke="#7a4a2e" stroke-width="0.9" opacity="0.25" stroke-linecap="round"/>`;
+`;
   }
   const lid = EYE_LID[shape] || EYE_LID.round;
   const { cy, rx: w, ry: up } = lid;
   const dn = up * 0.72;
   const inner = cx - side * w, outer = cx + side * w;
   const oy = cy - 0.7; // outer corner tilts up a little
-  const irisR = Math.min(4.3, up * 0.78 + 0.6);
+  const irisR = Math.min(5, up * 0.72 + 0.9);
   const iy = cy - up * 0.12;
   const eyePath = `M${inner},${cy} Q${cx},${cy - 2 * up} ${outer},${oy} Q${cx},${cy + 2 * dn} ${inner},${cy} Z`;
   const heavy = shape === 'sleepy';
   return `<path d="${eyePath}" fill="#ffffff"/>
-          <path d="${eyePath}" fill="#c9b8b0" opacity="0.25"/>
-          <path d="M${inner},${cy} Q${cx},${cy - 2 * up + 1.2} ${outer},${oy} L${outer},${oy + 1.4} Q${cx},${cy - 2 * up + 4} ${inner},${cy + 0.6} Z" fill="#ffffff"/>
           <circle cx="${cx}" cy="${iy}" r="${irisR}" fill="${color}"/>
           <circle cx="${cx}" cy="${iy + irisR * 0.35}" r="${irisR * 0.6}" fill="${lighten(color, 0.3)}" opacity="0.55"/>
           <circle cx="${cx}" cy="${iy}" r="${irisR}" fill="none" stroke="${darken(color, 0.45)}" stroke-width="0.8"/>
@@ -3706,8 +3725,7 @@ function eyeShapeSVG(shape, cx, side, color) {
           <circle cx="${cx + irisR * 0.35}" cy="${iy + irisR * 0.3}" r="${irisR * 0.13}" fill="#ffffff" opacity="0.9"/>
           ${heavy ? `<path d="M${inner},${cy} Q${cx},${cy - 2 * up} ${outer},${oy} L${outer},${oy - 0.5} Q${cx},${cy - 2 * up - 3} ${inner},${cy - 0.6} Z" fill="#7a4a2e" opacity="0.25"/>` : ''}
           <path d="M${inner - side * 0.6},${cy + 0.3} Q${cx},${cy - 2 * up} ${outer + side * 0.6},${oy - 0.3}" fill="none" stroke="#2b1c14" stroke-width="1.7" stroke-linecap="round"/>
-          <path d="M${inner + side * 1.5},${cy + 0.8} Q${cx},${cy + 2 * dn + 0.6} ${outer - side * 0.5},${oy + 0.7}" fill="none" stroke="#7a4a2e" stroke-width="0.7" opacity="0.35" stroke-linecap="round"/>
-          <path d="M${inner + side * 1},${cy - up - 1.6} Q${cx},${cy - 2 * up - 3.6} ${outer - side * 0.2},${oy - up - 1.2}" fill="none" stroke="#7a4a2e" stroke-width="0.8" opacity="0.22" stroke-linecap="round"/>`;
+`;
 }
 
 // Natural eyebrows: thicker at the inner end, tapering to a thin tail.
@@ -3717,7 +3735,7 @@ function eyebrowSVG(shape, cx, color) {
   const cfg = { soft: { th: 2.6, arch: 5.5, y: 79.5 }, straight: { th: 2.4, arch: 2.5, y: 78.5 }, thick: { th: 3.8, arch: 5, y: 79.5 } }[shape] || { th: 2.6, arch: 5.5, y: 79.5 };
   const { th, arch, y } = cfg;
   const peakX = cx - d * 3;
-  return `<path d="M${inX},${y + 0.6} Q${peakX},${y - arch} ${tailX},${y - 0.4} Q${peakX},${y - arch - th * 0.55} ${inX - d * 0.5},${y - th + 0.6} Q${inX + d * 0.8},${y - th * 0.4} ${inX},${y + 0.6} Z" fill="${color}"/>
+  return `<path d="M${inX},${y + 0.6} Q${peakX},${y - arch} ${tailX},${y - 0.4} Q${peakX},${y - arch - th * 0.55} ${inX - d * 0.5},${y - th + 0.6} Q${inX + d * 0.8},${y - th * 0.4} ${inX},${y + 0.6} Z" fill="${color}" opacity="0.85"/>
           <path d="M${inX - d * 1},${y - 0.4} Q${peakX},${y - arch - 0.6} ${tailX + d * 2},${y - 0.8}" fill="none" stroke="${lighten(color, 0.25)}" stroke-width="0.5" opacity="0.6"/>`;
 }
 
@@ -3747,11 +3765,9 @@ function buildFaceSVG(face, hairColor) {
     ${face.blush ? [130, 170].map((x) => [[11, 7.5, 0.14], [8.5, 5.8, 0.17], [6, 4, 0.2]].map(([rx, ry, o]) => `<ellipse cx="${x}" cy="104" rx="${rx}" ry="${ry}" fill="${face.blushColor || '#ff8fa3'}" opacity="${o}"/>`).join('')).join('') : ''}
     ${makeupUnderSVG(face)}
     ${face.freckles ? frecklesSVG() : ''}
-    <path d="M147.6,84 Q146.6,92 146.4,97.5" fill="none" stroke="#7a4a2e" stroke-width="1.5" opacity="0.12" stroke-linecap="round"/>
-    <ellipse cx="150" cy="99.6" rx="3.4" ry="2.4" fill="#7a4a2e" opacity="0.08"/>
-    <path d="M146,98.8 Q144.8,101.4 147.6,101.9 M154,98.8 Q155.2,101.4 152.4,101.9" fill="none" stroke="#7a4a2e" stroke-width="1" opacity="0.45" stroke-linecap="round"/>
-    <path d="M148.2,102.2 Q150,103 151.8,102.2" fill="none" stroke="#7a4a2e" stroke-width="0.9" opacity="0.3" stroke-linecap="round"/>
-    <ellipse cx="150.6" cy="98.6" rx="1.2" ry="0.8" fill="#ffffff" opacity="0.4"/>
+    <ellipse cx="150" cy="100.4" rx="3.6" ry="2.2" fill="#c97a5a" opacity="0.16"/>
+    <path d="M147.4,101 Q150,102.6 152.6,101" fill="none" stroke="#a0603e" stroke-width="0.9" opacity="0.35" stroke-linecap="round"/>
+    <ellipse cx="150.8" cy="99.2" rx="1.3" ry="0.9" fill="#ffffff" opacity="0.45"/>
     ${eyeShapeSVG(face.eyeShape, 132, -1, face.eyeColor)}
     ${eyeShapeSVG(face.eyeShape, 168, 1, face.eyeColor)}
     ${linerSVG(face, 132, -1)}
