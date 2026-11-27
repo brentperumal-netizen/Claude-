@@ -77,9 +77,10 @@ const legPath = (x1, y1, x2, y2, rU, rL, grow = 0) => limbPath(x1, y1, x2, y2, r
 const armPath = (x1, y1, x2, y2, rU, rL, grow = 0) => limbPath(x1, y1, x2, y2, rU, rL, ARM_PROFILE, grow);
 
 // A face with a soft jaw and chin, and a neck that flows into the shoulders.
-const HEAD_PATH = 'M102,93 A48,48 0 0 1 198,93 C198,117 188,134 172,141 Q150,149 128,141 C112,134 102,117 102,93 Z';
-const NECK_PATH = 'M139,126 L161,126 Q161,145 166,152 Q172,156 180,158 L120,158 Q128,156 134,152 Q139,145 139,126 Z';
-const BODY_DETAILS = `<path d="M150,136 Q150,145 150,150" fill="none" stroke="rgba(40,28,20,0.08)" stroke-width="2" stroke-linecap="round"/>
+const HEAD_PATH = 'M102,93 A48,48 0 0 1 198,93 C198,116 188,131 172,137 Q150,144 128,137 C112,131 102,116 102,93 Z';
+const NECK_PATH = 'M139,124 L161,124 L163.5,152 Q150,155 136.5,152 Z';
+const NECK_SIDES = 'M139,124 Q138.6,140 137.4,149 M161,124 Q161.4,140 162.6,149';
+const BODY_DETAILS = `<path d="M145,146 Q150,149 155,146" fill="none" stroke="rgba(40,28,20,0.1)" stroke-width="1.4" stroke-linecap="round"/>
   <path d="M131,160 Q140,157 147,161 M169,160 Q160,157 153,161" fill="none" stroke="rgba(40,28,20,0.16)" stroke-width="1.3" stroke-linecap="round"/>`;
 function jointLinesSVG(lx, rx) {
   // Soft hints of knees and elbows.
@@ -91,6 +92,28 @@ const TORSO_Y = { shoulder: 148, chest: 175, waist: 206, hip: 250 };
 
 // Builds a curved torso silhouette (shoulder -> chest -> waist -> hip) from a body
 // profile's half-widths, so the torso reads as a real body shape instead of a block.
+// The skin torso: like bodyTorsoPath, but the top slopes from rounded shoulders up to
+// the base of the neck (trapezius), so there are no square corners.
+function skinTorsoPath(bt) {
+  const cx = 150;
+  const { shoulder: sY, chest: bY, waist: wY, hip: hY } = TORSO_Y;
+  const s = bt.shoulderHalf, c = bt.chestHalf, w = bt.waistHalf, h = bt.hipHalf, nk = 13;
+  return `M${cx - nk},${sY + 1}
+    Q${cx - nk - 5},${sY + 3} ${cx - s + 9},${sY + 4}
+    Q${cx - s},${sY + 5} ${cx - s},${sY + 12}
+    C${cx - s},${sY + 20} ${cx - c},${bY - 6} ${cx - c},${bY}
+    C${cx - c},${bY + 16} ${cx - w},${wY - 14} ${cx - w},${wY}
+    C${cx - w},${wY + 16} ${cx - h},${hY - 18} ${cx - h},${hY}
+    L${cx + h},${hY}
+    C${cx + h},${hY - 18} ${cx + w},${wY + 16} ${cx + w},${wY}
+    C${cx + w},${wY - 14} ${cx + c},${bY + 16} ${cx + c},${bY}
+    C${cx + c},${bY - 6} ${cx + s},${sY + 20} ${cx + s},${sY + 12}
+    Q${cx + s},${sY + 5} ${cx + s - 9},${sY + 4}
+    Q${cx + nk + 5},${sY + 3} ${cx + nk},${sY + 1}
+    Q${cx},${sY + 4} ${cx - nk},${sY + 1}
+    Z`;
+}
+
 function bodyTorsoPath(bt, pad = 0) {
   const cx = 150;
   const { shoulder: sY, chest: bY, waist: wY, hip: hY } = TORSO_Y;
@@ -4507,7 +4530,7 @@ wireTabs('right-tabs', 'right-panels');
 function applyBodyGeometry(root, bodyTypeId) {
   const bt = BODY_TYPES.find((b) => b.id === bodyTypeId);
   const torso = root.querySelector('#torso, .p-torso');
-  if (torso) torso.setAttribute('d', bodyTorsoPath(bt));
+  if (torso) torso.setAttribute('d', skinTorsoPath(bt));
 
   const armLeft = root.querySelector('#arm-left, .p-arm-left');
   const armRight = root.querySelector('#arm-right, .p-arm-right');
@@ -5325,8 +5348,9 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
       <line x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
       </g>
       `}
-      <path d="${bodyTorsoPath(bt)}" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
-      <path d="${NECK_PATH}" stroke="rgba(40,28,20,0.18)" stroke-width="1.5"/>
+      <path d="${skinTorsoPath(bt)}" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
+      <path d="${NECK_PATH}"/>
+      <path d="${NECK_SIDES}" fill="none" stroke="rgba(40,28,20,0.22)" stroke-width="1.5" stroke-linecap="round"/>
       ${BODY_DETAILS}
       ${posed ? '' : jointLinesSVG(lx, rxHand)}
       <ellipse cx="104" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"/>
