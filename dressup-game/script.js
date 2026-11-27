@@ -3689,7 +3689,7 @@ function makeupOverSVG(face) {
   let out = highlightSVG(face);
   if (face.gems) out += faceGemsSVG();
   if (face.gloss && face.mouth !== 'surprised' && !(face.lipShape === 'full' && (face.mouth === 'smile' || face.mouth === 'neutral'))) {
-    out += `<ellipse cx="143" cy="${face.mouth === 'neutral' ? 115 : 117}" rx="4" ry="1.4" fill="#ffffff" opacity="0.75"/>`;
+    out += `<ellipse cx="143" cy="${face.mouth === 'neutral' ? 125 : 127}" rx="4" ry="1.4" fill="#ffffff" opacity="0.75"/>`;
   }
   if (face.glitter) {
     out += [[124, 99], [128, 106], [176, 99], [172, 106], [126, 82], [174, 82]].map(([x, y]) =>
@@ -3803,7 +3803,7 @@ function buildFaceSVG(face, hairColor) {
     ${lashesSVG(face.lashes, face.eyeShape, 168, 1)}
     ${eyebrowSVG(face.eyebrowShape, 132, hairColor)}
     ${eyebrowSVG(face.eyebrowShape, 168, hairColor)}
-    <g transform="translate(0,1)">${face.lipShape === 'full' && (face.mouth === 'smile' || face.mouth === 'neutral') ? lipsSVG(face) : mouthSVG(face.mouth, face.lipColor)}</g>
+    <g transform="translate(0,14)">${face.lipShape === 'full' && (face.mouth === 'smile' || face.mouth === 'neutral') ? lipsSVG(face) : mouthSVG(face.mouth, face.lipColor)}</g>
     ${makeupOverSVG(face)}
   `;
 }
