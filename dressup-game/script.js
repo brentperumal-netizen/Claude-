@@ -327,13 +327,17 @@ const HAIR_STYLES = [
           </g>` },
   { id: 'none', label: 'Bald', emoji: '⚪', svg: `` },
   { id: 'bun', label: 'Top Bun', emoji: '🍩',
-    svg: `<circle cx="150" cy="30" r="21"/>
-          <path d="M140,22 Q148,14 158,18" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>
-          <path d="M98,80 A58,58 0 0 1 202,80 Z"/>
-          <rect x="98" y="80" width="14" height="28" rx="7"/>
-          <rect x="188" y="80" width="14" height="28" rx="7"/>
-          <rect x="134" y="44" width="32" height="7" rx="3.5" fill="#2b2b2b" stroke="none" opacity="0.55"/>
-          <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
+    // Hair brushed up into a cute round top bun with a twist and a scrunchie.
+    svg: `<path d="M100,102 Q96,40 150,38 Q204,40 200,102 Q198,80 186,68 Q168,58 150,58 Q132,58 114,68 Q102,80 100,102 Z"/>
+          <path d="M116,66 Q132,50 144,44 M108,80 Q126,56 142,46 M184,66 Q168,50 156,44 M192,80 Q174,56 158,46" fill="none" stroke="#000000" stroke-width="0.8" opacity="0.16"/>
+          <path d="M122,58 Q134,48 144,44" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity="0.3"/>
+          <path d="M102,88 q-3,8 1,15 M198,88 q3,8 -1,15" fill="none" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+          <circle cx="150" cy="24" r="19"/>
+          <path d="M136,26 Q140,10 156,10 Q168,12 166,26 Q164,36 150,36 Q140,34 142,24 Q146,16 156,18 Q162,22 158,28" fill="none" stroke="#000000" stroke-width="1" opacity="0.22" stroke-linecap="round"/>
+          <path d="M140,14 Q148,8 158,10" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity="0.3"/>
+          <path d="M167,18 q8,-2 8,6 M134,16 q-6,-4 -9,2" fill="none" stroke-width="1.1" stroke-linecap="round" opacity="0.8"/>
+          <ellipse cx="150" cy="42" rx="15" ry="5.5" fill="#e0558f" stroke="#b83c6f" stroke-width="1"/>
+          <path d="M138,40 q3,4 6,0 M146,40 q4,4 8,0 M156,40 q3,4 6,0" fill="none" stroke="#b83c6f" stroke-width="0.8"/>` },
   { id: 'half-up', label: 'Half Up', emoji: '🎀',
     // The top section brushed back into a little bun with a bow; the rest falls long and straight.
     backSvg: `<path d="M94,92 Q90,36 150,33 Q210,36 206,92 L210,248 Q150,256 90,248 Z"/>
@@ -3519,10 +3523,10 @@ const LASH_STYLES = [
 
 // Upper-lid size for each eye shape, so lashes sit right on the lid.
 const EYE_LID = {
-  round: { cy: 90, rx: 8.6, ry: 6.8 },
-  almond: { cy: 90, rx: 9, ry: 5.6 },
-  sleepy: { cy: 91, rx: 8, ry: 3.8 },
-  wide: { cy: 89.5, rx: 9, ry: 7.8 },
+  round: { cy: 91, rx: 9.4, ry: 7.8 },
+  almond: { cy: 91, rx: 9.8, ry: 6.4 },
+  sleepy: { cy: 92, rx: 8.8, ry: 4.2 },
+  wide: { cy: 90.5, rx: 9.8, ry: 8.8 },
   closed: { cy: 91, rx: 7.5, ry: 2.6 },
 };
 
@@ -3648,17 +3652,17 @@ function linerSVG(face, cx, side) {
 
 // Realistic full lips with a cupid's bow, in different finishes.
 function lipsSVG(face) {
-  const c = face.lipColor || '#c9707d', d = darken(c, 0.3), l = lighten(c, 0.35);
+  const c = face.lipColor || '#c9707d', d = darken(c, 0.1), l = lighten(c, 0.35);
   const neutral = face.mouth === 'neutral';
-  const y0 = neutral ? 110 : 108.5, dip = neutral ? 1 : 5;
+  const y0 = neutral ? 108.5 : 107, dip = neutral ? 1 : 4;
   const finish = face.lipFinish || (face.gloss ? 'gloss' : 'satin');
-  let s = `<path d="M136,${y0} Q141,${y0 - 3} 146.5,${y0 - 2.2} Q150,${y0 - 0.8} 153.5,${y0 - 2.2} Q159,${y0 - 3} 164,${y0} Q150,${y0 + dip} 136,${y0} Z" fill="${d}"/>
-    <path d="M136,${y0} Q150,${y0 + dip} 164,${y0} Q159,${y0 + dip / 2 + 5.6} 150,${y0 + dip / 2 + 5.8} Q141,${y0 + dip / 2 + 5.6} 136,${y0} Z" fill="${c}"/>
-    <path d="M136,${y0} Q150,${y0 + dip} 164,${y0}" fill="none" stroke="${darken(c, 0.5)}" stroke-width="0.9" opacity="0.7" stroke-linecap="round"/>
+  let s = `<path d="M139,${y0} Q143,${y0 - 2.4} 147,${y0 - 1.8} Q150,${y0 - 0.6} 153,${y0 - 1.8} Q157,${y0 - 2.4} 161,${y0} Q150,${y0 + dip} 139,${y0} Z" fill="${d}"/>
+    <path d="M139,${y0} Q150,${y0 + dip} 161,${y0} Q157,${y0 + dip / 2 + 4.2} 150,${y0 + dip / 2 + 4.4} Q143,${y0 + dip / 2 + 4.2} 139,${y0} Z" fill="${c}"/>
+    <path d="M139,${y0} Q150,${y0 + dip} 161,${y0}" fill="none" stroke="${darken(c, 0.4)}" stroke-width="0.8" opacity="0.6" stroke-linecap="round"/>
 `;
-  const ly = y0 + dip / 2 + 2.6;
-  if (finish === 'satin') s += `<ellipse cx="150" cy="${ly}" rx="4.5" ry="1.2" fill="${l}" opacity="0.45"/>`;
-  if (finish === 'gloss') s += `<ellipse cx="150" cy="${ly}" rx="4.5" ry="1.4" fill="#ffffff" opacity="0.85"/><ellipse cx="143" cy="${y0 - 1.4}" rx="1.8" ry="0.7" fill="#ffffff" opacity="0.6"/>`;
+  const ly = y0 + dip / 2 + 2.2;
+  if (finish === 'satin') s += `<ellipse cx="150" cy="${ly}" rx="3.6" ry="1" fill="${l}" opacity="0.45"/>`;
+  if (finish === 'gloss') s += `<ellipse cx="150" cy="${ly}" rx="3.4" ry="1.1" fill="#ffffff" opacity="0.7"/>`;
   if (finish === 'shimmer') s += [[-8, 3], [-3, 4.5], [3, 4], [8, 2.5], [-5, -1], [5, -1]].map(([x, y]) => `<circle cx="${150 + x}" cy="${y0 + y + (y > 0 ? dip / 2 : 0)}" r="0.7" fill="#ffffff" opacity="0.95"/>`).join('');
   return s;
 }
@@ -3710,14 +3714,14 @@ const DEFAULT_FACE = {
   eyeColor: '#3b2417',
   eyebrowShape: 'soft',
   mouth: 'smile',
-  lipColor: '#e07a8a',
+  lipColor: '#ec8d9c',
   blush: true,
   freckles: false,
   shadowStyle: 'soft',
   liner: 'none',
   linerColor: '#1a1a1a',
   lipShape: 'full',
-  lipFinish: 'gloss',
+  lipFinish: 'satin',
   highlight: null,
   contour: false,
   gems: false,
@@ -3735,7 +3739,7 @@ function eyeShapeSVG(shape, cx, side, color) {
   const dn = up * 0.72;
   const inner = cx - side * w, outer = cx + side * w;
   const oy = cy - 0.7; // outer corner tilts up a little
-  const irisR = Math.min(5, up * 0.72 + 0.9);
+  const irisR = Math.min(5.8, up * 0.7 + 1.1);
   const iy = cy - up * 0.12;
   const eyePath = `M${inner},${cy} Q${cx},${cy - 2 * up} ${outer},${oy} Q${cx},${cy + 2 * dn} ${inner},${cy} Z`;
   const heavy = shape === 'sleepy';
@@ -3747,7 +3751,7 @@ function eyeShapeSVG(shape, cx, side, color) {
           <circle cx="${cx - irisR * 0.38}" cy="${iy - irisR * 0.38}" r="${irisR * 0.27}" fill="#ffffff"/>
           <circle cx="${cx + irisR * 0.35}" cy="${iy + irisR * 0.3}" r="${irisR * 0.13}" fill="#ffffff" opacity="0.9"/>
           ${heavy ? `<path d="M${inner},${cy} Q${cx},${cy - 2 * up} ${outer},${oy} L${outer},${oy - 0.5} Q${cx},${cy - 2 * up - 3} ${inner},${cy - 0.6} Z" fill="#7a4a2e" opacity="0.25"/>` : ''}
-          <path d="M${inner - side * 0.6},${cy + 0.3} Q${cx},${cy - 2 * up} ${outer + side * 0.6},${oy - 0.3}" fill="none" stroke="#2b1c14" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M${inner - side * 0.4},${cy + 0.2} Q${cx},${cy - 2 * up} ${outer + side * 0.6},${oy - 0.3}" fill="none" stroke="#3a2418" stroke-width="1.3" stroke-linecap="round"/>
 `;
 }
 
@@ -3755,7 +3759,7 @@ function eyeShapeSVG(shape, cx, side, color) {
 function eyebrowSVG(shape, cx, color) {
   const d = cx < 150 ? 1 : -1; // direction toward the nose
   const inX = cx + d * 8.5, tailX = cx - d * 10.5;
-  const cfg = { soft: { th: 2.6, arch: 5.5, y: 79.5 }, straight: { th: 2.4, arch: 2.5, y: 78.5 }, thick: { th: 3.8, arch: 5, y: 79.5 } }[shape] || { th: 2.6, arch: 5.5, y: 79.5 };
+  const cfg = { soft: { th: 2.2, arch: 5, y: 79 }, straight: { th: 2, arch: 2.2, y: 78 }, thick: { th: 3.4, arch: 4.6, y: 79 } }[shape] || { th: 2.2, arch: 5, y: 79 };
   const { th, arch, y } = cfg;
   const peakX = cx - d * 3;
   return `<path d="M${inX},${y + 0.6} Q${peakX},${y - arch} ${tailX},${y - 0.4} Q${peakX},${y - arch - th * 0.55} ${inX - d * 0.5},${y - th + 0.6} Q${inX + d * 0.8},${y - th * 0.4} ${inX},${y + 0.6} Z" fill="${color}" opacity="0.85"/>
@@ -3771,7 +3775,7 @@ function mouthSVG(shape, lipColor) {
   }
   if (shape === 'neutral') return `<line x1="132" y1="112" x2="168" y2="112" stroke="${lipColor}" stroke-width="3" stroke-linecap="round"/>`;
   if (shape === 'surprised') return `<ellipse cx="150" cy="114" rx="6" ry="8" fill="#7a2f36" stroke="${lipColor}" stroke-width="2.5"/>`;
-  return `<path d="M133,109 Q150,118 167,109" fill="none" stroke="${lipColor}" stroke-width="3" stroke-linecap="round"/>`;
+  return `<path d="M138,108 Q150,115 162,108" fill="none" stroke="${lipColor}" stroke-width="2.6" stroke-linecap="round"/>`;
 }
 
 function frecklesSVG() {
@@ -3799,7 +3803,7 @@ function buildFaceSVG(face, hairColor) {
     ${lashesSVG(face.lashes, face.eyeShape, 168, 1)}
     ${eyebrowSVG(face.eyebrowShape, 132, hairColor)}
     ${eyebrowSVG(face.eyebrowShape, 168, hairColor)}
-    <g transform="translate(0,4)">${face.lipShape === 'full' && (face.mouth === 'smile' || face.mouth === 'neutral') ? lipsSVG(face) : mouthSVG(face.mouth, face.lipColor)}</g>
+    <g transform="translate(0,1)">${face.lipShape === 'full' && (face.mouth === 'smile' || face.mouth === 'neutral') ? lipsSVG(face) : mouthSVG(face.mouth, face.lipColor)}</g>
     ${makeupOverSVG(face)}
   `;
 }
@@ -5532,7 +5536,7 @@ function buildDollSVGFull(look, idSuffix = '', opts = {}) {
       <ellipse cx="104" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"/>
       <ellipse cx="196" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"/>
       <path d="${HEAD_PATH}" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
-      <ellipse cx="128" cy="72" rx="10" ry="7" fill="#ffffff" opacity="0.35"/>
+      <ellipse cx="128" cy="72" rx="10" ry="7" fill="#ffffff" opacity="0"/>
       </g>
     </g>
     <g transform="${HEAD_T}" fill="url(#${hairGrad})" stroke="${hairDark}" stroke-opacity="0.55">${hairDef.svg}${hairDef.id === 'none' ? '' : bangsSVG(look.hair.bangs) + hairStrandsPattern(`hairStrandsF${idSuffix}`) + hairTextureSVG(hairDef.svg + bangsSVG(look.hair.bangs), `hairStrandsF${idSuffix}`)}</g>
