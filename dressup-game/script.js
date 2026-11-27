@@ -717,12 +717,34 @@ function shortsSVG(bt, fill, hemY = 310) {
   const crotchY = Math.min(hemY - 14, 272);
   const n = (v) => v.toFixed(1);
   // Straight sides and flat hems (not rounded).
-  const side = Math.max(hH + 1, 150 - (lcx - lr)), top = side;
-  return `<path d="M${n(cx - top)},${wY} L${n(cx - side)},${hemY}
-      L${n(lcx + lr)},${hemY}
+  // Fitted: hug the waist and the curve of the hips, then go straight down around each thigh.
+  const hipY = 250;
+  // Trace the real body curve between the waist and the hips (same curve as the skin).
+  const W = bt.waistHalf, Hh = bt.hipHalf, wTop = TORSO_Y.waist, pad = 2.6;
+  const bez = (t, a, b2, c, d) => (1 - t) ** 3 * a + 3 * (1 - t) ** 2 * t * b2 + 3 * (1 - t) * t * t * c + t ** 3 * d;
+  const contour = [];
+  for (let k = 0; k <= 40; k++) {
+    const t = k / 40;
+    contour.push([bez(t, W, W, Hh, Hh), bez(t, wTop, wTop + 16, hipY - 18, hipY)]);
+  }
+  const bodyAt = (y) => {
+    let best = contour[0];
+    contour.forEach((pt) => { if (Math.abs(pt[1] - y) < Math.abs(best[1] - y)) best = pt; });
+    let mx = 0; contour.forEach((pt) => { if (Math.abs(pt[1] - y) <= 2.5) mx = Math.max(mx, pt[0]); });
+    // the tops of the thighs (with their outline) must stay covered too
+    const legTop = 248 - (rU + 2.5);
+    const leg = y >= legTop ? 17 + Math.sqrt(Math.max(0, (rU + 2) ** 2 - (248 - Math.min(y, 248)) ** 2)) + 1.2 : 0;
+    return Math.max(Math.max(best[0], mx) + pad, leg);
+  };
+  const hipW = Math.max(bodyAt(hipY), hH);
+  const outerHem = Math.max(150 - (lcx - lr), hipW - 3);
+  const sideL = [wY, 233, 238, 243, 247, hipY].map((y) => [cx - (y === hipY ? hipW : bodyAt(y)), y]);
+  const sideR = [...sideL].reverse().map(([x, y]) => [300 - x, y]);
+  return `<path d="M${n(sideL[0][0])},${wY}${smoothThrough(sideL)}
+      L${n(cx - outerHem)},${hemY} L${n(lcx + lr)},${hemY}
       L${n(cx - 1)},${crotchY} L${n(cx + 1)},${crotchY}
-      L${n(rcx - lr)},${hemY} L${n(cx + side)},${hemY}
-      L${n(cx + top)},${wY} Z"${f}/>
+      L${n(rcx - lr)},${hemY} L${n(cx + outerHem)},${hemY}
+      L${n(sideR[0][0])},${hipY}${smoothThrough(sideR)} Z"${f}/>
     <path d="M${cx},${wY + 6} L${cx},${crotchY - 2}" fill="none" stroke="#000000" stroke-width="1" opacity="0.18"/>`;
 }
 
@@ -756,7 +778,7 @@ function camiTopSVG(bt, hemY, fill) {
 function basicsSVG(bt, top, bottom) {
   const cx = 150;
   return `${bottom ? `${shortsSVG(bt, '#2b2b2b', 270)}
-      <path d="M${(cx - torsoHalfAt(bt, 230) - 1.5).toFixed(1)},230.5 L${(cx + torsoHalfAt(bt, 230) + 1.5).toFixed(1)},230.5" stroke="#444444" stroke-width="5"/>` : ''}
+      <path d="M${(cx - torsoHalfAt(bt, 230.5) - 2.2).toFixed(1)},230.5 L${(cx + torsoHalfAt(bt, 230.5) + 2.2).toFixed(1)},230.5" stroke="#444444" stroke-width="5"/>` : ''}
     ${top ? camiTopSVG(bt, 220, '#2b2b2b') : ''}`;
 }
 
@@ -2052,7 +2074,7 @@ const OUTFIT_STYLES = [
   // ----- Even more bottoms -----
   { id: 'jean-shorts', label: 'Jean Shorts', emoji: '🩳', piece: 'bottom', fixedColor: true,
     svg: (bt) => {
-      const cx = 150, w = torsoHalfAt(bt, 228) + 1.5;
+      const cx = 150, w = torsoHalfAt(bt, 232) + 2.2;
       const t = (300 - 248) / 197, rU = bt.limbWidth / 2 * 1.15, rL = bt.limbWidth / 2 * 0.68, lr = rU + (rL - rU) * t + 2.8;
       const fray = (lc) => Array.from({ length: 5 }, (_, i) => { const x = (lc - lr + 3 + i * ((lr * 2 - 6) / 4)).toFixed(1); return `<line x1="${x}" y1="300" x2="${x}" y2="305" stroke="#ffffff" stroke-width="1.4" opacity="0.8"/>`; }).join('');
       return `<g fill="#6b93cf" stroke="#4f78b0" stroke-width="1.2">${shortsSVG(bt, null, 300)}</g>
@@ -3619,7 +3641,7 @@ function makeupOverSVG(face) {
   let out = highlightSVG(face);
   if (face.gems) out += faceGemsSVG();
   if (face.gloss && face.mouth !== 'surprised' && !(face.lipShape === 'full' && (face.mouth === 'smile' || face.mouth === 'neutral'))) {
-    out += `<ellipse cx="143" cy="${face.mouth === 'neutral' ? 111 : 113}" rx="4" ry="1.4" fill="#ffffff" opacity="0.75"/>`;
+    out += `<ellipse cx="143" cy="${face.mouth === 'neutral' ? 115 : 117}" rx="4" ry="1.4" fill="#ffffff" opacity="0.75"/>`;
   }
   if (face.glitter) {
     out += [[124, 99], [128, 106], [176, 99], [172, 106], [126, 82], [174, 82]].map(([x, y]) =>
@@ -3738,7 +3760,7 @@ function buildFaceSVG(face, hairColor) {
     ${lashesSVG(face.lashes, face.eyeShape, 168, 1)}
     ${eyebrowSVG(face.eyebrowShape, 132, hairColor)}
     ${eyebrowSVG(face.eyebrowShape, 168, hairColor)}
-    ${face.lipShape === 'full' && (face.mouth === 'smile' || face.mouth === 'neutral') ? lipsSVG(face) : mouthSVG(face.mouth, face.lipColor)}
+    <g transform="translate(0,4)">${face.lipShape === 'full' && (face.mouth === 'smile' || face.mouth === 'neutral') ? lipsSVG(face) : mouthSVG(face.mouth, face.lipColor)}</g>
     ${makeupOverSVG(face)}
   `;
 }
