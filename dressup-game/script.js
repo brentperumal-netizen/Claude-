@@ -98,14 +98,13 @@ function stripIds(markup) { return markup.replace(/\sid="[^"]*"/g, ''); }
 function shortLegsSVG(inner, suffix) {
   const c = `sl${suffix}`;
   const copy = stripIds(inner);
-  return `<defs>
-      <clipPath id="${c}a"><rect x="-400" y="-400" width="1100" height="${400 + LEG_TOP + 0.6}"/></clipPath>
-      <clipPath id="${c}b"><rect x="-400" y="${LEG_TOP - 0.6}" width="1100" height="${LEG_BOTTOM - LEG_TOP + 1.2}"/></clipPath>
-      <clipPath id="${c}c"><rect x="-400" y="${LEG_BOTTOM - 0.6}" width="1100" height="600"/></clipPath>
-    </defs>
-    <g clip-path="url(#${c}a)">${inner}</g>
-    <g transform="translate(0,${LEG_TOP}) scale(1,${LEG_SCALE}) translate(0,${-LEG_TOP})"><g clip-path="url(#${c}b)">${copy}</g></g>
-    <g transform="translate(0,${-LEG_LIFT})"><g clip-path="url(#${c}c)">${copy}</g></g>`;
+  // Masks (not clip paths) so each band is cut as one finished picture: no seam lines.
+  // Drawn bottom-up: the leg band runs a little past both joins underneath the others.
+  const m = (id, y, h) => `<mask id="${id}" maskUnits="userSpaceOnUse" x="-400" y="${y}" width="1100" height="${h}"><rect x="-400" y="${y}" width="1100" height="${h}" fill="#ffffff"/></mask>`;
+  return `<defs>${m(`${c}a`, -400, 400 + LEG_TOP)}${m(`${c}b`, LEG_TOP - 3, LEG_BOTTOM - LEG_TOP + 6)}${m(`${c}c`, LEG_BOTTOM, 600)}</defs>
+    <g transform="translate(0,${LEG_TOP}) scale(1,${LEG_SCALE}) translate(0,${-LEG_TOP})"><g mask="url(#${c}b)">${copy}</g></g>
+    <g transform="translate(0,${-LEG_LIFT})"><g mask="url(#${c}c)">${copy}</g></g>
+    <g mask="url(#${c}a)">${inner}</g>`;
 }
 
 // Builds a curved torso silhouette (shoulder -> chest -> waist -> hip) from a body
@@ -697,7 +696,7 @@ function camiTopSVG(bt, hemY, fill) {
 
 function basicsSVG(bt, top, bottom) {
   const cx = 150;
-  return `${bottom ? `${shortsSVG(bt, '#2b2b2b', 280)}
+  return `${bottom ? `${shortsSVG(bt, '#2b2b2b', 270)}
       <path d="M${(cx - torsoHalfAt(bt, 230) - 1.5).toFixed(1)},230.5 L${(cx + torsoHalfAt(bt, 230) + 1.5).toFixed(1)},230.5" stroke="#444444" stroke-width="5"/>` : ''}
     ${top ? camiTopSVG(bt, 220, '#2b2b2b') : ''}`;
 }
@@ -4610,6 +4609,9 @@ function render() {
 
 function renderStage() {
   applyBodyGeometry(document, state.bodyType);
+  ['arm-left-outline', 'arm-right-outline', 'leg-left-outline', 'leg-right-outline'].forEach((id) => {
+    document.getElementById(id).setAttribute('fill', darken(state.skin, 0.3));
+  });
 
   // skin
   setGradient('skinGradient', state.skin, 0.16, 0.1);
@@ -5335,8 +5337,8 @@ function buildDollSVGFull(look, idSuffix = '', opts = {}) {
     ${hairBackSvg}
     <g fill="url(#${skinGrad})">
       ${posed ? '' : `
-      <path d="${armPath(125, 168, lx, 272, rUpper, rLower, outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
-      <path d="${armPath(175, 168, rxHand, 272, rUpper, rLower, outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${armPath(125, 168, lx, 272, rUpper, rLower, outlineGrow)}" fill="${darken(look.skin, 0.3)}"/>
+      <path d="${armPath(175, 168, rxHand, 272, rUpper, rLower, outlineGrow)}" fill="${darken(look.skin, 0.3)}"/>
       <path d="${armPath(125, 168, lx, 272, rUpper, rLower)}"/>
       <path d="${armPath(175, 168, rxHand, 272, rUpper, rLower)}"/>
       <line x1="125" y1="168" x2="${lx}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.1"/>
@@ -5372,12 +5374,12 @@ function buildDollSVGFull(look, idSuffix = '', opts = {}) {
       `}
       ${outfitDef.hidesLegs ? '' : `
       <g class="pl-left">
-      <path d="${legPath(133, 248, 127, 445, rUpper, rLower, outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${legPath(133, 248, 127, 445, rUpper, rLower, outlineGrow)}" fill="${darken(look.skin, 0.3)}"/>
       <path d="${legPath(133, 248, 127, 445, rUpper, rLower)}"/>
       <line x1="133" y1="248" x2="127" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.08"/>
       </g>
       <g class="pl-right">
-      <path d="${legPath(167, 248, 173, 445, rUpper, rLower, outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
+      <path d="${legPath(167, 248, 173, 445, rUpper, rLower, outlineGrow)}" fill="${darken(look.skin, 0.3)}"/>
       <path d="${legPath(167, 248, 173, 445, rUpper, rLower)}"/>
       <line x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.08"/>
       </g>
