@@ -2578,29 +2578,55 @@ function closedHeelsSVG() {
   }).join('');
 }
 
+// Ballet flats seen from the front: a rounded toe box with a little bow, a low
+// opening where the top of the foot shows, and a thin sole.
+function balletFlatsSVG() {
+  return [[127, -1], [173, 1]].map(([cx, side]) => {
+    const o = (dx) => (cx + dx * side).toFixed(1);
+    return `
+      <ellipse cx="${cx}" cy="473" rx="16" ry="3.4" fill="#000000" opacity="0.2" stroke="none"/>
+      <path d="M${o(-12.5)},449 Q${o(-14.5)},458 ${o(-13.5)},464 C${o(-13)},471 ${o(-7)},473 ${cx},473 C${o(7)},473 ${o(14)},471 ${o(14)},464 Q${o(14.5)},457 ${o(12.5)},449 Z" stroke-width="1"/>
+      <path d="M${o(-10.5)},448 L${o(10.5)},448 Q${o(9.5)},456 ${cx},459 Q${o(-9.5)},456 ${o(-10.5)},448 Z" style="fill:var(--skin, #f1c9a5)" stroke="none"/>
+      <path d="M${o(-11)},448.6 Q${o(-9.5)},456 ${cx},459.4 Q${o(9.5)},456 ${o(11)},448.6" fill="none" stroke="#000000" stroke-width="1.1" opacity="0.35"/>
+      <path d="M${o(-13.5)},466 C${o(-12)},472.5 ${o(-6)},474.5 ${cx},474.5 C${o(6)},474.5 ${o(12.5)},472.5 ${o(14)},466" fill="none" stroke="#000000" stroke-width="1.6" opacity="0.3"/>
+      <path d="M${o(-4)},458.5 q-4,-3.2 -4.6,0.6 q0.6,3.8 4.6,0.6 Z M${o(4)},458.5 q4,-3.2 4.6,0.6 q-0.6,3.8 -4.6,0.6 Z" stroke-width="0.6"/>
+      <circle cx="${cx}" cy="459.1" r="1.4" stroke-width="0.6"/>
+      <path d="M${o(-8)},463 Q${o(-7)},469 ${o(-2)},471" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.45"/>`;
+  }).join('');
+}
+
+// Knee-high boots that follow the shape of the leg: a soft cuff, a buckle strap,
+// side stitching, a shaped toe and a little block heel.
+function kneeBootsSVG() {
+  return [[133, 127, -1], [167, 173, 1]].map(([top, cx, side]) => {
+    const o = (x, dx) => (x + dx * side).toFixed(1);
+    const at = (y) => top + (cx - top) * ((y - 248) / 197); // leg centre line at height y
+    const yT = 352, cT = at(yT), c1 = at(400), cA = at(440);
+    return `
+      <ellipse cx="${cx}" cy="476" rx="16" ry="3.4" fill="#000000" opacity="0.2" stroke="none"/>
+      <path d="M${o(cA, 9)},460 L${o(cA, 14.5)},460 L${o(cA, 13.8)},475 L${o(cA, 9.4)},475 Z" fill="#5e3b1a" stroke="none"/>
+      <path d="M${o(cT, -12.5)},${yT} L${o(cT, 12.5)},${yT}
+        C${o(c1, 12)},385 ${o(c1, 10.8)},410 ${o(cA, 10.5)},440
+        Q${o(cA, 14.5)},452 ${o(cA, 14)},464 C${o(cA, 13.5)},472 ${o(cA, 7)},474 ${cA},474
+        C${o(cA, -7)},474 ${o(cA, -13.5)},472 ${o(cA, -13.5)},464
+        Q${o(cA, -14)},452 ${o(cA, -10.5)},440
+        C${o(c1, -10.8)},410 ${o(c1, -12)},385 ${o(cT, -12.5)},${yT} Z" stroke-width="1.1"/>
+      <path d="M${o(cA, -13.5)},467 C${o(cA, -12)},473.5 ${o(cA, -6)},475.5 ${cA},475.5 C${o(cA, 6)},475.5 ${o(cA, 12.5)},473.5 ${o(cA, 13.8)},467" fill="none" stroke="#000000" stroke-width="2" opacity="0.4"/>
+      <path d="M${o(cT, -13)},${yT - 1} L${o(cT, 13)},${yT - 1} L${o(cT, 12.6)},${yT + 9} Q${cT.toFixed(1)},${yT + 11} ${o(cT, -12.6)},${yT + 9} Z" stroke-width="1"/>
+      <path d="M${o(cT, -12.6)},${yT + 9} Q${cT.toFixed(1)},${yT + 11} ${o(cT, 12.6)},${yT + 9}" fill="none" stroke="#000000" stroke-width="1" opacity="0.3"/>
+      <path d="M${o(cA, -10.6)},432 L${o(cA, 10.8)},432 L${o(cA, 11)},438 L${o(cA, -10.8)},438 Z" fill="#000000" opacity="0.28" stroke="none"/>
+      <rect x="${o(cA, 4.5)}" y="431" width="5" height="8" rx="1" fill="none" stroke="#f2c94c" stroke-width="1.2" transform="translate(${side < 0 ? -5 : 0},0)"/>
+      <path d="M${o(c1, 8.5)},${yT + 14} C${o(c1, 8)},400 ${o(cA, 7.8)},420 ${o(cA, 8.2)},444" fill="none" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.45"/>
+      <path d="M${o(c1, -6.5)},${yT + 16} C${o(c1, -7)},398 ${o(cA, -6.5)},420 ${o(cA, -7)},446" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity="0.28"/>
+      <path d="M${o(cA, -8)},460 Q${o(cA, -7)},469 ${o(cA, -2)},471" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.35"/>`;
+  }).join('');
+}
+
 const SHOE_STYLES = [
   { id: 'heels', label: 'Open-Toe Heels', emoji: '👡', svg: stilettoPumpsSVG() },
   { id: 'closed-heels', label: 'Closed-Toe Heels', emoji: '👠', svg: closedHeelsSVG() },
-  { id: 'flats', label: 'Flats', emoji: '🥿',
-    svg: `<ellipse cx="127" cy="454" rx="22" ry="6" fill="#000000" opacity="0.25"/>
-          <ellipse cx="127" cy="447" rx="21" ry="10"/>
-          <path d="M110,444 Q127,438 144,444" fill="none" stroke="#000000" stroke-width="1.3" opacity="0.22"/>
-          <path d="M118,441 Q127,446 136,441" fill="none" stroke="#000000" stroke-width="1" opacity="0.18"/>
-          <rect x="122" y="439" width="10" height="5" rx="2" fill="#8a6247"/>
-          <ellipse cx="173" cy="454" rx="22" ry="6" fill="#000000" opacity="0.25"/>
-          <ellipse cx="173" cy="447" rx="21" ry="10"/>
-          <path d="M156,444 Q173,438 190,444" fill="none" stroke="#000000" stroke-width="1.3" opacity="0.22"/>
-          <path d="M164,441 Q173,446 182,441" fill="none" stroke="#000000" stroke-width="1" opacity="0.18"/>
-          <rect x="168" y="439" width="10" height="5" rx="2" fill="#8a6247"/>` },
-  { id: 'boots', label: 'Boots', emoji: '👢',
-    svg: `<rect x="110" y="392" width="34" height="66" rx="14"/>
-          <rect x="105" y="449" width="44" height="13" rx="6" fill="#8a6247"/>
-          <path d="M108,406 Q127,400 146,406" fill="none" stroke="#8a6247" stroke-width="2.2" opacity="0.9"/>
-          <rect x="121" y="393" width="12" height="9" rx="3" fill="#8a6247"/>
-          <rect x="156" y="392" width="34" height="66" rx="14"/>
-          <rect x="151" y="449" width="44" height="13" rx="6" fill="#8a6247"/>
-          <path d="M154,406 Q173,400 192,406" fill="none" stroke="#8a6247" stroke-width="2.2" opacity="0.9"/>
-          <rect x="167" y="393" width="12" height="9" rx="3" fill="#8a6247"/>` },
+  { id: 'flats', label: 'Flats', emoji: '🥿', svg: balletFlatsSVG() },
+  { id: 'boots', label: 'Boots', emoji: '👢', svg: kneeBootsSVG() },
   { id: 'sneakers', label: 'Sneakers', emoji: '👟',
     svg: `<rect x="104" y="446" width="46" height="10" rx="5" fill="#ffffff"/>
           <path d="M106,444 Q106,428 124,425 Q144,423 150,438 Q152,444 148,446 L106,446 Z"/>
