@@ -311,12 +311,20 @@ const HAIR_STYLES = [
     backSvg: curlyBackSVG(146),
     svg: curlyHairSVG(142) },
   { id: 'ponytail', label: 'Ponytail', emoji: '🎀',
-    svg: `<path d="M198,70 q34,10 26,90 q-4,26 -26,30 q14,-40 4,-70 q-6,-24 -4,-50 Z"/>
-          <path d="M100,98 Q96,40 150,38 Q204,40 200,98 Q198,78 184,66 Q150,52 116,66 Q102,78 100,98 Z"/>
-          <path d="M120,64 Q150,50 186,66 M114,74 Q150,56 192,76" fill="none" stroke="#000000" stroke-width="0.8" opacity="0.18"/>
-          <ellipse cx="203" cy="72" rx="4.5" ry="6" fill="#e0558f" stroke="#b83c6f" stroke-width="1"/>
-          <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
-          <path d="M204,90 Q214,130 202,165" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.2"/>` },
+    // Hair brushed back into a high ponytail that swoops out and falls past the shoulder.
+    backSvg: `<path d="M186,60 C206,52 228,70 230,100 C232,136 222,170 214,200 C209,220 203,236 198,250 C195,236 196,220 194,204 C190,176 198,146 196,118 C195,96 192,78 182,66 Z"/>
+          <path d="M186,60 C206,52 228,70 230,100 C232,136 222,170 214,200 C209,220 203,236 198,250 C195,236 196,220 194,204 C190,176 198,146 196,118 C195,96 192,78 182,66 Z" fill="#000000" opacity="0.12" stroke="none"/>
+          <path d="M198,68 C214,74 222,96 220,124 C218,156 210,186 204,214" fill="none" stroke="#ffffff" stroke-width="2.4" opacity="0.22" stroke-linecap="round"/>
+          <path d="M206,70 C222,84 226,110 222,140 M200,90 C206,120 204,160 200,196 M212,120 C212,150 206,186 200,226" fill="none" stroke="#000000" stroke-width="0.9" opacity="0.2" stroke-linecap="round"/>
+          <path d="M96,96 Q92,38 150,35 Q208,38 204,96 L202,112 Q150,120 98,112 Z"/>`,
+    svg: `<path d="M100,102 Q96,40 150,38 Q204,40 200,102 Q198,82 188,70 Q168,58 150,58 Q128,58 114,68 Q103,80 100,102 Z"/>
+          <path d="M116,68 Q150,52 190,62 M108,80 Q150,56 194,66 M126,60 Q166,48 192,58" fill="none" stroke="#000000" stroke-width="0.8" opacity="0.16"/>
+          <path d="M120,62 Q154,48 186,58" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" opacity="0.3"/>
+          <path d="M102,88 q-3,8 1,15 M198,88 q3,8 -1,15" fill="none" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+          <g transform="rotate(28 192 62)">
+            <ellipse cx="192" cy="62" rx="6.5" ry="8" fill="#e0558f" stroke="#b83c6f" stroke-width="1"/>
+            <path d="M187,57 q5,3 10,0 M186.5,62 q5.5,3 11,0 M187,67 q5,3 10,0" fill="none" stroke="#b83c6f" stroke-width="0.8"/>
+          </g>` },
   { id: 'none', label: 'Bald', emoji: '⚪', svg: `` },
   { id: 'bun', label: 'Top Bun', emoji: '🍩',
     svg: `<circle cx="150" cy="30" r="21"/>
