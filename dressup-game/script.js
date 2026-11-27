@@ -376,20 +376,29 @@ const HAIR_STYLES = [
               <path d="M110,64 Q127,52 146,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>`;
     })() },
   { id: 'pigtails', label: 'Pigtails', emoji: '🎀',
-    svg: (() => {
-      const left = 'M106,70 C84,70 64,96 68,128 C70,150 84,164 94,154 C86,132 90,102 110,86 Z';
+    // Center part, hair brushed to each side into two high pigtails that swoop out and fall past the shoulders.
+    backSvg: (() => {
+      const tail = 'M114,60 C94,52 72,70 70,100 C68,136 78,170 86,200 C91,220 97,236 102,250 C105,236 104,220 106,204 C110,176 102,146 104,118 C105,96 108,78 118,66 Z';
+      const shine = 'M102,68 C86,74 78,96 80,124 C82,156 90,186 96,214';
+      const strands = 'M94,70 C78,84 74,110 78,140 M100,90 C94,120 96,160 100,196 M88,120 C88,150 94,186 100,226';
       const mirror = (d) => d.replace(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g, (_, x, y) => `${300 - Number(x)},${y}`);
-      return `<g class="hair-sway hair-sway-left"><path d="${left}"/>
-                <path d="M84,96 C76,112 78,134 88,148" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.22"/></g>
-              <g class="hair-sway hair-sway-right"><path d="${mirror(left)}"/>
-                <path d="${mirror('M84,96 C76,112 78,134 88,148')}" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.22"/></g>
-              <path d="M98,82 A58,58 0 0 1 202,82 Z"/>
-              <rect x="98" y="80" width="12" height="18" rx="6"/>
-              <rect x="190" y="80" width="12" height="18" rx="6"/>
-              <path d="M150,38 L150,56" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.25"/>
-              <circle cx="106" cy="76" r="6" fill="#ff8fc7" stroke="#e0558f" stroke-width="1"/>
-              <circle cx="194" cy="76" r="6" fill="#ff8fc7" stroke="#e0558f" stroke-width="1"/>
-              <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>`;
+      const one = (side, f) => `<g class="hair-sway hair-sway-${side}"><path d="${f(tail)}"/>
+          <path d="${f(tail)}" fill="#000000" opacity="0.12" stroke="none"/>
+          <path d="${f(shine)}" fill="none" stroke="#ffffff" stroke-width="2.4" opacity="0.22" stroke-linecap="round"/>
+          <path d="${f(strands)}" fill="none" stroke="#000000" stroke-width="0.9" opacity="0.2" stroke-linecap="round"/></g>`;
+      return `${one('left', (d) => d)}${one('right', mirror)}
+        <path d="M96,96 Q92,38 150,35 Q208,38 204,96 L202,112 Q150,120 98,112 Z"/>`;
+    })(),
+    svg: (() => {
+      const tie = (x, rot) => `<g transform="rotate(${rot} ${x} 62)">
+            <ellipse cx="${x}" cy="62" rx="6.5" ry="8" fill="#e0558f" stroke="#b83c6f" stroke-width="1"/>
+            <path d="M${x - 5},57 q5,3 10,0 M${x - 5.5},62 q5.5,3 11,0 M${x - 5},67 q5,3 10,0" fill="none" stroke="#b83c6f" stroke-width="0.8"/></g>`;
+      return `<path d="M100,102 Q96,40 150,38 Q204,40 200,102 Q198,82 186,70 Q168,58 150,58 Q132,58 114,70 Q102,82 100,102 Z"/>
+          <path d="M150,40 L150,58" fill="none" stroke="#000000" stroke-width="1.2" opacity="0.28"/>
+          <path d="M148,58 Q130,52 110,62 M146,48 Q126,46 108,58 M152,58 Q170,52 190,62 M154,48 Q174,46 192,58" fill="none" stroke="#000000" stroke-width="0.8" opacity="0.16"/>
+          <path d="M144,46 Q126,46 112,56 M156,46 Q174,46 188,56" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity="0.3"/>
+          <path d="M102,88 q-3,8 1,15 M198,88 q3,8 -1,15" fill="none" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+          ${tie(108, -28)}${tie(192, 28)}`;
     })() },
   { id: 'cotton-candy-puffs', label: 'Cotton Candy Puffs', emoji: '☁️', pass: 'sweetie', passTier: 5,
     svg: `${[[-1, 108], [1, 192]].map(([d, x]) => `<g class="hair-sway hair-sway-${d < 0 ? 'left' : 'right'}">
