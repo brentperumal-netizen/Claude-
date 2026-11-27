@@ -137,7 +137,7 @@ const ARM_UPPER = 0.8, ARM_LOWER = 0.85, HAND_SCALE = 0.88;
 // Shorter legs: everything between the thighs (LEG_TOP) and the ankles (LEG_BOTTOM) is drawn
 // squeezed by LEG_SCALE, and the feet/shoes below are moved up to meet them. The upper body and
 // the shoes keep their exact shapes, and every outfit shortens to match the legs.
-const LEG_TOP = 290, LEG_BOTTOM = 440, LEG_SCALE = 0.9;
+const LEG_TOP = 290, LEG_BOTTOM = 440, LEG_SCALE = 0.85;
 const LEG_LIFT = (LEG_BOTTOM - LEG_TOP) * (1 - LEG_SCALE);
 function stripIds(markup) { return markup.replace(/\sid="[^"]*"/g, ''); }
 function shortLegsSVG(inner, suffix) {
