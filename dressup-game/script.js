@@ -2578,6 +2578,31 @@ function closedHeelsSVG() {
   }).join('');
 }
 
+// Sneakers seen from the front: a rounded toe with a white rubber toe cap, laces
+// up the tongue, a side stripe and a chunky white sole. High-tops add a padded
+// collar up the ankle and a little heart patch.
+function sneakersSVG(high) {
+  return [[127, -1], [173, 1]].map(([cx, side]) => {
+    const o = (dx) => (cx + dx * side).toFixed(1);
+    const top = high ? 418 : 446;
+    const laceRows = high ? [424, 432, 440, 448, 455] : [449, 454.5];
+    return `
+      <ellipse cx="${cx}" cy="477" rx="17" ry="3.4" fill="#000000" opacity="0.2" stroke="none"/>
+      <path d="M${o(-15)},468 C${o(-15)},475 ${o(-8)},477 ${cx},477 C${o(8)},477 ${o(15.5)},475 ${o(15.5)},468 L${o(15)},466 L${o(-14.5)},466 Z" fill="#ffffff" stroke="#c9c3bb" stroke-width="1"/>
+      <path d="M${o(-15)},471 C${o(-10)},474 ${o(10)},474 ${o(15.5)},471" fill="none" stroke="#c9c3bb" stroke-width="0.9"/>
+      <path d="M${o(-11)},${top} L${o(11)},${top} ${high ? `L${o(11.5)},444` : ''} Q${o(15)},454 ${o(14.8)},466 L${o(-14.3)},466 Q${o(-14.5)},454 ${o(-11.5)},444 ${high ? '' : ''} Z" stroke-width="1"/>
+      ${high ? `<path d="M${o(-11.8)},${top} Q${cx},${top - 4} ${o(11.8)},${top} L${o(11.8)},${top + 5} Q${cx},${top + 1} ${o(-11.8)},${top + 5} Z" fill="#ffffff" opacity="0.9" stroke="none"/>` : ''}
+      <path d="M${o(-11)},466 Q${o(-11.5)},${high ? 458 : 461} ${o(-8)},${high ? 456 : 460} Q${cx},${high ? 453 : 458} ${o(8)},${high ? 456 : 460} Q${o(11.5)},${high ? 458 : 461} ${o(11)},466 Z" fill="#ffffff" opacity="0.92" stroke="none"/>
+      <path d="M${o(-5.5)},${top + (high ? 3 : 0)} L${o(5.5)},${top + (high ? 3 : 0)} L${o(5)},${high ? 458 : 459} Q${cx},${high ? 460 : 461} ${o(-5)},${high ? 458 : 459} Z" fill="#000000" opacity="0.12" stroke="none"/>
+      ${laceRows.map((y) => `<path d="M${o(-5)},${y} L${o(5)},${y + 2.4} M${o(5)},${y} L${o(-5)},${y + 2.4}" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round"/>
+        <circle cx="${o(-5.8)}" cy="${y}" r="0.9" fill="#ffffff" stroke="none"/><circle cx="${o(5.8)}" cy="${y}" r="0.9" fill="#ffffff" stroke="none"/>`).join('')}
+      <path d="M${o(8)},${high ? 436 : 452} Q${o(13)},${high ? 452 : 458} ${o(9)},463" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" opacity="0.85"/>
+      ${high ? `<circle cx="${o(9.6)}" cy="428" r="3.6" fill="#ffffff" stroke="none"/>
+        <path d="M${o(9.6)},430 c-2.6,-1.8 -2.6,-3.8 -1,-4 c0.6,0 1,0.4 1,0.9 c0,-0.5 0.4,-0.9 1,-0.9 c1.6,0.2 1.6,2.2 -1,4 Z" fill="#e0558f" stroke="none"/>` : ''}
+      <path d="M${o(-9)},${high ? 430 : 450} Q${o(-10.5)},${high ? 446 : 456} ${o(-9.5)},462" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.35"/>`;
+  }).join('');
+}
+
 // Ballet flats seen from the front: a rounded toe box with a little bow, a low
 // opening where the top of the foot shows, and a thin sole.
 function balletFlatsSVG() {
@@ -2627,19 +2652,7 @@ const SHOE_STYLES = [
   { id: 'closed-heels', label: 'Closed-Toe Heels', emoji: '👠', svg: closedHeelsSVG() },
   { id: 'flats', label: 'Flats', emoji: '🥿', svg: balletFlatsSVG() },
   { id: 'boots', label: 'Boots', emoji: '👢', svg: kneeBootsSVG() },
-  { id: 'sneakers', label: 'Sneakers', emoji: '👟',
-    svg: `<rect x="104" y="446" width="46" height="10" rx="5" fill="#ffffff"/>
-          <path d="M106,444 Q106,428 124,425 Q144,423 150,438 Q152,444 148,446 L106,446 Z"/>
-          <path d="M106,446 Q106,436 116,434 Q124,433 126,438 L126,446 Z" fill="#ffffff" opacity="0.85"/>
-          <line x1="130" y1="432" x2="142" y2="428" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
-          <line x1="130" y1="437" x2="144" y2="433" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
-          <line x1="130" y1="442" x2="146" y2="438" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
-          <rect x="150" y="446" width="46" height="10" rx="5" fill="#ffffff"/>
-          <path d="M152,444 Q152,428 170,425 Q190,423 196,438 Q198,444 194,446 L152,446 Z"/>
-          <path d="M152,446 Q152,436 162,434 Q170,433 172,438 L172,446 Z" fill="#ffffff" opacity="0.85"/>
-          <line x1="176" y1="432" x2="188" y2="428" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
-          <line x1="176" y1="437" x2="190" y2="433" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
-          <line x1="176" y1="442" x2="192" y2="438" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>` },
+  { id: 'sneakers', label: 'Sneakers', emoji: '👟', svg: sneakersSVG(false) },
 ];
 
 SHOE_STYLES.push({ id: 'platform-boots', label: 'Platform Boots', emoji: '🥾', pass: 'baddie', passTier: 4,
@@ -2655,14 +2668,7 @@ SHOE_STYLES.push({ id: 'sprinkle-sneakers', label: 'Sprinkle Sneakers', emoji: '
         <path d="M${106 + dx},444 Q${106 + dx},428 ${124 + dx},425 Q${144 + dx},423 ${150 + dx},438 Q${152 + dx},444 ${148 + dx},446 L${106 + dx},446 Z"/>
         ${[[114, 438, '#e05c5c', 20], [124, 432, '#5cc4e0', -30], [134, 438, '#f2c94c', 50], [142, 434, '#43b581', -10], [128, 441, '#9b6be0', 70]].map(([x, y, c, r]) =>
           `<rect x="${x + dx - 2.5}" y="${y - 0.9}" width="5" height="1.8" rx="0.9" fill="${c}" stroke="none" transform="rotate(${r} ${x + dx} ${y})"/>`).join('')}`).join('') });
-SHOE_STYLES.push({ id: 'high-tops', label: 'High-Tops', emoji: '👟',
-  svg: [0, 46].map((dx) => `
-        <rect x="${104 + dx}" y="446" width="46" height="11" rx="5" fill="#ffffff" stroke="#d6d6d6" stroke-width="1"/>
-        <path d="M${108 + dx},446 L${108 + dx},414 Q${110 + dx},404 ${124 + dx},404 L${132 + dx},404 Q${136 + dx},418 ${148 + dx},432 Q${152 + dx},440 ${150 + dx},446 Z"/>
-        <circle cx="${116 + dx}" cy="426" r="5" fill="#ffffff" stroke="none"/>
-        <path d="M${113 + dx},426 l3,-3 l3,3 l-3,3 Z" fill="#5c7ce0" stroke="none"/>
-        <path d="M${124 + dx},410 L${132 + dx},412 M${125 + dx},417 L${134 + dx},420 M${127 + dx},424 L${137 + dx},428" stroke="#ffffff" stroke-width="1.6"/>
-        <rect x="${108 + dx}" y="404" width="24" height="5" rx="2" fill="#ffffff" stroke="none" opacity="0.9"/>`).join('') });
+SHOE_STYLES.push({ id: 'high-tops', label: 'High-Tops', emoji: '👟', svg: sneakersSVG(true) });
 SHOE_STYLES.push({ id: 'loafers', label: 'Loafers', emoji: '👞',
   svg: [127, 173].map((x) => `
         <ellipse cx="${x}" cy="456" rx="17" ry="4" fill="#000000" opacity="0.2" stroke="none"/>
