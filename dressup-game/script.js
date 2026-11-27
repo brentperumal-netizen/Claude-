@@ -87,6 +87,30 @@ function jointLinesSVG(lx, rx) {
     <path d="M${(125 + (lx - 125) * 0.49 + 3).toFixed(1)},220 q3,2 5,0 M${(175 + (rx - 175) * 0.49 - 8).toFixed(1)},220 q3,2 5,0" fill="none" stroke="rgba(40,28,20,0.13)" stroke-width="1" stroke-linecap="round"/>`;
 }
 
+// The head (with its hair, face and anything worn on it) is drawn a little smaller,
+// shrinking toward the chin so it still sits on the neck.
+const HEAD_SCALE = 0.88;
+const HEAD_T = `translate(150,140) scale(${HEAD_SCALE}) translate(-150,-140)`;
+const headAccCache = {};
+function isHeadAccessory(acc) {
+  if (acc.id in headAccCache) return headAccCache[acc.id];
+  let head = false;
+  try {
+    const NS = 'http://www.w3.org/2000/svg';
+    const probe = document.createElementNS(NS, 'svg');
+    probe.setAttribute('width', '300'); probe.setAttribute('height', '520');
+    probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden';
+    const bt = BODY_TYPES[0];
+    probe.innerHTML = `<g>${typeof acc.svg === 'function' ? acc.svg(bt, {}) : acc.svg}</g>`;
+    document.body.appendChild(probe);
+    const bb = probe.firstChild.getBBox();
+    probe.remove();
+    head = bb.height > 0 && bb.y + bb.height / 2 < 132 && bb.y + bb.height < 160;
+  } catch (e) { head = false; }
+  headAccCache[acc.id] = head;
+  return head;
+}
+
 function hairStrandsPattern(id) {
   return `<pattern id="${id}" patternUnits="userSpaceOnUse" width="7" height="60">
       <path d="M1.2,0 Q2.6,30 1.2,60" fill="none" stroke="#000000" stroke-width="0.7" opacity="0.55"/>
@@ -94,8 +118,8 @@ function hairStrandsPattern(id) {
       <path d="M3,0 Q3.9,30 3,60" fill="none" stroke="#000000" stroke-width="0.35" opacity="0.35"/>
     </pattern>`;
 }
-function hairTextureSVG(markup, patternId) {
-  return markup ? `<g class="hair-tex" fill="url(#${patternId})" stroke="none" opacity="0.32" pointer-events="none">${markup}</g>` : '';
+function hairTextureSVG() {
+  return ''; // strand texture switched off
 }
 
 const TORSO_Y = { shoulder: 148, chest: 175, waist: 206, hip: 250 };
@@ -4637,6 +4661,9 @@ function render() {
 
 function renderStage() {
   applyBodyGeometry(document, state.bodyType);
+  ['ear-left', 'ear-right', 'head', 'head-highlight', 'layer-hair-back', 'layer-hair', 'layer-face'].forEach((id) => {
+    document.getElementById(id).setAttribute('transform', HEAD_T);
+  });
   ['arm-left-outline', 'arm-right-outline', 'leg-left-outline', 'leg-right-outline'].forEach((id) => {
     document.getElementById(id).setAttribute('fill', darken(state.skin, 0.3));
   });
@@ -4713,6 +4740,7 @@ function renderStage() {
     }
     if (state.accessories[acc.id]) {
       layer.innerHTML = typeof acc.svg === 'function' ? acc.svg(bt) : acc.svg;
+      if (isHeadAccessory(acc)) layer.setAttribute('transform', HEAD_T); else layer.removeAttribute('transform');
       layer.setAttribute('fill', acc.color);
       layer.setAttribute('stroke', acc.color);
       layer.style.display = '';
@@ -5311,11 +5339,11 @@ function buildDollSVGFull(look, idSuffix = '', opts = {}) {
   const rxHand = 207 + bt.armSpread;
 
   const accSvg = ACCESSORIES.filter((a) => look.accessories && look.accessories[a.id])
-    .map((a) => `<g fill="${a.color}" stroke="${a.color}">${typeof a.svg === 'function' ? a.svg(bt, { posed: !!opts.posed }) : a.svg}</g>`)
+    .map((a) => `<g fill="${a.color}" stroke="${a.color}"${isHeadAccessory(a) ? ` transform="${HEAD_T}"` : ''}>${typeof a.svg === 'function' ? a.svg(bt, { posed: !!opts.posed }) : a.svg}</g>`)
     .join('');
   // Parts of accessories that sit behind the body (like a backpack).
   const hairBackDef = HAIR_STYLES.find((h) => h.id === look.hair.style);
-  const hairBackSvg = hairBackDef && hairBackDef.backSvg ? `${hairStrandsPattern(`hairStrands${idSuffix}`)}<g class="hair-back" fill="url(#hairGrad${idSuffix})" stroke="${darken(look.hair.color, 0.3)}" stroke-opacity="0.55">${hairBackDef.backSvg}${hairTextureSVG(hairBackDef.backSvg, `hairStrands${idSuffix}`)}</g>` : '';
+  const hairBackSvg = hairBackDef && hairBackDef.backSvg ? `${hairStrandsPattern(`hairStrands${idSuffix}`)}<g class="hair-back" transform="${HEAD_T}" fill="url(#hairGrad${idSuffix})" stroke="${darken(look.hair.color, 0.3)}" stroke-opacity="0.55">${hairBackDef.backSvg}${hairTextureSVG(hairBackDef.backSvg, `hairStrands${idSuffix}`)}</g>` : '';
   const accBehindSvg = ACCESSORIES.filter((a) => a.behindSvg && look.accessories && look.accessories[a.id])
     .map((a) => `<g fill="${a.color}" stroke="${a.color}">${a.behindSvg}</g>`)
     .join('');
@@ -5419,13 +5447,15 @@ function buildDollSVGFull(look, idSuffix = '', opts = {}) {
       <path d="${NECK_PATH}"/>
       ${BODY_DETAILS}
       ${posed ? '' : jointLinesSVG(lx, rxHand)}
+      <g transform="${HEAD_T}">
       <ellipse cx="104" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"/>
       <ellipse cx="196" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"/>
       <path d="${HEAD_PATH}" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
       <ellipse cx="128" cy="72" rx="10" ry="7" fill="#ffffff" opacity="0.35"/>
+      </g>
     </g>
-    <g fill="url(#${hairGrad})" stroke="${hairDark}" stroke-opacity="0.55">${hairDef.svg}${hairDef.id === 'none' ? '' : bangsSVG(look.hair.bangs) + hairStrandsPattern(`hairStrandsF${idSuffix}`) + hairTextureSVG(hairDef.svg + bangsSVG(look.hair.bangs), `hairStrandsF${idSuffix}`)}</g>
-    <g>${buildFaceSVG(face, look.hair.color)}</g>
+    <g transform="${HEAD_T}" fill="url(#${hairGrad})" stroke="${hairDark}" stroke-opacity="0.55">${hairDef.svg}${hairDef.id === 'none' ? '' : bangsSVG(look.hair.bangs) + hairStrandsPattern(`hairStrandsF${idSuffix}`) + hairTextureSVG(hairDef.svg + bangsSVG(look.hair.bangs), `hairStrandsF${idSuffix}`)}</g>
+    <g transform="${HEAD_T}">${buildFaceSVG(face, look.hair.color)}</g>
     ${outfitDef.hidesLegs ? '' : posed ? `
       <clipPath id="shoeClipL${idSuffix}"><rect x="0" y="0" width="150" height="520"/></clipPath>
       <clipPath id="shoeClipR${idSuffix}"><rect x="150" y="0" width="150" height="520"/></clipPath>
