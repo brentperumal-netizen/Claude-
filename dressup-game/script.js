@@ -92,7 +92,7 @@ const TORSO_Y = { shoulder: 148, chest: 175, waist: 206, hip: 250 };
 // Shorter legs: everything between the thighs (LEG_TOP) and the ankles (LEG_BOTTOM) is drawn
 // squeezed by LEG_SCALE, and the feet/shoes below are moved up to meet them. The upper body and
 // the shoes keep their exact shapes, and every outfit shortens to match the legs.
-const LEG_TOP = 290, LEG_BOTTOM = 440, LEG_SCALE = 0.925;
+const LEG_TOP = 290, LEG_BOTTOM = 440, LEG_SCALE = 0.9;
 const LEG_LIFT = (LEG_BOTTOM - LEG_TOP) * (1 - LEG_SCALE);
 function stripIds(markup) { return markup.replace(/\sid="[^"]*"/g, ''); }
 function shortLegsSVG(inner, suffix) {
@@ -659,11 +659,12 @@ function shortsSVG(bt, fill, hemY = 310) {
   const lcx = 133 - 6 * t, rcx = 167 + 6 * t;
   const crotchY = Math.min(hemY - 14, 272);
   const n = (v) => v.toFixed(1);
-  return `<path d="M${n(cx - wW)},${wY} Q${n(cx - hH)},${wY + 10} ${n(cx - hH)},252
-      L${n(lcx - lr)},${hemY} Q${n(lcx)},${hemY + 3} ${n(lcx + lr)},${hemY}
-      L${n(cx - 1.5)},${crotchY} Q${cx},${crotchY + 2} ${n(cx + 1.5)},${crotchY}
-      L${n(rcx - lr)},${hemY} Q${n(rcx)},${hemY + 3} ${n(rcx + lr)},${hemY}
-      L${n(cx + hH)},252 Q${n(cx + hH)},${wY + 10} ${n(cx + wW)},${wY} Z"${f}/>
+  // Straight sides and flat hems (not rounded).
+  return `<path d="M${n(cx - wW)},${wY} L${n(cx - hH)},${wY + 14} L${n(cx - hH)},252
+      L${n(lcx - lr)},${hemY} L${n(lcx + lr)},${hemY}
+      L${n(cx - 1)},${crotchY} L${n(cx + 1)},${crotchY}
+      L${n(rcx - lr)},${hemY} L${n(rcx + lr)},${hemY}
+      L${n(cx + hH)},252 L${n(cx + hH)},${wY + 14} L${n(cx + wW)},${wY} Z"${f}/>
     <path d="M${cx},${wY + 6} L${cx},${crotchY - 2}" fill="none" stroke="#000000" stroke-width="1" opacity="0.18"/>`;
 }
 
