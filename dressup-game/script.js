@@ -615,7 +615,7 @@ function shortsSVG(bt, fill, hemY = 310) {
   const f = fill ? ` fill="${fill}"` : '';
   const t = (hemY - 248) / 197;
   const rU = bt.limbWidth / 2 * 1.15, rL = bt.limbWidth / 2 * 0.68;
-  const wW = torsoHalfAt(bt, wY) + 1.5, hH = Math.max(bt.hipHalf - 2.5, 17 + rU + 3);
+  const wW = torsoHalfAt(bt, wY) + 1.5, hH = Math.max(bt.hipHalf + 1.5, 17 + rU + 3);
   const lr = rU + (rL - rU) * t + 2.8;
   const lcx = 133 - 6 * t, rcx = 167 + 6 * t;
   const crotchY = Math.min(hemY - 14, 272);
@@ -657,7 +657,7 @@ function camiTopSVG(bt, hemY, fill) {
 
 function basicsSVG(bt, top, bottom) {
   const cx = 150;
-  return `${bottom ? `${shortsSVG(bt, '#2b2b2b', 296)}
+  return `${bottom ? `${shortsSVG(bt, '#2b2b2b', 280)}
       <path d="M${(cx - torsoHalfAt(bt, 230) - 1.5).toFixed(1)},230.5 L${(cx + torsoHalfAt(bt, 230) + 1.5).toFixed(1)},230.5" stroke="#444444" stroke-width="5"/>` : ''}
     ${top ? camiTopSVG(bt, 220, '#2b2b2b') : ''}`;
 }
