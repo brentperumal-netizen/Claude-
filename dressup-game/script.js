@@ -660,11 +660,12 @@ function shortsSVG(bt, fill, hemY = 310) {
   const crotchY = Math.min(hemY - 14, 272);
   const n = (v) => v.toFixed(1);
   // Straight sides and flat hems (not rounded).
-  return `<path d="M${n(cx - wW)},${wY} L${n(cx - hH)},${wY + 14} L${n(cx - hH)},252
-      L${n(lcx - lr)},${hemY} L${n(lcx + lr)},${hemY}
+  const side = Math.max(hH + 1, 150 - (lcx - lr)), top = side;
+  return `<path d="M${n(cx - top)},${wY} L${n(cx - side)},${hemY}
+      L${n(lcx + lr)},${hemY}
       L${n(cx - 1)},${crotchY} L${n(cx + 1)},${crotchY}
-      L${n(rcx - lr)},${hemY} L${n(rcx + lr)},${hemY}
-      L${n(cx + hH)},252 L${n(cx + hH)},${wY + 14} L${n(cx + wW)},${wY} Z"${f}/>
+      L${n(rcx - lr)},${hemY} L${n(cx + side)},${hemY}
+      L${n(cx + top)},${wY} Z"${f}/>
     <path d="M${cx},${wY + 6} L${cx},${crotchY - 2}" fill="none" stroke="#000000" stroke-width="1" opacity="0.18"/>`;
 }
 
