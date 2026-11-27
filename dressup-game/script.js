@@ -613,18 +613,18 @@ function pantsSVG(bt, fill, bottomY = 430, extra = 4) {
 function shortsSVG(bt, fill, hemY = 310) {
   const cx = 150, wY = 228;
   const f = fill ? ` fill="${fill}"` : '';
-  const wW = torsoHalfAt(bt, wY) + 3, hH = bt.hipHalf + 3;
   const t = (hemY - 248) / 197;
   const rU = bt.limbWidth / 2 * 1.15, rL = bt.limbWidth / 2 * 0.68;
-  const lr = rU + (rL - rU) * t + 3.5;
+  const wW = torsoHalfAt(bt, wY) + 1.5, hH = Math.max(bt.hipHalf - 2.5, 17 + rU + 3);
+  const lr = rU + (rL - rU) * t + 2.8;
   const lcx = 133 - 6 * t, rcx = 167 + 6 * t;
   const crotchY = Math.min(hemY - 14, 272);
   const n = (v) => v.toFixed(1);
-  return `<path d="M${n(cx - wW)},${wY} Q${n(cx - hH - 1)},${wY + 10} ${n(cx - hH)},252
+  return `<path d="M${n(cx - wW)},${wY} Q${n(cx - hH)},${wY + 10} ${n(cx - hH)},252
       L${n(lcx - lr)},${hemY} Q${n(lcx)},${hemY + 3} ${n(lcx + lr)},${hemY}
       L${n(cx - 1.5)},${crotchY} Q${cx},${crotchY + 2} ${n(cx + 1.5)},${crotchY}
       L${n(rcx - lr)},${hemY} Q${n(rcx)},${hemY + 3} ${n(rcx + lr)},${hemY}
-      L${n(cx + hH)},252 Q${n(cx + hH + 1)},${wY + 10} ${n(cx + wW)},${wY} Z"${f}/>
+      L${n(cx + hH)},252 Q${n(cx + hH)},${wY + 10} ${n(cx + wW)},${wY} Z"${f}/>
     <path d="M${cx},${wY + 6} L${cx},${crotchY - 2}" fill="none" stroke="#000000" stroke-width="1" opacity="0.18"/>`;
 }
 
@@ -642,7 +642,7 @@ function tankSVG(bt, hemY, fill) {
 function basicsSVG(bt, top, bottom) {
   const cx = 150;
   return `${bottom ? `${shortsSVG(bt, '#2b2b2b', 296)}
-      <path d="M${(cx - torsoHalfAt(bt, 230) - 3).toFixed(1)},230.5 L${(cx + torsoHalfAt(bt, 230) + 3).toFixed(1)},230.5" stroke="#444444" stroke-width="5"/>` : ''}
+      <path d="M${(cx - torsoHalfAt(bt, 230) - 1.5).toFixed(1)},230.5 L${(cx + torsoHalfAt(bt, 230) + 1.5).toFixed(1)},230.5" stroke="#444444" stroke-width="5"/>` : ''}
     ${top ? `${fittedTopSVG(bt, 220, '#2b2b2b')}
       <path d="M${cx - 12},${TORSO_Y.shoulder} Q${cx},${TORSO_Y.shoulder + 12} ${cx + 12},${TORSO_Y.shoulder}" fill="none" stroke="#555555" stroke-width="2"/>` : ''}`;
 }
@@ -1939,8 +1939,8 @@ const OUTFIT_STYLES = [
   // ----- Even more bottoms -----
   { id: 'jean-shorts', label: 'Jean Shorts', emoji: '🩳', piece: 'bottom', fixedColor: true,
     svg: (bt) => {
-      const cx = 150, w = torsoHalfAt(bt, 228) + 3;
-      const t = (300 - 248) / 197, rU = bt.limbWidth / 2 * 1.15, rL = bt.limbWidth / 2 * 0.68, lr = rU + (rL - rU) * t + 3.5;
+      const cx = 150, w = torsoHalfAt(bt, 228) + 1.5;
+      const t = (300 - 248) / 197, rU = bt.limbWidth / 2 * 1.15, rL = bt.limbWidth / 2 * 0.68, lr = rU + (rL - rU) * t + 2.8;
       const fray = (lc) => Array.from({ length: 5 }, (_, i) => { const x = (lc - lr + 3 + i * ((lr * 2 - 6) / 4)).toFixed(1); return `<line x1="${x}" y1="300" x2="${x}" y2="305" stroke="#ffffff" stroke-width="1.4" opacity="0.8"/>`; }).join('');
       return `<g fill="#6b93cf" stroke="#4f78b0" stroke-width="1.2">${shortsSVG(bt, null, 300)}</g>
         <path d="M${(cx - w).toFixed(1)},232 L${(cx + w).toFixed(1)},232" stroke="#5a85c0" stroke-width="8"/>
