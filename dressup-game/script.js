@@ -639,12 +639,27 @@ function tankSVG(bt, hemY, fill) {
             C${cx - w},${wY - 14} ${cx - c},${bY + 16} ${cx - c},${bY} Q${cx - c},${bY - 12} ${cx - s2},${sY - 2} Z"${f}/>`;
 }
 
+// A fitted spaghetti-strap cami that follows the body's curves closely.
+function camiTopSVG(bt, hemY, fill) {
+  const cx = 150, { shoulder: sY, chest: bY } = TORSO_Y;
+  const f = fill ? ` fill="${fill}"` : '';
+  const topY = sY + 18;
+  const pts = [topY, bY, (bY + TORSO_Y.waist) / 2, Math.min(hemY, TORSO_Y.waist), hemY].filter((y, i, a) => a.indexOf(y) === i && y <= hemY);
+  const half = (y) => torsoHalfAt(bt, y) + 1;
+  const n = (v) => v.toFixed(1);
+  const right = pts.map((y) => [cx + half(y), y]), left = pts.map((y) => [cx - half(y), y]).reverse();
+  const strapX = bt.shoulderHalf - 9;
+  return `<path d="M${n(cx - half(topY))},${topY} Q${cx},${topY + 7} ${n(cx + half(topY))},${topY}${smoothThrough(right)}
+      L${n(cx - half(hemY))},${hemY}${smoothThrough(left)} Z"${f}/>
+    <path d="M${n(cx - strapX)},${sY - 1} L${n(cx - half(topY) + 6)},${topY + 1} M${n(cx + strapX)},${sY - 1} L${n(cx + half(topY) - 6)},${topY + 1}" fill="none" stroke="${fill || '#2b2b2b'}" stroke-width="2" stroke-linecap="round"/>
+    <path d="M${n(cx - half(topY) + 2)},${topY + 1.5} Q${cx},${topY + 8.5} ${n(cx + half(topY) - 2)},${topY + 1.5}" fill="none" stroke="#555555" stroke-width="1.2"/>`;
+}
+
 function basicsSVG(bt, top, bottom) {
   const cx = 150;
   return `${bottom ? `${shortsSVG(bt, '#2b2b2b', 296)}
       <path d="M${(cx - torsoHalfAt(bt, 230) - 1.5).toFixed(1)},230.5 L${(cx + torsoHalfAt(bt, 230) + 1.5).toFixed(1)},230.5" stroke="#444444" stroke-width="5"/>` : ''}
-    ${top ? `${fittedTopSVG(bt, 220, '#2b2b2b')}
-      <path d="M${cx - 12},${TORSO_Y.shoulder} Q${cx},${TORSO_Y.shoulder + 12} ${cx + 12},${TORSO_Y.shoulder}" fill="none" stroke="#555555" stroke-width="2"/>` : ''}`;
+    ${top ? camiTopSVG(bt, 220, '#2b2b2b') : ''}`;
 }
 
 // ----- Dress & skirt building blocks -----
