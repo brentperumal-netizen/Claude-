@@ -2670,12 +2670,25 @@ SHOE_STYLES.push({ id: 'sprinkle-sneakers', label: 'Sprinkle Sneakers', emoji: '
           `<rect x="${x + dx - 2.5}" y="${y - 0.9}" width="5" height="1.8" rx="0.9" fill="${c}" stroke="none" transform="rotate(${r} ${x + dx} ${y})"/>`).join('')}`).join('') });
 SHOE_STYLES.push({ id: 'high-tops', label: 'High-Tops', emoji: '👟', svg: sneakersSVG(true) });
 SHOE_STYLES.push({ id: 'loafers', label: 'Loafers', emoji: '👞',
-  svg: [127, 173].map((x) => `
-        <ellipse cx="${x}" cy="456" rx="17" ry="4" fill="#000000" opacity="0.2" stroke="none"/>
-        <path d="M${x - 15},452 Q${x - 16},438 ${x},436 Q${x + 16},438 ${x + 15},452 Z"/>
-        <rect x="${x - 15}" y="450" width="30" height="5" rx="2" fill="#3a2a1a" stroke="none"/>
-        <rect x="${x - 8}" y="440" width="16" height="4" rx="1.5" fill="#000000" opacity="0.25" stroke="none"/>
-        <ellipse cx="${x}" cy="442" rx="2.4" ry="1.2" fill="#f2c94c" stroke="none"/>`).join('') });
+  // Penny loafers from the front: a stitched moc-toe apron, a strap with a gold bit,
+  // a low opening where the foot shows, a stacked sole and a polished shine.
+  svg: [[127, -1], [173, 1]].map(([cx, side]) => {
+    const o = (dx) => (cx + dx * side).toFixed(1);
+    return `
+      <ellipse cx="${cx}" cy="476" rx="17" ry="3.4" fill="#000000" opacity="0.2" stroke="none"/>
+      <path d="M${o(-14.5)},467 C${o(-14.5)},474 ${o(-8)},476 ${cx},476 C${o(8)},476 ${o(15)},474 ${o(15)},467 L${o(14.5)},465 L${o(-14)},465 Z" fill="#3a2a1a" stroke="none"/>
+      <path d="M${o(-14.5)},470.5 C${o(-10)},473.5 ${o(10)},473.5 ${o(15)},470.5" fill="none" stroke="#6b4a2a" stroke-width="0.8"/>
+      <path d="M${o(-12)},447 Q${o(-14.5)},456 ${o(-14)},466 C${o(-13)},472 ${o(-7)},474 ${cx},474 C${o(7)},474 ${o(13.5)},472 ${o(14.5)},466 Q${o(15)},456 ${o(12)},447 Z" stroke-width="1"/>
+      <path d="M${o(-10.5)},446.5 L${o(10.5)},446.5 Q${o(9.5)},452 ${cx},453.5 Q${o(-9.5)},452 ${o(-10.5)},446.5 Z" style="fill:var(--skin, #f1c9a5)" stroke="none"/>
+      <path d="M${o(-11)},447 Q${o(-9.5)},452.5 ${cx},454 Q${o(9.5)},452.5 ${o(11)},447" fill="none" stroke="#000000" stroke-width="1.1" opacity="0.35"/>
+      <path d="M${o(-8.5)},458 C${o(-9.5)},466 ${o(-5)},470.5 ${cx},470.5 C${o(5)},470.5 ${o(9.5)},466 ${o(8.5)},458" fill="none" stroke="#000000" stroke-width="1" opacity="0.3"/>
+      <path d="M${o(-8)},459.5 C${o(-8.6)},465 ${o(-4.6)},469 ${cx},469 C${o(4.6)},469 ${o(8.6)},465 ${o(8)},459.5" fill="none" stroke="#ffffff" stroke-width="0.7" stroke-dasharray="1.6 1.4" opacity="0.5"/>
+      <path d="M${o(-11.5)},455 Q${cx},453 ${o(11.5)},455 L${o(11.8)},460 Q${cx},458 ${o(-11.8)},460 Z" stroke-width="0.8"/>
+      <path d="M${o(-11.8)},460 Q${cx},458 ${o(11.8)},460" fill="none" stroke="#000000" stroke-width="0.9" opacity="0.3"/>
+      <rect x="${(cx - 4).toFixed(1)}" y="455.2" width="8" height="3.4" rx="1.6" fill="#f2c94c" stroke="#c98f1f" stroke-width="0.6"/>
+      <rect x="${(cx - 2.4).toFixed(1)}" y="456.1" width="4.8" height="1.6" rx="0.8" fill="#c98f1f" stroke="none"/>
+      <path d="M${o(-10)},462 Q${o(-9)},469 ${o(-3)},471.5" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.45"/>`;
+  }).join('') });
 SHOE_STYLES.push({ id: 'chunky-platforms', label: 'Chunky Platforms', emoji: '👟', theme: 'y2k',
   svg: [0, 46].map((dx) => `
         <rect x="${103 + dx}" y="444" width="48" height="18" rx="6" fill="#ffffff" stroke="#d6d6d6" stroke-width="1"/>
