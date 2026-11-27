@@ -78,10 +78,9 @@ const armPath = (x1, y1, x2, y2, rU, rL, grow = 0) => limbPath(x1, y1, x2, y2, r
 
 // A face with a soft jaw and chin, and a neck that flows into the shoulders.
 const HEAD_PATH = 'M102,93 A48,48 0 0 1 198,93 C198,116 188,131 172,137 Q150,144 128,137 C112,131 102,116 102,93 Z';
-const NECK_PATH = 'M139,124 L161,124 L163.5,152 Q150,155 136.5,152 Z';
-const NECK_SIDES = 'M139,124 Q138.6,140 137.4,149 M161,124 Q161.4,140 162.6,149';
-const BODY_DETAILS = `<path d="M145,146 Q150,149 155,146" fill="none" stroke="rgba(40,28,20,0.1)" stroke-width="1.4" stroke-linecap="round"/>
-  <path d="M131,160 Q140,157 147,161 M169,160 Q160,157 153,161" fill="none" stroke="rgba(40,28,20,0.16)" stroke-width="1.3" stroke-linecap="round"/>`;
+const NECK_PATH = 'M141,124 L159,124 L160,152 Q150,154 140,152 Z';
+const NECK_SIDES = '';
+const BODY_DETAILS = '';
 function jointLinesSVG(lx, rx) {
   // Soft hints of knees and elbows.
   return `<path d="M125,345 Q130,349 135,345 M165,345 Q170,349 175,345" fill="none" stroke="rgba(40,28,20,0.16)" stroke-width="1.1" stroke-linecap="round"/>
@@ -97,10 +96,10 @@ const TORSO_Y = { shoulder: 148, chest: 175, waist: 206, hip: 250 };
 function skinTorsoPath(bt) {
   const cx = 150;
   const { shoulder: sY, chest: bY, waist: wY, hip: hY } = TORSO_Y;
-  const s = bt.shoulderHalf, c = bt.chestHalf, w = bt.waistHalf, h = bt.hipHalf, nk = 13;
-  return `M${cx - nk},${sY + 1}
-    Q${cx - nk - 5},${sY + 3} ${cx - s + 9},${sY + 4}
-    Q${cx - s},${sY + 5} ${cx - s},${sY + 12}
+  const s = bt.shoulderHalf, c = bt.chestHalf, w = bt.waistHalf, h = bt.hipHalf, nk = 10;
+  return `M${cx - nk},${sY + 2}
+    L${cx - s + 7},${sY + 5}
+    Q${cx - s},${sY + 6} ${cx - s},${sY + 12}
     C${cx - s},${sY + 20} ${cx - c},${bY - 6} ${cx - c},${bY}
     C${cx - c},${bY + 16} ${cx - w},${wY - 14} ${cx - w},${wY}
     C${cx - w},${wY + 16} ${cx - h},${hY - 18} ${cx - h},${hY}
@@ -108,9 +107,8 @@ function skinTorsoPath(bt) {
     C${cx + h},${hY - 18} ${cx + w},${wY + 16} ${cx + w},${wY}
     C${cx + w},${wY - 14} ${cx + c},${bY + 16} ${cx + c},${bY}
     C${cx + c},${bY - 6} ${cx + s},${sY + 20} ${cx + s},${sY + 12}
-    Q${cx + s},${sY + 5} ${cx + s - 9},${sY + 4}
-    Q${cx + nk + 5},${sY + 3} ${cx + nk},${sY + 1}
-    Q${cx},${sY + 4} ${cx - nk},${sY + 1}
+    Q${cx + s},${sY + 6} ${cx + s - 7},${sY + 5}
+    L${cx + nk},${sY + 2}
     Z`;
 }
 
@@ -4582,7 +4580,7 @@ function render() {
   applyBodyGeometry(document, state.bodyType);
 
   // skin
-  setGradient('skinGradient', state.skin, 0.35, 0.22);
+  setGradient('skinGradient', state.skin, 0.16, 0.1);
   const skinEls = ['torso', 'neck', 'head', 'arm-left', 'arm-right', 'hand-left', 'hand-right', 'leg-left', 'leg-right', 'ear-left', 'ear-right'];
   skinEls.forEach((id) => {
     const node = document.getElementById(id);
@@ -5264,9 +5262,9 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
   const outfitGrad = `outfitGrad${idSuffix}`;
   const shoeGrad = `shoeGrad${idSuffix}`;
 
-  const skin = lighten(look.skin, 0.35);
+  const skin = lighten(look.skin, 0.16);
   const skinBase = look.skin;
-  const skinDark = darken(look.skin, 0.22);
+  const skinDark = darken(look.skin, 0.1);
   const hairLight = lighten(look.hair.color, 0.3);
   const hairDark = darken(look.hair.color, 0.35);
   const outfitLight = lighten(look.outfit.color, 0.4);
@@ -5305,8 +5303,8 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
       <path d="${armPath(175, 168, rxHand, 272, rUpper, rLower, outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
       <path d="${armPath(125, 168, lx, 272, rUpper, rLower)}"/>
       <path d="${armPath(175, 168, rxHand, 272, rUpper, rLower)}"/>
-      <line x1="125" y1="168" x2="${lx}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.28"/>
-      <line x1="175" y1="168" x2="${rxHand}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.28"/>
+      <line x1="125" y1="168" x2="${lx}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.1"/>
+      <line x1="175" y1="168" x2="${rxHand}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.1"/>
       <g transform="translate(${lx},272)" stroke="rgba(40,28,20,0.28)" stroke-width="1.2">
         <ellipse cx="7" cy="-4" rx="4.4" ry="3" transform="rotate(35 7 -4)"/>
         <ellipse cx="0" cy="-1" rx="9" ry="9"/>
@@ -5340,17 +5338,16 @@ function buildDollSVG(look, idSuffix = '', opts = {}) {
       <g class="pl-left">
       <path d="${legPath(133, 248, 127, 445, rUpper, rLower, outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
       <path d="${legPath(133, 248, 127, 445, rUpper, rLower)}"/>
-      <line x1="133" y1="248" x2="127" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
+      <line x1="133" y1="248" x2="127" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.08"/>
       </g>
       <g class="pl-right">
       <path d="${legPath(167, 248, 173, 445, rUpper, rLower, outlineGrow)}" fill="rgba(40,28,20,0.28)"/>
       <path d="${legPath(167, 248, 173, 445, rUpper, rLower)}"/>
-      <line x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.22"/>
+      <line x1="167" y1="248" x2="173" y2="445" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.08"/>
       </g>
       `}
       <path d="${skinTorsoPath(bt)}" stroke="rgba(40,28,20,0.22)" stroke-width="2"/>
       <path d="${NECK_PATH}"/>
-      <path d="${NECK_SIDES}" fill="none" stroke="rgba(40,28,20,0.22)" stroke-width="1.5" stroke-linecap="round"/>
       ${BODY_DETAILS}
       ${posed ? '' : jointLinesSVG(lx, rxHand)}
       <ellipse cx="104" cy="97" rx="6" ry="11" stroke="rgba(40,28,20,0.22)" stroke-width="1.2"/>
