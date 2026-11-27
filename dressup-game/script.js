@@ -540,33 +540,56 @@ const BANG_STYLES = [
 ];
 
 // Bangs sit over the forehead, drawn in the hair's own colour.
+// Realistic bangs: soft hair pieces with tapered tips, strand lines that follow how the
+// hair falls, and a shine band. They hug the forehead and stop just above the brows.
 function bangsSVG(style) {
   if (!style || style === 'none') return '';
+  const n = (v) => v.toFixed(1);
+  const strands = (list, op = 0.18) => `<path d="${list.join(' ')}" fill="none" stroke="#000000" stroke-width="0.8" opacity="${op}" stroke-linecap="round"/>`;
+  const shine = (d) => `<path d="${d}" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity="0.28"/>`;
   if (style === 'straight') {
-    // a blunt fringe with a softly jagged edge, from the right temple back to the left
+    // blunt fringe: the bottom edge dips a little in the middle and is made of soft pieces
+    const pieces = 9, x0 = 196, x1 = 104;
     let edge = '';
-    for (let i = 0; i <= 18; i++) {
-      const x = 196 - i * (92 / 18);
-      edge += ` L${x.toFixed(1)},${i % 2 ? 78 : 74}`;
+    for (let i = 0; i < pieces; i++) {
+      const a = x0 - (i * (x0 - x1)) / pieces, b = x0 - ((i + 1) * (x0 - x1)) / pieces;
+      const mid = (a + b) / 2, yA = 74 + 4 * Math.sin((i / pieces) * Math.PI), yB = 74 + 4 * Math.sin(((i + 1) / pieces) * Math.PI);
+      edge += ` Q${n(mid + 1.5)},${n((yA + yB) / 2 + 3)} ${n(b)},${n(yB)}`;
     }
-    return `<path d="M104,76 C102,50 124,42 150,42 C176,42 198,50 196,76${edge} Z" stroke-width="1"/>
-            <path d="M118,52 Q134,46 150,47" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>`;
+    const lines = [];
+    for (let i = 1; i < pieces; i++) { const x = x0 - (i * (x0 - x1)) / pieces; lines.push(`M${n(x + 2)},50 Q${n(x)},64 ${n(x - 0.5)},${n(74 + 4 * Math.sin((i / pieces) * Math.PI))}`); }
+    return `<path d="M104,74 C102,50 124,42 150,42 C176,42 198,50 196,74${edge} Z" stroke-width="0.8"/>
+            ${strands(lines)}${shine('M118,52 Q134,46 152,47')}`;
   }
   if (style === 'side') {
-    return `<path d="M102,84 C100,54 124,40 154,42 C182,44 198,58 197,76 Q176,60 148,64 Q120,68 102,84 Z" stroke-width="1"/>
-            <path d="M120,58 Q144,50 172,52" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>`;
+    // a soft side-swept fringe from a left part, tapering over the right brow
+    return `<path d="M104,84 C100,56 122,40 152,41 C180,42 199,56 198,80 Q192,72 184,70 Q170,64 150,66 Q128,70 112,80 Q108,82 104,84 Z" stroke-width="0.8"/>
+            <path d="M196,76 Q190,82 184,86 Q186,78 184,72 Z" stroke-width="0.6"/>
+            ${strands(['M118,52 Q150,46 186,62', 'M112,64 Q148,54 192,70', 'M108,76 Q140,62 190,78', 'M126,48 Q160,44 182,54'])}
+            ${shine('M122,52 Q150,45 178,54')}`;
   }
   if (style === 'curtain') {
-    return `<path d="M103,88 C100,56 122,42 150,42 C178,42 200,56 197,88 Q188,72 174,63 Q160,55 152,49 L148,49 Q140,55 126,63 Q112,72 103,88 Z" stroke-width="1"/>
-            <path d="M118,60 Q132,50 146,48 M182,60 Q168,50 154,48" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.25"/>`;
+    // two soft panels parted in the middle, sweeping out and down along the cheeks
+    const panel = 'M150,44 Q130,46 116,60 Q104,74 102,98 Q108,86 116,78 Q126,66 136,58 Q144,52 150,50 Z';
+    const mir = (d) => d.replace(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g, (_, x, y) => `${300 - Number(x)},${y}`);
+    return `<path d="M104,74 C102,50 124,42 150,42 C176,42 198,50 196,74 Q174,52 150,50 Q126,52 104,74 Z" stroke-width="0.8"/>
+            <path d="${panel}" stroke-width="0.8"/><path d="${mir(panel)}" stroke-width="0.8"/>
+            ${strands(['M146,50 Q124,58 110,84', 'M140,50 Q120,60 106,90', mir('M146,50 Q124,58 110,84'), mir('M140,50 Q120,60 106,90')])}
+            ${shine('M140,48 Q124,52 114,64')}${shine(mir('M140,48 Q124,52 114,64'))}`;
   }
   if (style === 'wispy') {
-    const strands = [118, 130, 142, 154, 166, 178].map((x, i) =>
-      `<path d="M${x - 6},58 Q${x - 3},68 ${x + (i % 2 ? 2 : -2)},${76 + (i % 3)} Q${x + 3},66 ${x + 6},58 Z" stroke-width="0.8"/>`).join('');
-    return `${strands}<path d="M104,66 C104,50 126,42 150,42 C174,42 196,50 196,66 Q150,56 104,66 Z" stroke-width="1"/>`;
+    // light, see-through fringe: separate tapered strands with forehead showing between
+    const tips = [[112, 72], [122, 76], [131, 74], [140, 77], [149, 75], [158, 77], [167, 74], [176, 76], [186, 72]];
+    const pieces = tips.map(([x, y], i) => `<path d="M${x - 5},56 Q${x - 2},${y - 8} ${x + (i % 2 ? 1.5 : -1.5)},${y} Q${x + 2},${y - 9} ${x + 5},56 Z" stroke-width="0.5"/>`).join('');
+    return `<path d="M104,66 C104,50 126,42 150,42 C174,42 196,50 196,66 Q150,54 104,66 Z" stroke-width="0.8"/>
+            ${pieces}${strands(tips.map(([x, y]) => `M${x},58 Q${x + 0.5},${y - 6} ${x},${y - 2}`), 0.15)}${shine('M120,50 Q136,45 152,46')}`;
   }
   if (style === 'micro') {
-    return `<path d="M106,66 C104,48 124,42 150,42 C176,42 196,48 194,66 Q150,60 106,66 Z" stroke-width="1"/>`;
+    // a short, choppy baby fringe high on the forehead
+    let edge = '';
+    for (let i = 0; i < 8; i++) { const a = 194 - i * 11, b = a - 11; edge += ` Q${a - 5},${66 + (i % 2) * 1.5} ${b},${62 + (i % 3)}`; }
+    return `<path d="M106,62 C104,48 124,42 150,42 C176,42 196,48 194,62${edge} Z" stroke-width="0.8"/>
+            ${strands([0, 1, 2, 3, 4, 5, 6].map((i) => `M${183 - i * 11},48 Q${182 - i * 11},56 ${183 - i * 11},62`))}${shine('M122,48 Q138,44 154,45')}`;
   }
   return '';
 }
