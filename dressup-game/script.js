@@ -89,6 +89,25 @@ function jointLinesSVG(lx, rx) {
 
 const TORSO_Y = { shoulder: 148, chest: 175, waist: 206, hip: 250 };
 
+// Shorter legs: everything between the thighs (LEG_TOP) and the ankles (LEG_BOTTOM) is drawn
+// squeezed by LEG_SCALE, and the feet/shoes below are moved up to meet them. The upper body and
+// the shoes keep their exact shapes, and every outfit shortens to match the legs.
+const LEG_TOP = 290, LEG_BOTTOM = 440, LEG_SCALE = 0.8;
+const LEG_LIFT = (LEG_BOTTOM - LEG_TOP) * (1 - LEG_SCALE);
+function stripIds(markup) { return markup.replace(/\sid="[^"]*"/g, ''); }
+function shortLegsSVG(inner, suffix) {
+  const c = `sl${suffix}`;
+  const copy = stripIds(inner);
+  return `<defs>
+      <clipPath id="${c}a"><rect x="-400" y="-400" width="1100" height="${400 + LEG_TOP + 0.6}"/></clipPath>
+      <clipPath id="${c}b"><rect x="-400" y="${LEG_TOP - 0.6}" width="1100" height="${LEG_BOTTOM - LEG_TOP + 1.2}"/></clipPath>
+      <clipPath id="${c}c"><rect x="-400" y="${LEG_BOTTOM - 0.6}" width="1100" height="600"/></clipPath>
+    </defs>
+    <g clip-path="url(#${c}a)">${inner}</g>
+    <g transform="translate(0,${LEG_TOP}) scale(1,${LEG_SCALE}) translate(0,${-LEG_TOP})"><g clip-path="url(#${c}b)">${copy}</g></g>
+    <g transform="translate(0,${-LEG_LIFT})"><g clip-path="url(#${c}c)">${copy}</g></g>`;
+}
+
 // Builds a curved torso silhouette (shoulder -> chest -> waist -> hip) from a body
 // profile's half-widths, so the torso reads as a real body shape instead of a block.
 // The skin torso: like bodyTorsoPath, but the top slopes from rounded shoulders up to
@@ -4576,7 +4595,20 @@ function applyBodyGeometry(root, bodyTypeId) {
 
 // ---------- Render (main stage) ----------
 
+function syncShortLegs() {
+  const top = document.getElementById('doll-top');
+  if (!top) return;
+  const html = stripIds(top.innerHTML);
+  document.getElementById('doll-mid').innerHTML = html;
+  document.getElementById('doll-bot').innerHTML = html;
+}
+
 function render() {
+  renderStage();
+  syncShortLegs();
+}
+
+function renderStage() {
   applyBodyGeometry(document, state.bodyType);
 
   // skin
@@ -5233,6 +5265,10 @@ function piecesSVG(look, bt, suffix) {
 }
 
 function buildDollSVG(look, idSuffix = '', opts = {}) {
+  return shortLegsSVG(buildDollSVGFull(look, idSuffix, opts), idSuffix);
+}
+
+function buildDollSVGFull(look, idSuffix = '', opts = {}) {
   const posed = !!opts.posed;
   const bt = BODY_TYPES.find((b) => b.id === look.bodyType);
   const hairDef = HAIR_STYLES.find((h) => h.id === look.hair.style);
