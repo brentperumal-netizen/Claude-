@@ -234,6 +234,40 @@ function spiderWebSVG(cx, cy, r) {
   return `<path d="${lines} ${rings}" fill="none" stroke="#ffffff" stroke-width="1" stroke-linejoin="round" opacity="0.85"/>`;
 }
 
+// Curly hair built from many small ringlets on a soft base (no big bubbles).
+// sideBottom: how far the side curls fall (0 = short curls around the head only).
+function curlyHairSVG(sideBottom) {
+  const ring = (x, y, r) => `M${(x - r).toFixed(1)},${y.toFixed(1)} a${r},${r} 0 1,0 ${r * 2},0 a${r},${r} 0 1,0 ${-r * 2},0`;
+  const curl = (x, y, r) => `<path d="M${(x - r * 0.55).toFixed(1)},${(y - r * 0.1).toFixed(1)} q${(r * 0.5).toFixed(1)},${(-r * 0.7).toFixed(1)} ${(r * 1).toFixed(1)},${(r * 0.15).toFixed(1)}" fill="none" stroke="#000000" stroke-width="0.9" opacity="0.25"/>`;
+  // crown ringlets around the top of the head
+  const crown = [];
+  for (let a = 192; a <= 348; a += 13) {
+    const t = a * Math.PI / 180;
+    crown.push([150 + 56 * Math.cos(t), 94 + 58 * Math.sin(t), 8.5]);
+  }
+  for (let a = 210; a <= 330; a += 20) {
+    const t = a * Math.PI / 180;
+    crown.push([150 + 40 * Math.cos(t), 92 + 46 * Math.sin(t), 7]);
+  }
+  const base = 'M94,100 Q90,36 150,34 Q210,36 206,100 Q198,72 176,62 Q150,54 124,62 Q102,72 94,100 Z';
+  let sides = '';
+  ['left', 'right'].forEach((side) => {
+    const mx = (x) => (side === 'left' ? x : 300 - x);
+    const bottom = sideBottom || 128;
+    const r = [];
+    for (let y = 98; y <= bottom; y += 13) {
+      r.push([mx(91 + ((y / 13) % 2) * 3), y, 8]);
+      r.push([mx(106 + ((y / 13) % 2) * 2), y + 6, 7]);
+    }
+    if (sideBottom) for (let x = 90; x <= 116; x += 9) r.push([mx(x), bottom + 6, 7]);
+    const curtain = sideBottom ? `M${mx(98)},84 L${mx(116)},92 L${mx(114)},${bottom} L${mx(90)},${bottom} L${mx(88)},96 Z` : `M${mx(96)},86 L${mx(112)},92 L${mx(110)},${bottom} L${mx(90)},${bottom} Z`;
+    sides += `<g class="hair-sway hair-sway-${side}"><path stroke="none" d="${curtain}"/><path stroke="none" d="${r.map((c) => ring(...c)).join(' ')}"/>${r.map((c) => curl(...c)).join('')}</g>`;
+  });
+  return `${sides}
+    <path stroke="none" d="${base}"/><path stroke="none" d="${crown.map((c) => ring(...c)).join(' ')}"/>
+    ${crown.map((c) => curl(...c)).join('')}`;
+}
+
 const HAIR_STYLES = [
   { id: 'bob', label: 'Bob', emoji: '💇‍♀️',
     backSvg: `<path d="M96,92 Q92,36 150,33 Q208,36 204,92 L205,138 Q178,148 150,148 Q122,148 95,138 Z"/>
@@ -251,30 +285,10 @@ const HAIR_STYLES = [
           <path d="M110,64 Q127,52 146,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
           <path d="M100,110 Q103,160 98,200" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.18"/>` },
   { id: 'curly', label: 'Curly', emoji: '✨',
-    // Long curls: columns of ringlets fall past the shoulders (and gently sway).
-    svg: `${['left', 'right'].map((side) => {
-            const mx = (x) => (side === 'left' ? x : 300 - x);
-            const curls = [[96, 146, 15], [108, 160, 13], [92, 172, 14], [104, 190, 13], [90, 202, 13], [102, 220, 12], [92, 236, 12], [100, 252, 11], [94, 266, 10]];
-            return `<g class="hair-sway hair-sway-${side}"><path stroke="none" d="${curls.map(([x, y, r]) => `M${mx(x) - r},${y} a${r},${r} 0 1,0 ${r * 2},0 a${r},${r} 0 1,0 ${-r * 2},0`).join(' ')}"/>
-              ${curls.map(([x, y, r]) => `<path d="M${mx(x) - r * 0.5},${y - r * 0.2} q${r * 0.5},${-r * 0.6} ${r * 0.9},${r * 0.1}" fill="none" stroke="#000000" stroke-width="1" opacity="0.22"/>`).join('')}
-              <circle cx="${mx(92)}" cy="${172 - 4}" r="2.6" fill="#ffffff" opacity="0.2"/><circle cx="${mx(102)}" cy="${220 - 4}" r="2.4" fill="#ffffff" opacity="0.2"/></g>`;
-          }).join('')}
-          <path stroke="none" d="${[[108, 72, 17], [128, 50, 20], [150, 42, 21], [172, 50, 20], [192, 72, 17], [98, 98, 15], [202, 98, 15], [104, 122, 13], [196, 122, 13]].map(([x, y, r]) => `M${x - r},${y} a${r},${r} 0 1,0 ${r * 2},0 a${r},${r} 0 1,0 ${-r * 2},0`).join(' ')}"/>
-          ${[[108, 72, 17], [128, 50, 20], [150, 42, 21], [172, 50, 20], [192, 72, 17], [98, 98, 15], [202, 98, 15]].map(([x, y, r]) => `<path d="M${x - r * 0.5},${y - r * 0.15} q${r * 0.5},${-r * 0.6} ${r * 0.9},${r * 0.1}" fill="none" stroke="#000000" stroke-width="1" opacity="0.22"/>`).join('')}
-          <path d="M138,36 Q150,29 162,36" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
-          <circle cx="118" cy="58" r="3" fill="#ffffff" opacity="0.22"/>` },
+    // Long curls: a soft curly mass made of many small ringlets, falling past the shoulders (with sway).
+    svg: curlyHairSVG(252) },
   { id: 'short-curly', label: 'Short Curls', emoji: '🌀',
-    svg: `<circle cx="108" cy="72" r="17"/>
-          <circle cx="128" cy="50" r="20"/>
-          <circle cx="150" cy="42" r="21"/>
-          <circle cx="172" cy="50" r="20"/>
-          <circle cx="192" cy="72" r="17"/>
-          <circle cx="98" cy="98" r="15"/>
-          <circle cx="202" cy="98" r="15"/>
-          <circle cx="104" cy="122" r="13"/>
-          <circle cx="196" cy="122" r="13"/>
-          <path d="M138,36 Q150,29 162,36" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
-          <circle cx="118" cy="58" r="3" fill="#ffffff" opacity="0.22"/>` },
+    svg: curlyHairSVG(0) },
   { id: 'ponytail', label: 'Ponytail', emoji: '🎀',
     svg: `<path d="M198,70 q34,10 26,90 q-4,26 -26,30 q14,-40 4,-70 q-6,-24 -4,-50 Z"/>
           <path d="M100,98 Q96,40 150,38 Q204,40 200,98 Q198,78 184,66 Q150,52 116,66 Q102,78 100,98 Z"/>
