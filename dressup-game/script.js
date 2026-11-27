@@ -643,7 +643,7 @@ function basicsSVG(bt, top, bottom) {
   const cx = 150;
   return `${bottom ? `${shortsSVG(bt, '#2b2b2b', 296)}
       <path d="M${(cx - torsoHalfAt(bt, 230) - 3).toFixed(1)},230.5 L${(cx + torsoHalfAt(bt, 230) + 3).toFixed(1)},230.5" stroke="#444444" stroke-width="5"/>` : ''}
-    ${top ? `${fittedTopSVG(bt, 240, '#2b2b2b')}
+    ${top ? `${fittedTopSVG(bt, 254, '#2b2b2b')}
       <path d="M${cx - 12},${TORSO_Y.shoulder} Q${cx},${TORSO_Y.shoulder + 12} ${cx + 12},${TORSO_Y.shoulder}" fill="none" stroke="#555555" stroke-width="2"/>` : ''}`;
 }
 
