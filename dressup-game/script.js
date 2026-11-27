@@ -88,6 +88,8 @@ function jointLinesSVG(lx, rx) {
 }
 
 const TORSO_Y = { shoulder: 148, chest: 175, waist: 206, hip: 250 };
+// Slimmer arms (legs keep their width) and slightly smaller hands to match.
+const ARM_UPPER = 0.8, ARM_LOWER = 0.85, HAND_SCALE = 0.88;
 
 // Shorter legs: everything between the thighs (LEG_TOP) and the ankles (LEG_BOTTOM) is drawn
 // squeezed by LEG_SCALE, and the feet/shoes below are moved up to meet them. The upper body and
@@ -534,7 +536,7 @@ function sleeveSVG(bt, side, f = '', len = 0.3) {
   const ax = cx + side * 25, ay = 168, hx = cx + side * (57 + bt.armSpread), hy = 272;
   const dx = hx - ax, dy = hy - ay, L = Math.hypot(dx, dy);
   const nx = -dy / L * side * -1, ny = dx / L * side * -1; // normal pointing away from the body
-  const r = bt.limbWidth / 2 * 1.15 + 2.5;
+  const r = bt.limbWidth / 2 * 1.15 * ARM_UPPER + 2.5;
   const mx = ax + dx * len, my = ay + dy * len;
   const out = [mx + nx * r, my + ny * r], inn = [mx - nx * r, my - ny * r];
   const s = bt.shoulderHalf + 2, c = bt.chestHalf + 3;
@@ -4573,10 +4575,10 @@ function applyBodyGeometry(root, bodyTypeId) {
   const rLower = bt.limbWidth / 2 * 0.68;
   const outlineGrow = 2;
 
-  if (armLeft) armLeft.setAttribute('d', armPath(125, 168, lx, 272, rUpper, rLower));
-  if (armRight) armRight.setAttribute('d', armPath(175, 168, rx, 272, rUpper, rLower));
-  if (armLeftOutline) armLeftOutline.setAttribute('d', armPath(125, 168, lx, 272, rUpper, rLower, outlineGrow));
-  if (armRightOutline) armRightOutline.setAttribute('d', armPath(175, 168, rx, 272, rUpper, rLower, outlineGrow));
+  if (armLeft) armLeft.setAttribute('d', armPath(125, 168, lx, 272, rUpper * ARM_UPPER, rLower * ARM_LOWER));
+  if (armRight) armRight.setAttribute('d', armPath(175, 168, rx, 272, rUpper * ARM_UPPER, rLower * ARM_LOWER));
+  if (armLeftOutline) armLeftOutline.setAttribute('d', armPath(125, 168, lx, 272, rUpper * ARM_UPPER, rLower * ARM_LOWER, outlineGrow));
+  if (armRightOutline) armRightOutline.setAttribute('d', armPath(175, 168, rx, 272, rUpper * ARM_UPPER, rLower * ARM_LOWER, outlineGrow));
   if (legLeft) legLeft.setAttribute('d', legPath(133, 248, 127, 445, rUpper, rLower));
   if (legRight) legRight.setAttribute('d', legPath(167, 248, 173, 445, rUpper, rLower));
   if (legLeftOutline) legLeftOutline.setAttribute('d', legPath(133, 248, 127, 445, rUpper, rLower, outlineGrow));
@@ -4586,12 +4588,12 @@ function applyBodyGeometry(root, bodyTypeId) {
 
   [armLeftShine, armRightShine, legLeftShine, legRightShine].forEach((l) => l && l.setAttribute('stroke-width', Math.max(2, bt.limbWidth * 0.22)));
 
-  if (handLeft) handLeft.setAttribute('transform', `translate(${lx},272)`);
-  if (handRight) handRight.setAttribute('transform', `translate(${rx},272)`);
+  if (handLeft) handLeft.setAttribute('transform', `translate(${lx},272) scale(${HAND_SCALE})`);
+  if (handRight) handRight.setAttribute('transform', `translate(${rx},272) scale(${HAND_SCALE})`);
   if (armLeftShine) armLeftShine.setAttribute('x2', lx);
   if (armRightShine) armRightShine.setAttribute('x2', rx);
-  if (handLeftDetail) handLeftDetail.setAttribute('transform', `translate(${lx},272)`);
-  if (handRightDetail) handRightDetail.setAttribute('transform', `translate(${rx},272)`);
+  if (handLeftDetail) handLeftDetail.setAttribute('transform', `translate(${lx},272) scale(${HAND_SCALE})`);
+  if (handRightDetail) handRightDetail.setAttribute('transform', `translate(${rx},272) scale(${HAND_SCALE})`);
 }
 
 // ---------- Render (main stage) ----------
@@ -5339,13 +5341,13 @@ function buildDollSVGFull(look, idSuffix = '', opts = {}) {
     ${hairBackSvg}
     <g fill="url(#${skinGrad})">
       ${posed ? '' : `
-      <path d="${armPath(125, 168, lx, 272, rUpper, rLower, outlineGrow)}" fill="${darken(look.skin, 0.3)}"/>
-      <path d="${armPath(175, 168, rxHand, 272, rUpper, rLower, outlineGrow)}" fill="${darken(look.skin, 0.3)}"/>
-      <path d="${armPath(125, 168, lx, 272, rUpper, rLower)}"/>
-      <path d="${armPath(175, 168, rxHand, 272, rUpper, rLower)}"/>
+      <path d="${armPath(125, 168, lx, 272, rUpper * ARM_UPPER, rLower * ARM_LOWER, outlineGrow)}" fill="${darken(look.skin, 0.3)}"/>
+      <path d="${armPath(175, 168, rxHand, 272, rUpper * ARM_UPPER, rLower * ARM_LOWER, outlineGrow)}" fill="${darken(look.skin, 0.3)}"/>
+      <path d="${armPath(125, 168, lx, 272, rUpper * ARM_UPPER, rLower * ARM_LOWER)}"/>
+      <path d="${armPath(175, 168, rxHand, 272, rUpper * ARM_UPPER, rLower * ARM_LOWER)}"/>
       <line x1="125" y1="168" x2="${lx}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.1"/>
       <line x1="175" y1="168" x2="${rxHand}" y2="272" stroke="#ffffff" stroke-width="${shineWidth}" stroke-linecap="round" opacity="0.1"/>
-      <g transform="translate(${lx},272)" stroke="rgba(40,28,20,0.28)" stroke-width="1.2">
+      <g transform="translate(${lx},272) scale(${HAND_SCALE})" stroke="rgba(40,28,20,0.28)" stroke-width="1.2">
         <ellipse cx="7" cy="-4" rx="4.4" ry="3" transform="rotate(35 7 -4)"/>
         <ellipse cx="0" cy="-1" rx="9" ry="9"/>
         <rect x="-6.4" y="5" width="3.2" height="9" rx="1.6"/>
@@ -5354,7 +5356,7 @@ function buildDollSVGFull(look, idSuffix = '', opts = {}) {
         <rect x="5.2" y="5" width="2.8" height="7.5" rx="1.4"/>
         ${dollNailsSVG('L', look.nails)}
       </g>
-      <g transform="translate(${rxHand},272)" stroke="rgba(40,28,20,0.28)" stroke-width="1.2">
+      <g transform="translate(${rxHand},272) scale(${HAND_SCALE})" stroke="rgba(40,28,20,0.28)" stroke-width="1.2">
         <ellipse cx="-7" cy="-4" rx="4.4" ry="3" transform="rotate(-35 -7 -4)"/>
         <ellipse cx="0" cy="-1" rx="9" ry="9"/>
         <rect x="3.2" y="5" width="3.2" height="9" rx="1.6"/>
@@ -5363,12 +5365,12 @@ function buildDollSVGFull(look, idSuffix = '', opts = {}) {
         <rect x="-8" y="5" width="2.8" height="7.5" rx="1.4"/>
         ${dollNailsSVG('R', look.nails)}
       </g>
-      <g transform="translate(${lx},272)" opacity="0.3">
+      <g transform="translate(${lx},272) scale(${HAND_SCALE})" opacity="0.3">
         <line x1="-3.4" y1="6" x2="-3.4" y2="13" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"/>
         <line x1="0.4" y1="6" x2="0.4" y2="14" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"/>
         <line x1="4.4" y1="6" x2="4.4" y2="12" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"/>
       </g>
-      <g transform="translate(${rxHand},272)" opacity="0.3">
+      <g transform="translate(${rxHand},272) scale(${HAND_SCALE})" opacity="0.3">
         <line x1="3.4" y1="6" x2="3.4" y2="13" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"/>
         <line x1="-0.4" y1="6" x2="-0.4" y2="14" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"/>
         <line x1="-4.4" y1="6" x2="-4.4" y2="12" stroke="#2b1c14" stroke-width="1" stroke-linecap="round"/>
@@ -8153,8 +8155,8 @@ function lerp(a, b, k) { return a + (b - a) * k; }
 function lerpPt(p, q, k) { return [lerp(p[0], q[0], k), lerp(p[1], q[1], k)]; }
 
 function setArm(root, side, shoulder, elbow, hand, bt) {
-  const rU = bt.limbWidth / 2 * 1.15;
-  const rL = bt.limbWidth / 2 * 0.68;
+  const rU = bt.limbWidth / 2 * 1.15 * ARM_UPPER;
+  const rL = bt.limbWidth / 2 * 0.68 * ARM_LOWER;
   const rE = (rU + rL) / 2;
   const g = 2;
   const q = (c) => root.querySelector(`.pa-${side}-${c}`);
@@ -8163,7 +8165,7 @@ function setArm(root, side, shoulder, elbow, hand, bt) {
   q('u').setAttribute('d', capsulePath(shoulder[0], shoulder[1], rU, elbow[0], elbow[1], rE));
   q('f').setAttribute('d', capsulePath(elbow[0], elbow[1], rE, hand[0], hand[1], rL));
   const ang = Math.atan2(hand[1] - elbow[1], hand[0] - elbow[0]) * 180 / Math.PI - 90;
-  q('hand').setAttribute('transform', `translate(${hand[0].toFixed(1)},${hand[1].toFixed(1)}) rotate(${ang.toFixed(1)})`);
+  q('hand').setAttribute('transform', `translate(${hand[0].toFixed(1)},${hand[1].toFixed(1)}) rotate(${ang.toFixed(1)}) scale(${HAND_SCALE})`);
 }
 
 const catwalkOverlay = document.getElementById('catwalk-overlay');
