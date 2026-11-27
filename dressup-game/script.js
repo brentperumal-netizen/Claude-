@@ -335,15 +335,21 @@ const HAIR_STYLES = [
           <rect x="134" y="44" width="32" height="7" rx="3.5" fill="#2b2b2b" stroke="none" opacity="0.55"/>
           <path d="M112,62 Q126,53 140,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>` },
   { id: 'half-up', label: 'Half Up', emoji: '🎀',
-    svg: `<circle cx="150" cy="40" r="14"/>
-          <rect x="92" y="82" width="22" height="165" rx="11"/>
-          <rect x="186" y="82" width="22" height="165" rx="11"/>
-          <path d="M96,82 A60,60 0 0 1 204,82 Z"/>
-          <path d="M150,34 L134,24 L134,44 Z" fill="#e0558f" stroke="#b83c6f" stroke-width="1"/>
-          <path d="M150,34 L166,24 L166,44 Z" fill="#e0558f" stroke="#b83c6f" stroke-width="1"/>
-          <circle cx="150" cy="34" r="4" fill="#b83c6f" stroke="none"/>
-          <path d="M110,64 Q127,52 146,58" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
-          <path d="M100,110 Q103,160 98,200" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.18"/>` },
+    // The top section brushed back into a little bun with a bow; the rest falls long and straight.
+    backSvg: `<path d="M94,92 Q90,36 150,33 Q210,36 206,92 L210,248 Q150,256 90,248 Z"/>
+          <path d="M94,92 Q90,36 150,33 Q210,36 206,92 L210,248 Q150,256 90,248 Z" fill="#000000" opacity="0.16" stroke="none"/>
+          ${[100, 112, 188, 200].map((x) => `<line x1="${x}" y1="120" x2="${x + (x < 150 ? -2 : 2)}" y2="244" stroke="#000000" stroke-width="1" opacity="0.15"/>`).join('')}`,
+    svg: `<ellipse cx="150" cy="34" rx="15" ry="12"/>
+          <path d="M140,30 Q150,24 160,30" fill="none" stroke="#000000" stroke-width="0.9" opacity="0.2"/>
+          <path d="M97,104 Q94,40 150,38 Q206,40 203,104 Q198,80 184,68 Q166,58 150,58 Q134,58 116,68 Q102,80 97,104 Z"/>
+          <path d="M118,66 Q132,50 146,42 M134,58 Q142,48 148,42 M182,66 Q168,50 154,42 M166,58 Q158,48 152,42" fill="none" stroke="#000000" stroke-width="0.8" opacity="0.16"/>
+          <path d="M124,58 Q136,46 146,42" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity="0.3"/>
+          <path d="M97,88 Q93,150 98,212 L119,212 Q113,150 116,104 Q112,90 104,84 Z"/>
+          <path d="M203,88 Q207,150 202,212 L181,212 Q187,150 184,104 Q188,90 196,84 Z"/>
+          <path d="M103,112 Q101,160 104,206 M197,112 Q199,160 196,206" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.2" stroke-linecap="round"/>
+          <path d="M150,28 L134,18 L134,38 Z" fill="#e0558f" stroke="#b83c6f" stroke-width="1"/>
+          <path d="M150,28 L166,18 L166,38 Z" fill="#e0558f" stroke="#b83c6f" stroke-width="1"/>
+          <circle cx="150" cy="28" r="4" fill="#b83c6f" stroke="none"/>` },
   { id: 'spiderweb', label: 'Spiderweb Waves', emoji: '🕸️', theme: 'halloween',
     svg: `<path d="M96,82 A60,60 0 0 1 204,82 Z"/>
           <rect x="92" y="82" width="22" height="180" rx="11"/>
